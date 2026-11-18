@@ -4,524 +4,536 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burger & Cia Express - Delivery</title>
-    <!-- Tailwind CSS para design moderno e responsivo -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome para ícones -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#fff1f2', 100: '#ffe4e6', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c' }
+                        ifood: { 50: '#fff1f2', 500: '#ef4444', 600: '#ea580c', 700: '#c2410c', default: '#ea580c' }
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 antialiased min-h-screen flex flex-col">
+<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col pb-20">
 
     <!-- ========================================== -->
-    <!-- TELA 1: PORTAL DE ENTRADA (SÓ O CLIENTE) -->
+    <!-- TOPO / HEADER ESTILO iFOOD -->
     <!-- ========================================== -->
-    <div id="view-portal" class="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-brand-700 z-50 flex flex-col items-center justify-center p-4">
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-brand-500 to-amber-500"></div>
-            
-            <div class="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-600 text-3xl shadow-inner">
-                <i class="fa-solid fa-burger"></i>
+    <header class="bg-white shadow-sm sticky top-0 z-30 border-b border-gray-100">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="mudarVisaoApp('cliente')">
+                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-lg font-bold shadow-sm">
+                    <i class="fa-solid fa-burger"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm text-gray-900 flex items-center gap-1">Burger & Cia Express <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i></h1>
+                    <p class="text-xs text-gray-500 flex items-center gap-1 truncate max-w-[200px]" id="header-endereco-txt">
+                        <i class="fa-solid fa-location-dot text-orange-500"></i> Toque para definir endereço
+                    </p>
+                </div>
             </div>
             
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">Burger & Cia Express</h1>
-            <p class="text-sm text-gray-500 mb-8">O melhor sabor da cidade direto na sua casa</p>
-
-            <div class="space-y-4">
-                <button onclick="entrarComoCliente()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-4 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3 text-lg">
-                    <i class="fa-solid fa-bag-shopping"></i> Fazer Pedido / Cardápio
-                </button>
-            </div>
-
-            <!-- Acessos internos discretíssimos no rodapé para o Dono e Motoboy -->
-            <div class="mt-12 pt-4 border-t border-gray-100 flex justify-center gap-4">
-                <button onclick="entrarComoMotoboy()" class="text-xs text-gray-400 hover:text-gray-600 transition flex items-center gap-1 py-1 px-2 rounded hover:bg-gray-50">
-                    <i class="fa-solid fa-motorcycle"></i> Área do Motoboy
-                </button>
-                <button onclick="entrarComoDono()" class="text-xs text-gray-400 hover:text-gray-600 transition flex items-center gap-1 py-1 px-2 rounded hover:bg-gray-50">
-                    <i class="fa-solid fa-lock"></i> Painel da Lanchonete
+            <div class="flex items-center gap-2">
+                <button onclick="abrirMeusPedidos()" class="relative p-2.5 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition" title="Meus Pedidos">
+                    <i class="fa-solid fa-receipt text-sm"></i>
+                    <span id="badge-pedidos" class="absolute -top-1 -right-1 bg-orange-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden font-bold">0</span>
                 </button>
             </div>
         </div>
-        <p class="text-xs text-gray-400 mt-6">&copy; 2026 Burger & Cia Express - Todos os direitos reservados.</p>
-    </div>
+    </header>
 
     <!-- ========================================== -->
-    <!-- TELA 2: CADASTRO RÁPIDO DO CLIENTE (PRIMEIRA VEZ) -->
+    <!-- CONTEÚDO PRINCIPAL: VITRINE DO CLIENTE -->
     <!-- ========================================== -->
-    <div id="view-cliente-cadastro" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-6 md:p-8">
-            <div class="text-center mb-6">
-                <div class="w-14 h-14 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-3 text-brand-600 text-2xl">
-                    <i class="fa-solid fa-user-plus"></i>
-                </div>
-                <h2 class="text-xl font-bold text-gray-900">Bem-vindo(a)!</h2>
-                <p class="text-xs text-gray-500">Cadastre-se rapidinho para fazer seus pedidos e liberar sua localização para o motoboy.</p>
+    <main id="app-view-cliente" class="max-w-3xl mx-auto px-4 py-4 flex-1 w-full space-y-5">
+        
+        <!-- Banner Destaque iFood Style -->
+        <div class="bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex items-center justify-between">
+            <div class="relative z-10 space-y-1">
+                <span class="bg-white/20 text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full">Entrega Rápida 🚀</span>
+                <h2 class="text-xl font-black">Fome de Burger Artesanal?</h2>
+                <p class="text-xs text-orange-100">Pão brioche fresquinho, carne suculenta e queijo derretido.</p>
             </div>
+            <div class="text-5xl opacity-30 md:opacity-80 z-10"><i class="fa-solid fa-utensils"></i></div>
+            <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+        </div>
 
-            <form id="form-cadastro-cliente" onsubmit="salvarCadastroCliente(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Seu Nome Completo</label>
-                    <input type="text" id="cad-nome" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm" placeholder="Ex: João da Silva">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">WhatsApp / Telefone</label>
-                    <input type="tel" id="cad-tel" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm" placeholder="(00) 90000-0000">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Endereço de Entrega (Rua, Número, Bairro)</label>
-                    <textarea id="cad-endereco" rows="2" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm" placeholder="Ex: Rua das Flores, 123 - Centro"></textarea>
-                </div>
-                
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-location-crosshairs text-amber-600"></i> Localização GPS Exata:</span>
-                        <button type="button" onclick="capturarGPSCliente()" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded text-xs font-semibold transition">Capturar GPS</button>
-                    </div>
-                    <p id="cad-gps-status" class="text-gray-500 italic">Nenhuma coordenada capturada ainda.</p>
-                </div>
+        <!-- Categorias (Filtros Rápidos) -->
+        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <button onclick="filtrarCategoria('todos')" class="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-full shadow-sm whitespace-nowrap transition">🔥 Todos</button>
+            <button onclick="filtrarCategoria('Burger')" class="px-4 py-2 bg-white text-gray-700 border border-gray-200 text-xs font-bold rounded-full hover:bg-gray-50 whitespace-nowrap transition">🍔 Burgers</button>
+            <button onclick="filtrarCategoria('Porção')" class="px-4 py-2 bg-white text-gray-700 border border-gray-200 text-xs font-bold rounded-full hover:bg-gray-50 whitespace-nowrap transition">🍟 Porções</button>
+            <button onclick="filtrarCategoria('Bebida')" class="px-4 py-2 bg-white text-gray-700 border border-gray-200 text-xs font-bold rounded-full hover:bg-gray-50 whitespace-nowrap transition">🥤 Bebidas</button>
+        </div>
 
-                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-xl shadow-md transition text-sm">
-                    Salvar e Entrar no Cardápio
-                </button>
-            </form>
+        <!-- Lista de Produtos -->
+        <div>
+            <h3 class="font-bold text-gray-900 text-base mb-3">Mais Pedidos</h3>
+            <div id="vitrine-cardapio" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- PAINEL SECRETO / INTERNO DA LANCHONETE (DONO) -->
+    <!-- ========================================== -->
+    <main id="app-view-dono" class="max-w-4xl mx-auto px-4 py-4 flex-1 w-full space-y-4 hidden">
+        <div class="bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-between shadow">
+            <div>
+                <h2 class="font-bold text-sm">Painel da Lanchonete (Gestão)</h2>
+                <p class="text-xs text-gray-400">Controle de Cozinha e Pedidos</p>
+            </div>
+            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-lg text-white font-semibold transition"><i class="fa-solid fa-arrow-left"></i> Voltar ao App</button>
+        </div>
+
+        <!-- Abas do Dono -->
+        <div class="flex gap-2 border-b border-gray-200 pb-2 text-xs font-bold">
+            <button onclick="mudarAbaGestao('pedidos')" id="aba-btn-pedidos" class="px-3 py-1.5 bg-orange-600 text-white rounded-lg shadow-sm">Fila de Pedidos</button>
+            <button onclick="mudarAbaGestao('motoboys')" id="aba-btn-motoboys" class="px-3 py-1.5 bg-white text-gray-700 border rounded-lg">Gerenciar Motoboys</button>
+            <button onclick="mudarAbaGestao('cardapio')" id="aba-btn-cardapio" class="px-3 py-1.5 bg-white text-gray-700 border rounded-lg">Gerenciar Cardápio</button>
+        </div>
+
+        <!-- Conteúdo Fila de Pedidos -->
+        <div id="gestao-conteudo-pedidos" class="space-y-3">
+            <div class="flex justify-between items-center">
+                <h4 class="font-bold text-gray-800 text-sm">Pedidos Chegando em Tempo Real</h4>
+                <button onclick="renderizarGestaoPedidos()" class="text-xs bg-white border px-2.5 py-1 rounded-lg font-semibold"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+            </div>
+            <div id="lista-pedidos-cozinha" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </div>
+
+        <!-- Conteúdo Gestão Motoboys -->
+        <div id="gestao-conteudo-motoboys" class="space-y-4 hidden">
+            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
+                <h4 class="font-bold text-gray-800 text-xs uppercase">Cadastrar Novo Motoboy</h4>
+                <form onsubmit="cadastrarMotoboyDono(event)" class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <input type="text" id="cad-m-nome" placeholder="Nome" required class="px-3 py-2 border rounded-lg text-xs">
+                    <input type="text" id="cad-m-tel" placeholder="WhatsApp" required class="px-3 py-2 border rounded-lg text-xs">
+                    <button type="submit" class="bg-gray-900 text-white rounded-lg text-xs font-bold py-2">Salvar Motoboy</button>
+                </form>
+            </div>
+            <div id="lista-motoboys-cadastrados" class="space-y-2"></div>
+        </div>
+
+        <!-- Conteúdo Gestão Cardápio -->
+        <div id="gestao-conteudo-cardapio" class="space-y-4 hidden">
+            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
+                <h4 class="font-bold text-gray-800 text-xs uppercase">Adicionar Novo Produto</h4>
+                <form onsubmit="cadastrarProdutoDono(event)" class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                    <input type="text" id="cad-p-nome" placeholder="Nome" required class="px-3 py-2 border rounded-lg text-xs">
+                    <input type="number" step="0.01" id="cad-p-preco" placeholder="Preço (R$)" required class="px-3 py-2 border rounded-lg text-xs">
+                    <select id="cad-p-cat" class="px-3 py-2 border rounded-lg text-xs">
+                        <option value="Burger">Burger</option>
+                        <option value="Porção">Porção</option>
+                        <option value="Bebida">Bebida</option>
+                    </select>
+                    <button type="submit" class="bg-orange-600 text-white rounded-lg text-xs font-bold py-2">Adicionar</button>
+                </form>
+            </div>
+            <div id="lista-produtos-cadastrados" class="space-y-2"></div>
+        </div>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- PAINEL SECRETO / INTERNO DO MOTOBOY -->
+    <!-- ========================================== -->
+    <main id="app-view-motoboy" class="max-w-3xl mx-auto px-4 py-4 flex-1 w-full space-y-4 hidden">
+        <div class="bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-between shadow">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-gray-900 font-bold">
+                    <i class="fa-solid fa-motorcycle text-sm"></i>
+                </div>
+                <div>
+                    <select id="select-motoboy-ativo" onchange="mudarMotoboyLogado()" class="bg-gray-800 text-amber-400 font-bold text-xs px-2 py-1 rounded border border-gray-700">
+                        <!-- Preenchido via JS -->
+                    </select>
+                    <p class="text-[10px] text-gray-400">Portal do Entregador</p>
+                </div>
+            </div>
+            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-lg text-white font-semibold transition"><i class="fa-solid fa-arrow-left"></i> Sair</button>
+        </div>
+
+        <div class="space-y-3" id="lista-entregas-motoboy"></div>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- BARRA INFERIOR FLUTUANTE (CARRINHO iFOOD STYLE) -->
+    <!-- ========================================== -->
+    <div id="barra-carrinho-flutuante" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-2xl z-40 hidden">
+        <div class="max-w-3xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 font-bold">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 font-semibold" id="resumo-qtd-itens">0 itens</p>
+                    <p class="text-sm font-black text-gray-900" id="resumo-valor-total">R$ 0,00</p>
+                </div>
+            </div>
+            <button onclick="abrirCheckout()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition text-sm flex items-center gap-2">
+                Ver Sacola <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- TELA 3: PAINEL DO CLIENTE (CARDÁPIO & PEDIDOS) -->
+    <!-- MODAL: CHECKOUT / FINALIZAR PEDIDO -->
     <!-- ========================================== -->
-    <div id="view-cliente-app" class="hidden flex-col flex-1">
-        <header class="bg-white shadow-sm sticky top-0 z-30">
-            <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-brand-50 rounded-full flex items-center justify-center text-brand-600 font-bold">
-                        <i class="fa-solid fa-burger"></i>
-                    </div>
-                    <div>
-                        <h2 class="font-bold text-sm text-gray-900" id="header-nome-cliente">Cliente</h2>
-                        <p class="text-xs text-green-600 font-medium flex items-center gap-1"><i class="fa-solid fa-circle text-[8px]"></i> Online</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="abrirMeusPedidos()" class="relative bg-gray-100 hover:bg-gray-200 p-2.5 rounded-full transition text-gray-700">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                        <span id="badge-meus-pedidos" class="absolute -top-1 -right-1 bg-brand-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
-                    </button>
-                    <button onclick="abrirCarrinho()" class="relative bg-brand-50 hover:bg-brand-100 text-brand-600 px-4 py-2 rounded-full font-bold text-sm transition flex items-center gap-2">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span id="carrinho-qtd">0</span>
-                    </button>
-                    <button onclick="voltarAoPortal()" class="text-gray-400 hover:text-gray-600 p-2 text-sm" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
-                </div>
-            </div>
-        </header>
-
-        <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full pb-24">
-            <div class="mb-6 bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl p-5 text-white shadow-lg flex items-center justify-between">
-                <div>
-                    <h2 class="text-xl font-bold mb-1">Fome de quê hoje?</h2>
-                    <p class="text-xs text-brand-100">Burgers artesanais suculentos preparados na chapa.</p>
-                </div>
-                <div class="hidden md:block text-4xl opacity-80"><i class="fa-solid fa-utensils"></i></div>
-            </div>
-
-            <div id="lista-cardapio" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Preenchido via JavaScript -->
-            </div>
-        </main>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- TELA 4: PAINEL DO MOTOBOY -->
-    <!-- ========================================== -->
-    <div id="view-motoboy-app" class="hidden flex-col flex-1 bg-gray-50">
-        <header class="bg-gray-900 text-white shadow-md sticky top-0 z-30">
-            <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center font-bold">
-                        <i class="fa-solid fa-motorcycle"></i>
-                    </div>
-                    <div>
-                        <select id="select-motoboy-logado" onchange="mudarMotoboyLogado()" class="bg-gray-800 text-amber-400 text-xs font-bold px-2 py-1 rounded border border-gray-700 focus:outline-none">
-                            <!-- Preenchido dinamicamente -->
-                        </select>
-                        <p class="text-xs text-gray-400">Painel do Entregador</p>
-                    </div>
-                </div>
-                <button onclick="voltarAoPortal()" class="text-gray-400 hover:text-white text-sm"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
-            </div>
-        </header>
-
-        <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-box text-brand-600"></i> Entregas Atribuídas a Você</h3>
-                <button onclick="carregarDadosMotoboy()" class="text-xs bg-white border border-gray-300 hover:bg-gray-100 px-3 py-1.5 rounded-lg font-semibold text-gray-700 transition flex items-center gap-1.5"><i class="fa-solid fa-rotate"></i> Atualizar</button>
-            </div>
-            <div id="lista-entregas-motoboy" class="space-y-4"></div>
-        </main>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- TELA 5: PAINEL DA LANCHONETE (DONO / COZINHA) -->
-    <!-- ========================================== -->
-    <div id="view-dono-app" class="hidden flex-col flex-1 bg-gray-50">
-        <header class="bg-gray-900 text-white shadow-md sticky top-0 z-30">
-            <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-brand-600 text-white rounded-full flex items-center justify-center font-bold">
-                        <i class="fa-solid fa-store"></i>
-                    </div>
-                    <div>
-                        <h2 class="font-bold text-sm">Painel da Lanchonete (Gestão)</h2>
-                        <p class="text-xs text-brand-400">Controle de Pedidos e Equipe</p>
-                    </div>
-                </div>
-                <button onclick="voltarAoPortal()" class="text-xs bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
-            </div>
-            <div class="bg-gray-800 px-4 flex gap-2 border-t border-gray-700 text-xs font-semibold overflow-x-auto">
-                <button onclick="mudarAbaDono('pedidos')" id="tab-btn-pedidos" class="py-2.5 px-4 text-brand-400 border-b-2 border-brand-500 transition whitespace-nowrap"><i class="fa-solid fa-receipt"></i> Pedidos na Cozinha</button>
-                <button onclick="mudarAbaDono('motoboys')" id="tab-btn-motoboys" class="py-2.5 px-4 text-gray-400 hover:text-white transition whitespace-nowrap"><i class="fa-solid fa-motorcycle"></i> Gestão de Motoboys</button>
-                <button onclick="mudarAbaDono('cardapio')" id="tab-btn-cardapio" class="py-2.5 px-4 text-gray-400 hover:text-white transition whitespace-nowrap"><i class="fa-solid fa-burger"></i> Gerenciar Cardápio</button>
-            </div>
-        </header>
-
-        <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full">
-            <div id="dono-aba-pedidos" class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-gray-800 text-lg">Fila de Pedidos em Tempo Real</h3>
-                    <button onclick="renderizarPedidosDono()" class="text-xs bg-white border border-gray-300 hover:bg-gray-100 px-3 py-1.5 rounded-lg font-semibold text-gray-700 transition"><i class="fa-solid fa-rotate"></i> Atualizar Fila</button>
-                </div>
-                <div id="lista-pedidos-dono" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
-
-            <div id="dono-aba-motoboys" class="hidden space-y-6">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="font-bold text-gray-800 text-base mb-3"><i class="fa-solid fa-user-plus text-brand-600"></i> Cadastrar Novo Motoboy</h3>
-                    <form onsubmit="cadastrarMotoboy(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <input type="text" id="m-nome" placeholder="Nome do Motoboy" required class="px-3 py-2 border rounded-lg text-sm">
-                        <input type="text" id="m-tel" placeholder="WhatsApp" required class="px-3 py-2 border rounded-lg text-sm">
-                        <input type="text" id="m-moto" placeholder="Moto / Placa" required class="px-3 py-2 border rounded-lg text-sm">
-                        <button type="submit" class="bg-gray-900 hover:bg-black text-white font-semibold rounded-lg text-sm py-2 transition">Cadastrar Motoboy</button>
-                    </form>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="font-bold text-gray-800 text-base mb-3">Motoboys Cadastrados</h3>
-                    <div id="lista-motoboys-cadastrados" class="space-y-2"></div>
-                </div>
-            </div>
-
-            <div id="dono-aba-cardapio" class="hidden space-y-6">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="font-bold text-gray-800 text-base mb-3"><i class="fa-solid fa-plus text-brand-600"></i> Adicionar Novo Item ao Cardápio</h3>
-                    <form onsubmit="cadastrarItemCardapio(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <input type="text" id="c-nome" placeholder="Nome do Produto" required class="px-3 py-2 border rounded-lg text-sm">
-                        <input type="number" step="0.01" id="c-preco" placeholder="Preço (R$)" required class="px-3 py-2 border rounded-lg text-sm">
-                        <input type="text" id="c-desc" placeholder="Descrição rápida" required class="px-3 py-2 border rounded-lg text-sm">
-                        <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg text-sm py-2 transition">Adicionar Produto</button>
-                    </form>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="font-bold text-gray-800 text-base mb-3">Itens Ativos no Cardápio</h3>
-                    <div id="lista-cardapio-dono" class="space-y-2"></div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- MODAL: CARRINHO -->
-    <div id="modal-carrinho" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end md:items-center justify-center p-0 md:p-4">
+    <div id="modal-checkout" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end md:items-center justify-center p-0 md:p-4">
         <div class="bg-white w-full max-w-lg rounded-t-3xl md:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-base"><i class="fa-solid fa-cart-shopping"></i> Seu Carrinho</h3>
-                <button onclick="fecharCarrinho()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-bag-shopping"></i> Sacola de Compras</h3>
+                <button onclick="fecharCheckout()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 space-y-4">
-                <div id="itens-carrinho-modal" class="divide-y divide-gray-100"></div>
-                <div class="border-t border-gray-200 pt-4 space-y-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Forma de Pagamento</label>
-                        <select id="pagamento-tipo" onchange="mudarFormaPagamento()" class="w-full px-3 py-2 border rounded-xl text-sm font-medium">
-                            <option value="pix">Pix (Chave Automática)</option>
-                            <option value="cartao">Cartão na Entrega (Maquininha)</option>
-                            <option value="dinheiro">Dinheiro (Espécie)</option>
-                        </select>
+            
+            <div class="p-4 overflow-y-auto flex-1 space-y-4 text-xs">
+                <div id="itens-sacola-modal" class="divide-y divide-gray-100"></div>
+
+                <!-- Dados do Cliente & Endereço -->
+                <div class="bg-gray-50 p-3 rounded-xl space-y-2 border">
+                    <p class="font-bold text-gray-900 uppercase">Seus Dados de Entrega</p>
+                    <input type="text" id="checkout-nome" placeholder="Seu Nome Completo" class="w-full px-3 py-2 border rounded-lg bg-white">
+                    <input type="tel" id="checkout-tel" placeholder="WhatsApp / Telefone" class="w-full px-3 py-2 border rounded-lg bg-white">
+                    <textarea id="checkout-end" rows="2" placeholder="Endereço (Rua, Número, Bairro)" class="w-full px-3 py-2 border rounded-lg bg-white"></textarea>
+                    <button type="button" onclick="capturarGPSCheckout()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-location-crosshairs"></i> Capturar Localização GPS Exata para o Motoboy
+                    </button>
+                    <p id="checkout-gps-status" class="text-center text-gray-500 italic">GPS não capturado (usando padrão)</p>
+                </div>
+
+                <!-- Pagamento -->
+                <div class="space-y-2">
+                    <p class="font-bold text-gray-900 uppercase">Forma de Pagamento</p>
+                    <select id="checkout-pagamento" onchange="mudarFormaPagamentoModal()" class="w-full px-3 py-2 border rounded-lg bg-white font-medium">
+                        <option value="pix">Pix (Chave Automática)</option>
+                        <option value="cartao">Cartão na Entrega (Maquininha)</option>
+                        <option value="dinheiro">Dinheiro (Espécie)</option>
+                    </select>
+                    <div id="bloco-troco-modal" class="hidden">
+                        <input type="text" id="checkout-troco" placeholder="Troco para quanto? (Ex: R$ 50)" class="w-full px-3 py-2 border rounded-lg bg-white">
                     </div>
-                    <div id="bloco-troco" class="hidden">
-                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Troco para quanto?</label>
-                        <input type="text" id="pagamento-troco" placeholder="Ex: R$ 50,00 ou Não preciso" class="w-full px-3 py-2 border rounded-xl text-sm">
-                    </div>
-                    <div id="bloco-pix-info" class="bg-brand-50 border border-brand-200 p-3 rounded-xl text-xs text-brand-800">
-                        <p class="font-bold mb-1"><i class="fa-solid fa-qrcode"></i> Chave Pix para Pagamento:</p>
-                        <p class="font-mono bg-white p-2 rounded border border-brand-200 text-center select-all">00020126580014br.gov.bcb.pix... (Chave CNPJ Burger & Cia)</p>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-xl space-y-1 text-sm">
-                        <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="resumo-subtotal">R$ 0,00</span></div>
-                        <div class="flex justify-between text-gray-600"><span>Taxa de Entrega</span><span>R$ 5,00</span></div>
-                        <div class="flex justify-between font-bold text-gray-900 text-base pt-2 border-t"><span>Total</span><span id="resumo-total" class="text-brand-600">R$ 0,00</span></div>
+                    <div id="bloco-pix-modal" class="bg-orange-50 border border-orange-200 p-2.5 rounded-lg text-orange-900">
+                        <p class="font-bold mb-1"><i class="fa-solid fa-qrcode"></i> Chave Pix CNPJ:</p>
+                        <p class="font-mono bg-white p-1.5 rounded border text-center select-all">00.000.000/0001-00 (Burger & Cia)</p>
                     </div>
                 </div>
+
+                <div class="bg-gray-100 p-3 rounded-xl space-y-1 text-xs">
+                    <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="modal-subtotal">R$ 0,00</span></div>
+                    <div class="flex justify-between text-gray-600"><span>Taxa de Entrega</span><span>R$ 5,00</span></div>
+                    <div class="flex justify-between font-black text-gray-900 text-sm pt-2 border-t"><span>Total</span><span id="modal-total" class="text-orange-600">R$ 0,00</span></div>
+                </div>
             </div>
-            <div class="p-4 bg-gray-50 border-t border-gray-200">
-                <button onclick="finalizarPedido()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-md transition text-base">
+
+            <div class="p-3 bg-white border-t">
+                <button onclick="enviarPedidoFinal()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl shadow transition text-sm">
                     Enviar Pedido para a Lanchonete 🚀
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- ========================================== -->
     <!-- MODAL: MEUS PEDIDOS -->
+    <!-- ========================================== -->
     <div id="modal-meus-pedidos" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+        <div class="bg-white w-full max-w-md rounded-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-base"><i class="fa-solid fa-clock-rotate-left"></i> Meus Pedidos Realizados</h3>
-                <button onclick="fecharMeusPedidos()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-receipt"></i> Meus Pedidos</h3>
+                <button onclick="fecharMeusPedidos()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 space-y-3" id="lista-meus-pedidos-container"></div>
+            <div class="p-4 overflow-y-auto flex-1 space-y-3" id="lista-meus-pedidos-modal"></div>
         </div>
     </div>
 
-    <!-- MODAL: MAPA DO MOTOBOY -->
+    <!-- ========================================== -->
+    <!-- MODAL: MAPA DO MOTOBOY (GPS) -->
+    <!-- ========================================== -->
     <div id="modal-mapa-motoboy" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-xl rounded-2xl flex flex-col shadow-2xl overflow-hidden">
+        <div class="bg-white w-full max-w-md rounded-2xl flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-base flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-amber-400"></i> Rota de Entrega (GPS)</h3>
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-map-location-dot text-amber-400"></i> Rota de Entrega Exata</h3>
                 <button onclick="fecharMapaMotoboy()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="p-4 space-y-4">
-                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs space-y-1">
-                    <p class="font-bold text-amber-900" id="mapa-cliente-nome">Cliente: -</p>
-                    <p class="text-gray-700" id="mapa-cliente-end">Endereço: -</p>
-                    <p class="text-brand-700 font-semibold" id="mapa-cliente-pagamento">Pagamento: -</p>
+            <div class="p-4 space-y-3 text-xs">
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl space-y-1">
+                    <p class="font-bold text-amber-900" id="mapa-c-nome">Cliente: -</p>
+                    <p class="text-gray-700" id="mapa-c-end">Endereço: -</p>
+                    <p class="font-bold text-orange-600" id="mapa-c-pag">Pagamento: -</p>
                 </div>
-                <div class="bg-gray-200 h-64 rounded-xl relative overflow-hidden flex items-center justify-center border border-gray-300">
-                    <div class="absolute inset-0 opacity-40 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                    <div class="text-center z-10 space-y-2 p-4 bg-white/90 backdrop-blur rounded-xl shadow-md max-w-xs">
-                        <div class="text-2xl text-brand-600 animate-bounce"><i class="fa-solid fa-location-dot"></i></div>
-                        <p class="text-xs font-bold text-gray-800">Coordenadas GPS de Destino Capturadas</p>
-                        <p class="text-[11px] text-gray-500 font-mono" id="mapa-coords-txt">Lat: -, Lng: -</p>
+                <div class="bg-gray-100 h-48 rounded-xl flex items-center justify-center border text-center p-4 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]"></div>
+                    <div class="z-10 space-y-1 bg-white/90 p-3 rounded-lg shadow">
+                        <i class="fa-solid fa-location-dot text-2xl text-orange-600 animate-bounce"></i>
+                        <p class="font-bold text-gray-800">Coordenadas GPS Capturadas</p>
+                        <p class="text-[10px] text-gray-500 font-mono" id="mapa-c-coords">Lat: -, Lng: -</p>
                     </div>
                 </div>
-                <a id="btn-abrir-google-maps" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition text-center block text-sm">
-                    <i class="fa-solid fa-diamond-turn-right"></i> Abrir Navegação no Google Maps
+                <a id="btn-google-maps-link" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition text-center block text-sm shadow">
+                    <i class="fa-solid fa-diamond-turn-right"></i> Abrir Rota no Google Maps
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- ========================================== -->
+    <!-- ACESSOS DISCRETOS NO RODAPÉ (DONO E MOTOBOY) -->
+    <!-- ========================================== -->
+    <footer class="mt-auto py-6 text-center border-t border-gray-200 bg-white">
+        <p class="text-[11px] text-gray-400 mb-2">&copy; 2026 Burger & Cia Express - Todos os direitos reservados.</p>
+        <div class="flex justify-center gap-4 text-xs">
+            <button onclick="mudarVisaoApp('motoboy')" class="text-gray-400 hover:text-gray-600 transition flex items-center gap-1"><i class="fa-solid fa-motorcycle"></i> Área Motoboy</button>
+            <span class="text-gray-300">•</span>
+            <button onclick="mudarVisaoApp('dono')" class="text-gray-400 hover:text-gray-600 transition flex items-center gap-1"><i class="fa-solid fa-lock"></i> Painel da Lanchonete</button>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ========================================== -->
     <script>
         let db = {
-            clienteLogado: JSON.parse(localStorage.getItem('burger_cliente')) || null,
-            motoboyLogado: localStorage.getItem('burger_motoboy_atual') || 'Carlos Entregador',
             cardapio: JSON.parse(localStorage.getItem('burger_cardapio')) || [
-                { id: 1, nome: 'X-Burger Artesanal', preco: 28.00, desc: 'Pão brioche, carne 160g, cheddar derretido e molho especial.' },
-                { id: 2, nome: 'X-Bacon Supremo', preco: 34.00, desc: 'Pão brioche, carne 160g, muito bacon crocante e maionese verde.' },
-                { id: 3, nome: 'Burger Duplo Monster', preco: 42.00, desc: 'Dois blends de 160g, dobro de queijo, bacon e cebola caramelizada.' },
-                { id: 4, nome: 'Batata Frita com Cheddar e Bacon', preco: 22.00, desc: 'Porção generosa de batatas sequinhas com cheddar cremoso e bacon.' },
-                { id: 5, nome: 'Refrigerante Lata 350ml', preco: 6.00, desc: 'Coca-Cola, Guaraná Antarctica ou Sprite.' }
+                { id: 1, nome: 'X-Burger Artesanal', preco: 28.00, cat: 'Burger', desc: 'Pão brioche, carne 160g, cheddar derretido e molho especial.' },
+                { id: 2, nome: 'X-Bacon Supremo', preco: 34.00, cat: 'Burger', desc: 'Pão brioche, carne 160g, muito bacon crocante e maionese verde.' },
+                { id: 3, nome: 'Burger Duplo Monster', preco: 42.00, cat: 'Burger', desc: 'Dois blends de 160g, dobro de queijo, bacon e cebola caramelizada.' },
+                { id: 4, nome: 'Batata Frita com Cheddar', preco: 22.00, cat: 'Porção', desc: 'Porção generosa de batatas sequinhas com cheddar cremoso e bacon.' },
+                { id: 5, nome: 'Refrigerante Lata 350ml', preco: 6.00, cat: 'Bebida', desc: 'Coca-Cola, Guaraná Antarctica ou Sprite.' }
             ],
             motoboys: JSON.parse(localStorage.getItem('burger_motoboys')) || [
-                { nome: 'Carlos Entregador', tel: '(84) 98888-1111', moto: 'Honda Fan 160 - Placa ABC-1234' },
-                { nome: 'João da Moto', tel: '(84) 99999-2222', moto: 'Yamaha Fazer 150 - Placa XYZ-9876' }
+                { nome: 'Carlos Entregador', tel: '(84) 98888-1111' },
+                { nome: 'João da Moto', tel: '(84) 99999-2222' }
             ],
             pedidos: JSON.parse(localStorage.getItem('burger_pedidos')) || []
         };
 
         let carrinho = [];
+        let categoriaAtual = 'todos';
+        let gpsAtual = { lat: -5.1878, lng: -37.3441 }; // Padrão Mossoró
 
-        function salvarDados() {
+        // Inicialização
+        window.onload = function() {
+            renderizarVitrine();
+            popularSelectMotoboy();
+            atualizarBadgePedidos();
+            const clienteSalvo = JSON.parse(localStorage.getItem('burger_cliente_temp'));
+            if(clienteSalvo) {
+                document.getElementById('checkout-nome').value = clienteSalvo.nome || '';
+                document.getElementById('checkout-tel').value = clienteSalvo.tel || '';
+                document.getElementById('checkout-end').value = clienteSalvo.endereco || '';
+                if(clienteSalvo.endTexto) {
+                    document.getElementById('header-endereco-txt').innerHTML = `<i class="fa-solid fa-location-dot text-orange-500"></i> ${clienteSalvo.endTexto}`;
+                }
+            }
+        };
+
+        function salvarDB() {
             localStorage.setItem('burger_cardapio', JSON.stringify(db.cardapio));
             localStorage.setItem('burger_motoboys', JSON.stringify(db.motoboys));
             localStorage.setItem('burger_pedidos', JSON.stringify(db.pedidos));
-            if(db.clienteLogado) localStorage.setItem('burger_cliente', JSON.stringify(db.clienteLogado));
         }
 
-        function mudarTela(telaId) {
-            ['view-portal', 'view-cliente-cadastro', 'view-cliente-app', 'view-motoboy-app', 'view-dono-app'].forEach(t => {
-                document.getElementById(t).classList.add('hidden');
-                document.getElementById(t).classList.remove('flex');
-            });
-            const alvo = document.getElementById(telaId);
-            alvo.classList.remove('hidden');
-            alvo.classList.add('flex');
-        }
+        function mudarVisaoApp(visao) {
+            document.getElementById('app-view-cliente').classList.add('hidden');
+            document.getElementById('app-view-dono').classList.add('hidden');
+            document.getElementById('app-view-motoboy').classList.add('hidden');
+            document.getElementById('barra-carrinho-flutuante').classList.add('hidden');
 
-        function voltarAoPortal() {
-            mudarTela('view-portal');
-        }
-
-        function entrarComoCliente() {
-            if(!db.clienteLogado) {
-                mudarTela('view-cliente-cadastro');
-            } else {
-                iniciarAppCliente();
+            if(visao === 'cliente') {
+                document.getElementById('app-view-cliente').classList.remove('hidden');
+                if(carrinho.length > 0) document.getElementById('barra-carrinho-flutuante').classList.remove('hidden');
+            } else if(visao === 'dono') {
+                document.getElementById('app-view-dono').classList.remove('hidden');
+                renderizarGestaoPedidos();
+                renderizarGestaoMotoboys();
+                renderizarGestaoCardapio();
+            } else if(visao === 'motoboy') {
+                document.getElementById('app-view-motoboy').classList.remove('hidden');
+                renderizarEntregasMotoboy();
             }
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        let gpsTemp = { lat: -5.1878, lng: -37.3441 };
-        function capturarGPSCliente() {
-            const status = document.getElementById('cad-gps-status');
-            if(navigator.geolocation) {
-                status.innerText = "Buscando localização exata via GPS...";
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        gpsTemp = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                        status.innerText = `GPS Capturado com sucesso! (${gpsTemp.lat.toFixed(4)}, ${gpsTemp.lng.toFixed(4)})`;
-                        status.className = "text-green-600 font-bold";
-                    },
-                    (err) => {
-                        status.innerText = "GPS simulado ativado com sucesso para sua região.";
-                        status.className = "text-amber-600 font-bold";
-                    },
-                    { timeout: 10000 }
-                );
-            } else {
-                status.innerText = "Geolocalização não suportada. Usando padrão.";
-            }
+        // --- CLIENTE / VITRINE ---
+        function filtrarCategoria(cat) {
+            categoriaAtual = cat;
+            renderizarVitrine();
         }
 
-        function salvarCadastroCliente(e) {
-            e.preventDefault();
-            db.clienteLogado = {
-                nome: document.getElementById('cad-nome').value,
-                tel: document.getElementById('cad-tel').value,
-                endereco: document.getElementById('cad-endereco').value,
-                gps: gpsTemp
-            };
-            salvarDados();
-            iniciarAppCliente();
-        }
-
-        function iniciarAppCliente() {
-            mudarTela('view-cliente-app');
-            document.getElementById('header-nome-cliente').innerText = db.clienteLogado.nome;
-            renderizarCardapioCliente();
-            atualizarBadgeMeusPedidos();
-        }
-
-        function renderizarCardapioCliente() {
-            const container = document.getElementById('lista-cardapio');
-            container.innerHTML = db.cardapio.map(item => `
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-md transition">
-                    <div>
-                        <h3 class="font-bold text-gray-900 text-base mb-1">${item.nome}</h3>
-                        <p class="text-xs text-gray-500 mb-3">${item.desc}</p>
+        function renderizarVitrine() {
+            const container = document.getElementById('vitrine-cardapio');
+            const filtrados = categoriaAtual === 'todos' ? db.cardapio : db.cardapio.filter(i => i.cat === categoriaAtual);
+            
+            container.innerHTML = filtrados.map(item => `
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center gap-3 hover:shadow-md transition">
+                    <div class="space-y-1 flex-1">
+                        <h4 class="font-bold text-gray-900 text-sm">${item.nome}</h4>
+                        <p class="text-xs text-gray-500 line-clamp-2">${item.desc}</p>
+                        <p class="font-black text-orange-600 text-sm pt-1">R$ ${item.preco.toFixed(2)}</p>
                     </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-gray-100">
-                        <span class="font-bold text-brand-600 text-base">R$ ${item.preco.toFixed(2)}</span>
-                        <button onclick="adicionarAoCarrinho(${item.id})" class="bg-brand-50 hover:bg-brand-600 hover:text-white text-brand-600 font-semibold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-plus"></i> Adicionar
-                        </button>
-                    </div>
+                    <button onclick="adicionarCarrinho(${item.id})" class="w-10 h-10 bg-orange-50 hover:bg-orange-600 text-orange-600 hover:text-white rounded-xl flex items-center justify-center font-bold transition shadow-sm">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
                 </div>
             `).join('');
         }
 
-        function adicionarAoCarrinho(id) {
-            const item = db.cardapio.find(p => p.id === id);
+        function adicionarCarrinho(id) {
+            const prod = db.cardapio.find(p => p.id === id);
             const existe = carrinho.find(c => c.id === id);
-            if(existe) {
-                existe.qtd++;
+            if(existe) existe.qtd++;
+            else carrinho.push({ ...prod, qtd: 1 });
+            
+            atualizarBarraCarrinho();
+        }
+
+        function atualizarBarraCarrinho() {
+            const qtdTotal = carrinho.reduce((acc, item) => acc + item.qtd, 0);
+            const valTotal = carrinho.reduce((acc, item) => acc + (item.preco * item.qtd), 0);
+            
+            if(qtdTotal > 0) {
+                document.getElementById('resumo-qtd-itens').innerText = `${qtdTotal} ${qtdTotal === 1 ? 'item' : 'itens'}`;
+                document.getElementById('resumo-valor-total').innerText = `R$ ${valTotal.toFixed(2)}`;
+                document.getElementById('barra-carrinho-flutuante').classList.remove('hidden');
             } else {
-                carrinho.push({ ...item, qtd: 1 });
+                document.getElementById('barra-carrinho-flutuante').classList.add('hidden');
             }
-            atualizarCarrinhoContador();
         }
 
-        function atualizarCarrinhoContador() {
-            const totalQtd = carrinho.reduce((sum, item) => sum + item.qtd, 0);
-            document.getElementById('carrinho-qtd').innerText = totalQtd;
-        }
-
-        function abrirCarrinho() {
-            if(carrinho.length === 0) {
-                alert('Seu carrinho está vazio!');
-                return;
-            }
-            renderizarItensCarrinhoModal();
-            document.getElementById('modal-carrinho').classList.remove('hidden');
-        }
-
-        function fecharCarrinho() {
-            document.getElementById('modal-carrinho').classList.add('hidden');
-        }
-
-        function mudarFormaPagamento() {
-            const tipo = document.getElementById('pagamento-tipo').value;
-            document.getElementById('bloco-troco').classList.toggle('hidden', tipo !== 'dinheiro');
-            document.getElementById('bloco-pix-info').classList.toggle('hidden', tipo !== 'pix');
-        }
-
-        function renderizarItensCarrinhoModal() {
-            const container = document.getElementById('itens-carrinho-modal');
+        // --- CHECKOUT ---
+        function abrirCheckout() {
+            const container = document.getElementById('itens-sacola-modal');
             let subtotal = 0;
             container.innerHTML = carrinho.map((item, idx) => {
                 subtotal += item.preco * item.qtd;
                 return `
-                    <div class="py-3 flex items-center justify-between text-sm">
+                    <div class="py-2.5 flex justify-between items-center text-xs">
                         <div>
-                            <p class="font-bold text-gray-800">${item.nome}</p>
-                            <p class="text-xs text-gray-500">R$ ${item.preco.toFixed(2)} un</p>
+                            <p class="font-bold text-gray-800">${item.qtd}x ${item.nome}</p>
+                            <p class="text-gray-500">R$ ${item.preco.toFixed(2)} un</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="alterarQtdCarrinho(${idx}, -1)" class="w-7 h-7 bg-gray-100 rounded-full font-bold hover:bg-gray-200">-</button>
-                            <span class="font-bold text-sm">${item.qtd}</span>
-                            <button onclick="alterarQtdCarrinho(${idx}, 1)" class="w-7 h-7 bg-gray-100 rounded-full font-bold hover:bg-gray-200">+</button>
+                            <span class="font-bold text-gray-900">R$ ${(item.preco * item.qtd).toFixed(2)}</span>
+                            <button onclick="removerItemCarrinho(${idx})" class="text-red-500 p-1"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
             }).join('');
 
-            document.getElementById('resumo-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
-            document.getElementById('resumo-total').innerText = `R$ ${(subtotal + 5.00).toFixed(2)}`;
+            document.getElementById('modal-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
+            document.getElementById('modal-total').innerText = `R$ ${(subtotal + 5.00).toFixed(2)}`;
+            document.getElementById('modal-checkout').classList.remove('hidden');
         }
 
-        function alterarQtdCarrinho(idx, delta) {
-            carrinho[idx].qtd += delta;
-            if(carrinho[idx].qtd <= 0) carrinho.splice(idx, 1);
-            atualizarCarrinhoContador();
-            if(carrinho.length === 0) fecharCarrinho();
-            else renderizarItensCarrinhoModal();
+        function fecharCheckout() {
+            document.getElementById('modal-checkout').classList.add('hidden');
         }
 
-        function finalizarPedido() {
-            const subtotal = carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
+        function removerItemCarrinho(idx) {
+            carrinho.splice(idx, 1);
+            atualizarBarraCarrinho();
+            if(carrinho.length === 0) fecharCheckout();
+            else abrirCheckout();
+        }
+
+        function capturarGPSCheckout() {
+            const status = document.getElementById('checkout-gps-status');
+            if(navigator.geolocation) {
+                status.innerText = "Buscando localização exata via GPS...";
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        gpsAtual = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        status.innerText = `GPS Capturado com sucesso! (${gpsAtual.lat.toFixed(4)}, ${gpsAtual.lng.toFixed(4)})`;
+                        status.className = "text-center text-green-600 font-bold";
+                    },
+                    (err) => {
+                        status.innerText = "GPS padrão ativado com sucesso.";
+                        status.className = "text-center text-amber-600 font-bold";
+                    },
+                    { timeout: 10000 }
+                );
+            }
+        }
+
+        function mudarFormaPagamentoModal() {
+            const tipo = document.getElementById('checkout-pagamento').value;
+            document.getElementById('bloco-troco-modal').classList.toggle('hidden', tipo !== 'dinheiro');
+            document.getElementById('bloco-pix-modal').classList.toggle('hidden', tipo !== 'pix');
+        }
+
+        function enviarPedidoFinal() {
+            const nome = document.getElementById('checkout-nome').value;
+            const tel = document.getElementById('checkout-tel').value;
+            const end = document.getElementById('checkout-end').value;
+
+            if(!nome || !tel || !end) {
+                alert('Por favor, preencha seu nome, telefone e endereço.');
+                return;
+            }
+
+            const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * item.qtd), 0);
             const total = subtotal + 5.00;
-            const tipoPagamento = document.getElementById('pagamento-tipo').value;
-            const troco = document.getElementById('pagamento-troco').value;
+            const tipoPagamento = document.getElementById('checkout-pagamento').value;
+            const troco = document.getElementById('checkout-troco').value;
 
             const novoPedido = {
                 id: 'PED-' + Math.floor(1000 + Math.random() * 9000),
-                cliente: db.clienteLogado,
+                cliente: { nome, tel, endereco: end, gps: gpsAtual },
                 itens: [...carrinho],
                 total: total,
-                pagamento: tipoPagamento === 'dinheiro' ? `Dinheiro (Troco para: ${troco || 'Não informado'})` : (tipoPagamento === 'pix' ? 'Pix (Pago)' : 'Cartão na Entrega'),
+                pagamento: tipoPagamento === 'dinheiro' ? `Dinheiro (Troco para: ${troco || 'Não'})` : (tipoPagamento === 'pix' ? 'Pix (Pago)' : 'Cartão na Entrega'),
                 status: 'Recebido',
                 motoboyAtribuido: null,
                 data: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
             db.pedidos.unshift(novoPedido);
-            salvarDados();
+            salvarDB();
+
+            // Salva dados temporários do cliente
+            localStorage.setItem('burger_cliente_temp', JSON.stringify({ nome, tel, endereco: end }));
+            document.getElementById('header-endereco-txt').innerHTML = `<i class="fa-solid fa-location-dot text-orange-500"></i> ${end}`;
+
             carrinho = [];
-            atualizarCarrinhoContador();
-            fecharCarrinho();
-            alert('Pedido enviado com sucesso para a lanchonete! Acompanhe o status em "Meus Pedidos".');
+            atualizarBarraCarrinho();
+            fecharCheckout();
+            alert('Pedido realizado com sucesso! Acompanhe o status em "Meus Pedidos".');
             abrirMeusPedidos();
         }
 
         function abrirMeusPedidos() {
-            renderizarMeusPedidosModal();
+            const container = document.getElementById('lista-meus-pedidos-modal');
+            const telUser = document.getElementById('checkout-tel').value;
+            const meus = telUser ? db.pedidos.filter(p => p.cliente.tel === telUser) : db.pedidos;
+
+            if(meus.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">Nenhum pedido recente encontrado.</p>`;
+            } else {
+                container.innerHTML = meus.map(p => `
+                    <div class="bg-gray-50 border rounded-xl p-3 text-xs space-y-2">
+                        <div class="flex justify-between font-bold">
+                            <span>${p.id} (${p.data})</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] uppercase ${
+                                p.status === 'Recebido' ? 'bg-amber-100 text-amber-800' :
+                                p.status === 'Em Preparo' ? 'bg-blue-100 text-blue-800' :
+                                p.status === 'Saiu para Entrega' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
+                            }">${p.status}</span>
+                        </div>
+                        <p class="text-gray-600">${p.itens.map(i => `${i.qtd}x ${i.nome}`).join(', ')}</p>
+                        <div class="flex justify-between font-bold pt-1 border-t text-orange-600">
+                            <span>Total: R$ ${p.total.toFixed(2)}</span>
+                            <span class="text-gray-500 font-normal">Entregador: ${p.motoboyAtribuido || 'Aguardando'}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
             document.getElementById('modal-meus-pedidos').classList.remove('hidden');
         }
 
@@ -529,152 +541,38 @@
             document.getElementById('modal-meus-pedidos').classList.add('hidden');
         }
 
-        function renderizarMeusPedidosModal() {
-            const container = document.getElementById('lista-meus-pedidos-container');
-            const meus = db.pedidos.filter(p => p.cliente.tel === db.clienteLogado.tel);
-            if(meus.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">Você ainda não realizou nenhum pedido.</p>`;
-                return;
-            }
-            container.innerHTML = meus.map(p => `
-                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs space-y-2">
-                    <div class="flex justify-between font-bold text-gray-800">
-                        <span>${p.id} (${p.data})</span>
-                        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
-                            p.status === 'Recebido' ? 'bg-amber-100 text-amber-800' :
-                            p.status === 'Em Preparo' ? 'bg-blue-100 text-blue-800' :
-                            p.status === 'Saiu para Entrega' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
-                        }">${p.status}</span>
-                    </div>
-                    <p class="text-gray-600">${p.itens.map(i => `${i.qtd}x ${i.nome}`).join(', ')}</p>
-                    <div class="flex justify-between items-center pt-2 border-t border-gray-200 font-bold">
-                        <span class="text-brand-600">Total: R$ ${p.total.toFixed(2)}</span>
-                        <span class="text-gray-500 font-normal">Entregador: ${p.motoboyAtribuido || 'Aguardando despacho'}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function atualizarBadgeMeusPedidos() {
-            const meus = db.pedidos.filter(p => p.cliente.tel === db.clienteLogado.tel && p.status !== 'Entregue');
-            const badge = document.getElementById('badge-meus-pedidos');
-            if(meus.length > 0) {
-                badge.innerText = meus.length;
+        function atualizarBadgePedidos() {
+            const badge = document.getElementById('badge-pedidos');
+            if(db.pedidos.length > 0) {
+                badge.innerText = db.pedidos.length;
                 badge.classList.remove('hidden');
             } else {
                 badge.classList.add('hidden');
             }
         }
 
-        // Motoboy
-        function entrarComoMotoboy() {
-            mudarTela('view-motoboy-app');
-            popularSelectMotoboys();
-            carregarDadosMotoboy();
-        }
-
-        function popularSelectMotoboys() {
-            const select = document.getElementById('select-motoboy-logado');
-            select.innerHTML = db.motoboys.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
-            select.value = db.motoboyLogado;
-        }
-
-        function mudarMotoboyLogado() {
-            db.motoboyLogado = document.getElementById('select-motoboy-logado').value;
-            carregarDadosMotoboy();
-        }
-
-        function carregarDadosMotoboy() {
-            const container = document.getElementById('lista-entregas-motoboy');
-            const entregas = db.pedidos.filter(p => p.motoboyAtribuido === db.motoboyLogado && p.status !== 'Entregue');
-            
-            if(entregas.length === 0) {
-                container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-gray-400 text-xs shadow-sm"><i class="fa-solid fa-mug-hot text-3xl mb-2 text-gray-300"></i><p>Nenhuma entrega atribuída a você no momento.</p></div>`;
-                return;
-            }
-
-            container.innerHTML = entregas.map(p => `
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-sm text-gray-900">${p.id}</span>
-                        <span class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded font-bold">${p.status}</span>
-                    </div>
-                    <div class="text-xs space-y-1 text-gray-600">
-                        <p><strong>Cliente:</strong> ${p.cliente.nome} (${p.cliente.tel})</p>
-                        <p><strong>Endereço:</strong> ${p.cliente.endereco}</p>
-                        <p class="font-bold text-brand-600"><strong>Cobrança:</strong> ${p.pagamento} (Total: R$ ${p.total.toFixed(2)})</p>
-                    </div>
-                    <div class="flex gap-2 pt-2">
-                        <button onclick="abrirMapaMotoboy('${p.id}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-3 rounded-xl transition text-xs flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-map-location-dot"></i> Ver Rota GPS
-                        </button>
-                        <button onclick="confirmarEntregaMotoboy('${p.id}')" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-3 rounded-xl transition text-xs flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-check"></i> Concluir Entrega
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        let pedidoAtualMapa = null;
-        function abrirMapaMotoboy(id) {
-            pedidoAtualMapa = db.pedidos.find(p => p.id === id);
-            document.getElementById('mapa-cliente-nome').innerText = `Cliente: ${pedidoAtualMapa.cliente.nome} (${pedidoAtualMapa.cliente.tel})`;
-            document.getElementById('mapa-cliente-end').innerText = `Endereço: ${pedidoAtualMapa.cliente.endereco}`;
-            document.getElementById('mapa-cliente-pagamento').innerText = `Condição: ${pedidoAtualMapa.pagamento}`;
-            document.getElementById('mapa-coords-txt').innerText = `Lat: ${pedidoAtualMapa.cliente.gps.lat.toFixed(4)}, Lng: ${pedidoAtualMapa.cliente.gps.lng.toFixed(4)}`;
-            
-            const urlMaps = `https://www.google.com/maps/search/?api=1&query=${pedidoAtualMapa.cliente.gps.lat},${pedidoAtualMapa.cliente.gps.lng}`;
-            document.getElementById('btn-abrir-google-maps').href = urlMaps;
-            
-            document.getElementById('modal-mapa-motoboy').classList.remove('hidden');
-        }
-
-        function fecharMapaMotoboy() {
-            document.getElementById('modal-mapa-motoboy').classList.add('hidden');
-        }
-
-        function confirmarEntregaMotoboy(id) {
-            const p = db.pedidos.find(p => p.id === id);
-            if(p) {
-                p.status = 'Entregue';
-                salvarDados();
-                carregarDadosMotoboy();
-                alert('Entrega concluída com sucesso!');
-            }
-        }
-
-        // Dono
-        function entrarComoDono() {
-            mudarTela('view-dono-app');
-            renderizarPedidosDono();
-            renderizarMotoboysDono();
-            renderizarCardapioDono();
-        }
-
-        function mudarAbaDono(aba) {
+        // --- PAINEL DONO (GESTÃO) ---
+        function mudarAbaGestao(aba) {
             ['pedidos', 'motoboys', 'cardapio'].forEach(a => {
-                document.getElementById(`dono-aba-${a}`).classList.add('hidden');
-                document.getElementById(`tab-btn-${a}`).className = "py-2.5 px-4 text-gray-400 hover:text-white transition whitespace-nowrap";
+                document.getElementById(`gestao-conteudo-${a}`).classList.add('hidden');
+                document.getElementById(`aba-btn-${a}`).className = "px-3 py-1.5 bg-white text-gray-700 border rounded-lg text-xs font-bold";
             });
-            document.getElementById(`dono-aba-${aba}`).classList.remove('hidden');
-            document.getElementById(`tab-btn-${aba}`).className = "py-2.5 px-4 text-brand-400 border-b-2 border-brand-500 transition whitespace-nowrap";
+            document.getElementById(`gestao-conteudo-${aba}`).classList.remove('hidden');
+            document.getElementById(`aba-btn-${aba}`).className = "px-3 py-1.5 bg-orange-600 text-white rounded-lg text-xs font-bold shadow-sm";
         }
 
-        function renderizarPedidosDono() {
-            const container = document.getElementById('lista-pedidos-dono');
-            const ativas = db.pedidos;
-            
-            if(ativas.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-400 italic col-span-2">Nenhum pedido registrado no sistema ainda.</p>`;
+        function renderizarGestaoPedidos() {
+            const container = document.getElementById('lista-pedidos-cozinha');
+            if(db.pedidos.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 italic col-span-2">Nenhum pedido na fila.</p>`;
                 return;
             }
 
-            container.innerHTML = ativas.map(p => `
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 text-xs space-y-3">
-                    <div class="flex justify-between items-center font-bold">
-                        <span class="text-sm text-gray-900">${p.id} (${p.data})</span>
-                        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
+            container.innerHTML = db.pedidos.map(p => `
+                <div class="bg-white p-4 rounded-2xl border shadow-sm text-xs space-y-2">
+                    <div class="flex justify-between font-bold">
+                        <span>${p.id} (${p.data})</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] uppercase ${
                             p.status === 'Recebido' ? 'bg-amber-100 text-amber-800' :
                             p.status === 'Em Preparo' ? 'bg-blue-100 text-blue-800' :
                             p.status === 'Saiu para Entrega' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
@@ -684,124 +582,153 @@
                         <p class="font-bold text-gray-800">${p.cliente.nome} (${p.cliente.tel})</p>
                         <p class="text-gray-500">${p.cliente.endereco}</p>
                     </div>
-                    <div class="bg-gray-50 p-2.5 rounded-lg text-gray-700">
-                        <p class="font-bold mb-1">Itens:</p>
-                        ${p.itens.map(i => `<p>• ${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})</p>`).join('')}
-                        <p class="mt-1 pt-1 border-t border-gray-200 font-bold text-brand-600">Total: R$ ${p.total.toFixed(2)} | ${p.pagamento}</p>
+                    <div class="bg-gray-50 p-2 rounded text-gray-700">
+                        ${p.itens.map(i => `<p>• ${i.qtd}x ${i.nome}</p>`).join('')}
+                        <p class="font-bold text-orange-600 mt-1 pt-1 border-t">R$ ${p.total.toFixed(2)} | ${p.pagamento}</p>
                     </div>
-
-                    <div class="space-y-2 pt-1">
-                        <div class="flex gap-2">
-                            <button onclick="mudarStatusPedido('${p.id}', 'Em Preparo')" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 rounded font-semibold transition">Na Chapa / Preparo</button>
-                            <button onclick="mudarStatusPedido('${p.id}', 'Saiu para Entrega')" class="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700 py-1.5 rounded font-semibold transition">Despachar</button>
+                    <div class="space-y-1 pt-1">
+                        <div class="flex gap-1">
+                            <button onclick="mudarStatus('${p.id}', 'Em Preparo')" class="flex-1 bg-blue-50 text-blue-700 py-1 rounded font-semibold">Em Preparo</button>
+                            <button onclick="mudarStatus('${p.id}', 'Saiu para Entrega')" class="flex-1 bg-purple-50 text-purple-700 py-1 rounded font-semibold">Despachar</button>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <select id="motoboy-atrib-${p.id}" class="flex-1 border rounded px-2 py-1 bg-white text-xs">
+                        <div class="flex gap-1 items-center">
+                            <select id="atrib-${p.id}" class="flex-1 border rounded px-2 py-1 bg-white">
                                 <option value="">Atribuir Motoboy...</option>
                                 ${db.motoboys.map(m => `<option value="${m.nome}" ${p.motoboyAtribuido === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('')}
                             </select>
-                            <button onclick="atribuirMotoboyPedido('${p.id}')" class="bg-gray-800 hover:bg-black text-white px-3 py-1 rounded font-semibold transition">Atribuir</button>
+                            <button onclick="salvarMotoboyPedido('${p.id}')" class="bg-gray-900 text-white px-3 py-1 rounded font-bold">OK</button>
                         </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        function mudarStatusPedido(id, novoStatus) {
-            const p = db.pedidos.find(p => p.id === id);
-            if(p) {
-                p.status = novoStatus;
-                salvarDados();
-                renderizarPedidosDono();
-            }
+        function mudarStatus(id, status) {
+            const p = db.pedidos.find(x => x.id === id);
+            if(p) { p.status = status; salvarDB(); renderizarGestaoPedidos(); }
         }
 
-        function atribuirMotoboyPedido(id) {
-            const select = document.getElementById(`motoboy-atrib-${id}`);
-            const motoboy = select.value;
-            if(!motoboy) {
-                alert('Selecione um motoboy');
-                return;
-            }
-            const p = db.pedidos.find(p => p.id === id);
-            if(p) {
-                p.motoboyAtribuido = motoboy;
-                p.status = 'Saiu para Entrega';
-                salvarDados();
-                renderizarPedidosDono();
-                alert(`Pedido atribuído a ${motoboy} com sucesso!`);
-            }
+        function salvarMotoboyPedido(id) {
+            const m = document.getElementById(`atrib-${id}`).value;
+            if(!m) { alert('Selecione um motoboy'); return; }
+            const p = db.pedidos.find(x => x.id === id);
+            if(p) { p.motoboyAtribuido = m; p.status = 'Saiu para Entrega'; salvarDB(); renderizarGestaoPedidos(); }
         }
 
-        function cadastrarMotoboy(e) {
+        function cadastrarMotoboyDono(e) {
             e.preventDefault();
-            const novo = {
-                nome: document.getElementById('m-nome').value,
-                tel: document.getElementById('m-tel').value,
-                moto: document.getElementById('m-moto').value
-            };
-            db.motoboys.push(novo);
-            salvarDados();
-            renderizarMotoboysDono();
-            document.getElementById('m-nome').value = '';
-            document.getElementById('m-tel').value = '';
-            document.getElementById('m-moto').value = '';
-            alert('Motoboy cadastrado com sucesso!');
+            db.motoboys.push({
+                nome: document.getElementById('cad-m-nome').value,
+                tel: document.getElementById('cad-m-tel').value
+            });
+            salvarDB();
+            renderizarGestaoMotoboys();
+            popularSelectMotoboy();
+            document.getElementById('cad-m-nome').value = '';
+            document.getElementById('cad-m-tel').value = '';
+            alert('Motoboy cadastrado!');
         }
 
-        function renderizarMotoboysDono() {
-            const container = document.getElementById('lista-motoboys-cadastrados');
-            container.innerHTML = db.motoboys.map((m, idx) => `
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl text-xs border">
-                    <div>
-                        <p class="font-bold text-gray-900">${m.nome} (${m.tel})</p>
-                        <p class="text-gray-500">${m.moto}</p>
-                    </div>
-                    <button onclick="removerMotoboy(${idx})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+        function renderizarGestaoMotoboys() {
+            document.getElementById('lista-motoboys-cadastrados').innerHTML = db.motoboys.map((m, idx) => `
+                <div class="flex justify-between items-center p-3 bg-white border rounded-xl text-xs">
+                    <div><p class="font-bold">${m.nome}</p><p class="text-gray-500">${m.tel}</p></div>
+                    <button onclick="removerMotoboy(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `).join('');
         }
 
         function removerMotoboy(idx) {
             db.motoboys.splice(idx, 1);
-            salvarDados();
-            renderizarMotoboysDono();
+            salvarDB();
+            renderizarGestaoMotoboys();
+            popularSelectMotoboy();
         }
 
-        function cadastrarItemCardapio(e) {
+        function cadastrarProdutoDono(e) {
             e.preventDefault();
-            const novo = {
+            db.cardapio.push({
                 id: Date.now(),
-                nome: document.getElementById('c-nome').value,
-                preco: parseFloat(document.getElementById('c-preco').value),
-                desc: document.getElementById('c-desc').value
-            };
-            db.cardapio.push(novo);
-            salvarDados();
-            renderizarCardapioDono();
-            document.getElementById('c-nome').value = '';
-            document.getElementById('c-preco').value = '';
-            document.getElementById('c-desc').value = '';
-            alert('Item adicionado ao cardápio!');
+                nome: document.getElementById('cad-p-nome').value,
+                preco: parseFloat(document.getElementById('cad-p-preco').value),
+                cat: document.getElementById('cad-p-cat').value,
+                desc: 'Delicioso item recém-adicionado ao cardápio.'
+            });
+            salvarDB();
+            renderizarVitrine();
+            renderizarGestaoCardapio();
+            document.getElementById('cad-p-nome').value = '';
+            document.getElementById('cad-p-preco').value = '';
+            alert('Produto adicionado ao cardápio!');
         }
 
-        function renderizarCardapioDono() {
-            const container = document.getElementById('lista-cardapio-dono');
-            container.innerHTML = db.cardapio.map((item, idx) => `
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl text-xs border">
-                    <div>
-                        <p class="font-bold text-gray-900">${item.nome} - <span class="text-brand-600">R$ ${item.preco.toFixed(2)}</span></p>
-                        <p class="text-gray-500">${item.desc}</p>
-                    </div>
-                    <button onclick="removerItemCardapio(${idx})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+        function renderizarGestaoCardapio() {
+            document.getElementById('lista-produtos-cadastrados').innerHTML = db.cardapio.map((item, idx) => `
+                <div class="flex justify-between items-center p-3 bg-white border rounded-xl text-xs">
+                    <div><p class="font-bold">${item.nome} - R$ ${item.preco.toFixed(2)}</p><p class="text-gray-500">Cat: ${item.cat}</p></div>
+                    <button onclick="removerProduto(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `).join('');
         }
 
-        function removerItemCardapio(idx) {
+        function removerProduto(idx) {
             db.cardapio.splice(idx, 1);
-            salvarDados();
-            renderizarCardapioDono();
+            salvarDB();
+            renderizarVitrine();
+            renderizarGestaoCardapio();
+        }
+
+        // --- PAINEL MOTOBOY ---
+        function popularSelectMotoboy() {
+            const sel = document.getElementById('select-motoboy-ativo');
+            sel.innerHTML = db.motoboys.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
+        }
+
+        function renderizarEntregasMotoboy() {
+            const motoboyAtivo = document.getElementById('select-motoboy-ativo').value;
+            const container = document.getElementById('lista-entregas-motoboy');
+            const entregas = db.pedidos.filter(p => p.motoboyAtribuido === motoboyAtivo && p.status !== 'Entregue');
+
+            if(entregas.length === 0) {
+                container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-gray-400 text-xs border shadow-sm"><i class="fa-solid fa-mug-hot text-2xl mb-2"></i><p>Nenhuma entrega para você no momento.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = entregas.map(p => `
+                <div class="bg-white p-4 rounded-2xl border shadow-sm text-xs space-y-2">
+                    <div class="flex justify-between font-bold">
+                        <span>${p.id}</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded">${p.status}</span>
+                    </div>
+                    <p><strong>Cliente:</strong> ${p.cliente.nome} (${p.cliente.tel})</p>
+                    <p><strong>Endereço:</strong> ${p.cliente.endereco}</p>
+                    <p class="font-bold text-orange-600">Cobrança: ${p.pagamento} (Total: R$ ${p.total.toFixed(2)})</p>
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="abrirMapaGPS('${p.id}')" class="flex-1 bg-blue-600 text-white font-bold py-2 rounded-xl"><i class="fa-solid fa-map-location-dot"></i> Ver Rota GPS</button>
+                        <button onclick="concluirEntrega('${p.id}')" class="flex-1 bg-green-600 text-white font-bold py-2 rounded-xl"><i class="fa-solid fa-check"></i> Concluir</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function abrirMapaGPS(id) {
+            const p = db.pedidos.find(x => x.id === id);
+            document.getElementById('mapa-c-nome').innerText = `Cliente: ${p.cliente.nome} (${p.cliente.tel})`;
+            document.getElementById('mapa-c-end').innerText = `Endereço: ${p.cliente.endereco}`;
+            document.getElementById('mapa-c-pag').innerText = `Condição: ${p.pagamento}`;
+            document.getElementById('mapa-c-coords').innerText = `Lat: ${p.cliente.gps.lat.toFixed(4)}, Lng: ${p.cliente.gps.lng.toFixed(4)}`;
+            
+            document.getElementById('btn-google-maps-link').href = `https://www.google.com/maps/search/?api=1&query=${p.cliente.gps.lat},${p.cliente.gps.lng}`;
+            document.getElementById('modal-mapa-motoboy').classList.remove('hidden');
+        }
+
+        function fecharMapaMotoboy() {
+            document.getElementById('modal-mapa-motoboy').classList.add('hidden');
+        }
+
+        function concluirEntrega(id) {
+            const p = db.pedidos.find(x => x.id === id);
+            if(p) { p.status = 'Entregue'; salvarDB(); renderizarEntregasMotoboy(); alert('Entrega finalizada!'); }
         }
     </script>
 </body>
