@@ -1,218 +1,305 @@
-<!DOCTYPE html>
+from pathlib import Path
+import zipfile
+
+base = Path("/mnt/data/BrDias_Lanches_Firebase")
+base.mkdir(exist_ok=True)
+
+html = r'''<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#ff6b24">
-  <title>BrDias Lanches | Delivery</title>
-  <style>
-    :root{--orange:#ff6b24;--yellow:#ffd447;--red:#ef3f45;--green:#159b62;--ink:#25212a;--muted:#77717c;--paper:#fffaf4;--line:#eee5dc}
-    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--paper);color:var(--ink)}
-    button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:700}
-    .top{background:linear-gradient(110deg,#ff6b24,#ff9b28);color:#fff;padding:18px max(18px,calc((100% - 1180px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-    .brand{font-size:25px;font-weight:900;letter-spacing:-1px}.brand span{color:#3b2430}.top small{display:block;font-size:12px;opacity:.9;margin-top:3px}
-    .top-actions{display:flex;gap:8px;align-items:center}.top button{background:#fff;color:#d94c18}.top .ghost{background:#7c2f19;color:#fff}
-    main{max-width:1180px;margin:24px auto;padding:0 18px}.hero{background:linear-gradient(110deg,#3c2330,#6b2e3b);color:white;border-radius:22px;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px;overflow:hidden}
-    .hero h1{font-size:clamp(25px,4vw,42px);margin:0 0 10px}.hero p{max-width:580px;line-height:1.5;color:#f7dfe0;margin:0}.hero .emoji{font-size:74px}
-    .notice{padding:12px 15px;border-radius:12px;background:#fff1d3;color:#74460a;margin:16px 0;display:none}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.tab{background:#fff;border:1px solid var(--line);color:#554b50}.tab.active{background:var(--orange);color:#fff;border-color:var(--orange)}
-    .section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:25px 0 14px}.section-head h2{margin:0;font-size:23px}.muted{color:var(--muted);font-size:13px}
-    .categories{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.cat{background:#fff0df;color:#9b481b;border:1px solid #ffe0c2;padding:9px 14px;border-radius:30px}.cat.active{background:#3c2330;color:#fff;border-color:#3c2330}
-    .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}.product{background:#fff;border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 5px 18px #42220a0a}.product img{width:100%;height:155px;object-fit:cover;background:#f5e9df;display:block}.product-body{padding:14px}.product h3{margin:0 0 7px;font-size:17px}.product p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.4;min-height:35px}.price-row{display:flex;justify-content:space-between;align-items:center;gap:8px}.price{font-weight:900;color:#df4c20;font-size:18px}.add{background:var(--green);color:#fff;padding:9px 13px}
-    .panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:13px;font-weight:700;color:#5d5156}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #e6dcd4;border-radius:10px;background:#fff;color:var(--ink)}.field textarea{min-height:75px;resize:vertical}.wide{grid-column:1/-1}
-    .primary{background:var(--orange);color:#fff}.secondary{background:#f5eee8;color:#51454a}.danger{background:#ffe8e6;color:#a72b25}.success{background:#e3f7eb;color:#167345}
-    .hidden{display:none!important}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.cart-line,.order{border-bottom:1px solid var(--line);padding:12px 0;display:flex;justify-content:space-between;gap:12px;align-items:center}.cart-line:last-child,.order:last-child{border:0}.cart-total{font-size:20px;font-weight:900;text-align:right;margin:14px 0}
-    .status{display:inline-block;border-radius:30px;background:#fff0d8;color:#8a4b12;padding:5px 9px;font-size:12px;font-weight:700}.status.delivered{background:#e1f6e9;color:#147241}
-    .empty{padding:30px;text-align:center;color:var(--muted);background:#fff;border:1px dashed #e4d6ca;border-radius:15px}
-    .footer{text-align:center;padding:35px 15px;color:#897f83;font-size:12px}.loginbox{max-width:540px;margin:25px auto}.loginbox h2{margin-top:0}
-    .admin-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.order-actions{display:flex;gap:6px;flex-wrap:wrap}.order-actions button{padding:8px 10px;font-size:12px}
-    @media(max-width:650px){.hero{padding:22px}.hero .emoji{font-size:48px}.grid,.admin-layout{grid-template-columns:1fr}.top{padding:15px 18px}.top-actions{width:100%}.top-actions button{flex:1}.section-head{align-items:start;flex-direction:column}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ff6b24">
+<title>BrDias Lanches | Delivery</title>
+<style>
+:root{--orange:#ff6b24;--yellow:#ffd447;--red:#ef3f45;--green:#159b62;--ink:#25212a;--muted:#77717c;--paper:#fffaf4;--line:#eee5dc}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--paper);color:var(--ink)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:700}
+.top{background:linear-gradient(110deg,#ff6b24,#ff9b28);color:#fff;padding:18px max(18px,calc((100% - 1180px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:25px;font-weight:900;letter-spacing:-1px}.brand span{color:#3b2430}.top small{display:block;font-size:12px;opacity:.9;margin-top:3px}
+.top-actions{display:flex;gap:8px;align-items:center}.top button{background:#fff;color:#d94c18}.top .ghost{background:#7c2f19;color:#fff}
+main{max-width:1180px;margin:24px auto;padding:0 18px}.hero{background:linear-gradient(110deg,#3c2330,#6b2e3b);color:white;border-radius:22px;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px;overflow:hidden}
+.hero h1{font-size:clamp(25px,4vw,42px);margin:0 0 10px}.hero p{max-width:580px;line-height:1.5;color:#f7dfe0;margin:0}.hero .emoji{font-size:74px}
+.notice{padding:12px 15px;border-radius:12px;background:#fff1d3;color:#74460a;margin:16px 0;display:none}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.tab{background:#fff;border:1px solid var(--line);color:#554b50}.tab.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:25px 0 14px}.section-head h2{margin:0;font-size:23px}.muted{color:var(--muted);font-size:13px}
+.categories{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.cat{background:#fff0df;color:#9b481b;border:1px solid #ffe0c2;padding:9px 14px;border-radius:30px}.cat.active{background:#3c2330;color:#fff;border-color:#3c2330}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}.product{background:#fff;border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 5px 18px #42220a0a}.product img{width:100%;height:155px;object-fit:cover;background:#f5e9df;display:block}.product-body{padding:14px}.product h3{margin:0 0 7px;font-size:17px}.product p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.4;min-height:35px}.price-row{display:flex;justify-content:space-between;align-items:center;gap:8px}.price{font-weight:900;color:#df4c20;font-size:18px}.add{background:var(--green);color:#fff;padding:9px 13px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:13px;font-weight:700;color:#5d5156}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #e6dcd4;border-radius:10px;background:#fff;color:var(--ink)}.field textarea{min-height:75px;resize:vertical}.wide{grid-column:1/-1}
+.primary{background:var(--orange);color:#fff}.secondary{background:#f5eee8;color:#51454a}.danger{background:#ffe8e6;color:#a72b25}.success{background:#e3f7eb;color:#167345}
+.hidden{display:none!important}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.cart-line,.order{border-bottom:1px solid var(--line);padding:12px 0;display:flex;justify-content:space-between;gap:12px;align-items:center}.cart-line:last-child,.order:last-child{border:0}.cart-total{font-size:20px;font-weight:900;text-align:right;margin:14px 0}
+.status{display:inline-block;border-radius:30px;background:#fff0d8;color:#8a4b12;padding:5px 9px;font-size:12px;font-weight:700}.status.delivered{background:#e1f6e9;color:#147241}
+.empty{padding:30px;text-align:center;color:var(--muted);background:#fff;border:1px dashed #e4d6ca;border-radius:15px}
+.footer{text-align:center;padding:35px 15px;color:#897f83;font-size:12px}.loginbox{max-width:540px;margin:25px auto}.loginbox h2{margin-top:0}
+.admin-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.order-actions{display:flex;gap:6px;flex-wrap:wrap}.order-actions button,.order-actions select{padding:8px 10px;font-size:12px}.link{color:#cf4b1b;font-weight:bold}
+@media(max-width:650px){.hero{padding:22px}.hero .emoji{font-size:48px}.grid,.admin-layout{grid-template-columns:1fr}.top{padding:15px 18px}.top-actions{width:100%}.top-actions button{flex:1}.section-head{align-items:start;flex-direction:column}}
+</style>
 </head>
 <body>
 <header class="top">
-  <div><div class="brand">🍔 BrDias <span>Lanches</span></div><small>Seu sabor favorito chega até você!</small></div>
-  <div class="top-actions">
-    <button class="ghost" id="loginOpen">Entrar</button>
-    <button id="cartOpen">🛒 Carrinho <span id="cartCount">0</span></button>
-  </div>
+ <div><div class="brand">🍔 BrDias <span>Lanches</span></div><small>Seu sabor favorito chega até você!</small></div>
+ <div class="top-actions"><button class="ghost" id="loginOpen">Entrar</button><button id="cartOpen">🛒 Carrinho <span id="cartCount">0</span></button></div>
 </header>
 <main>
-  <section class="hero">
-    <div><h1>Fome de coisa boa?</h1><p>Escolha seus lanches favoritos, peça pelo BrDias Lanches e acompanhe seu pedido até a entrega.</p></div>
-    <div class="emoji">🍔 🍟 🥤</div>
-  </section>
-  <div id="notice" class="notice"></div>
-  <nav class="tabs">
-    <button class="tab active" data-view="store">Cardápio</button>
-    <button class="tab" data-view="account">Minha conta</button>
-    <button class="tab" data-view="orders">Meus pedidos</button>
-    <button class="tab hidden" id="ownerTab" data-view="owner">Painel do dono</button>
-    <button class="tab hidden" id="courierTab" data-view="courier">Área do motoboy</button>
-  </nav>
-
-  <section id="view-store">
-    <div class="section-head"><div><h2>Nosso cardápio 😋</h2><span class="muted">Feito para matar sua fome.</span></div><span class="muted" id="storeStatus">Cardápio online</span></div>
-    <div class="categories" id="categories">
-      <button class="cat active" data-category="Todos">Todos</button>
-      <button class="cat" data-category="Lanches">🍔 Lanches</button>
-      <button class="cat" data-category="Bebidas">🥤 Bebidas</button>
-      <button class="cat" data-category="Porções">🍟 Porções</button>
-    </div>
-    <div id="products" class="products"><div class="empty">Configure o Supabase para carregar os produtos.</div></div>
-  </section>
-
-  <section id="view-account" class="hidden">
-    <div class="section-head"><div><h2>Minha conta</h2><span class="muted">Mantenha seus dados de entrega atualizados.</span></div></div>
-    <div class="panel">
-      <div id="accountState" class="muted">Entre ou crie sua conta para salvar seus dados.</div>
-      <form id="profileForm" class="grid hidden">
-        <div class="field"><label>Nome completo</label><input id="pName" required></div>
-        <div class="field"><label>Instagram</label><input id="pInstagram" placeholder="@seuinstagram"></div>
-        <div class="field"><label>WhatsApp</label><input id="pWhatsapp" required placeholder="(84) 99999-9999"></div>
-        <div class="field"><label>CEP</label><input id="pCep"></div>
-        <div class="field wide"><label>Endereço completo</label><input id="pAddress" required placeholder="Rua, número, bairro, complemento"></div>
-        <div class="field"><label>Cidade</label><input id="pCity" required value="Mossoró"></div>
-        <div class="field"><label>Ponto de referência</label><input id="pReference"></div>
-        <div class="field wide"><label>Link/localização do Google Maps (opcional)</label><input id="pLocation" placeholder="Cole aqui o link de localização"></div>
-        <div class="wide"><button class="primary" type="submit">Salvar meus dados</button></div>
-      </form>
-    </div>
-  </section>
-
-  <section id="view-orders" class="hidden">
-    <div class="section-head"><div><h2>Meus pedidos 📦</h2><span class="muted">Acompanhe o andamento dos seus pedidos.</span></div><button class="secondary" id="refreshOrders">Atualizar</button></div>
-    <div id="customerOrders" class="panel"><div class="empty">Entre na sua conta para visualizar seus pedidos.</div></div>
-  </section>
-
-  <section id="view-owner" class="hidden">
-    <div class="section-head"><div><h2>Painel do proprietário 👑</h2><span class="muted">Gerencie cardápio, equipe e pedidos.</span></div><button class="secondary" id="refreshOwner">Atualizar painel</button></div>
-    <div class="admin-layout">
-      <div class="panel">
-        <h3>➕ Cadastrar produto</h3>
-        <form id="productForm" class="grid">
-          <div class="field wide"><label>Nome do produto</label><input id="prodName" required></div>
-          <div class="field"><label>Categoria</label><select id="prodCategory"><option>Lanches</option><option>Bebidas</option><option>Porções</option></select></div>
-          <div class="field"><label>Preço (R$)</label><input id="prodPrice" type="number" min="0.01" step="0.01" required></div>
-          <div class="field wide"><label>Descrição</label><textarea id="prodDescription"></textarea></div>
-          <div class="field wide"><label>Foto do produto</label><input id="prodImage" type="file" accept="image/png,image/jpeg,image/gif"></div>
-          <div class="wide"><button class="primary" type="submit">Salvar produto</button></div>
-        </form>
-        <p class="muted">A imagem será enviada para o armazenamento do Supabase.</p>
-      </div>
-      <div class="panel">
-        <h3>🛵 Cadastrar motoboy</h3>
-        <form id="courierForm" class="grid">
-          <div class="field wide"><label>E-mail da conta do motoboy</label><input id="courierEmail" type="email" required></div>
-          <div class="field wide"><label>Nome do motoboy</label><input id="courierName" required></div>
-          <div class="field wide"><label>WhatsApp</label><input id="courierWhatsapp"></div>
-          <div class="wide"><button class="primary" type="submit">Vincular motoboy</button></div>
-        </form>
-        <p class="muted">O motoboy precisa criar a própria conta primeiro. Depois informe aqui o mesmo e-mail.</p>
-        <h3>📋 Produtos cadastrados</h3><div id="ownerProducts" class="muted">Carregando...</div>
-      </div>
-    </div>
-    <div class="panel"><h3>🧾 Pedidos recebidos</h3><div id="ownerOrders">Carregando...</div></div>
-  </section>
-
-  <section id="view-courier" class="hidden">
-    <div class="section-head"><div><h2>Área do motoboy 🛵</h2><span class="muted">Consulte suas entregas e atualize o status.</span></div><button class="secondary" id="refreshCourier">Atualizar</button></div>
-    <div id="courierOrders" class="panel">Carregando entregas...</div>
-  </section>
-
-  <section id="view-login" class="hidden loginbox">
-    <div class="panel">
-      <h2>Bem-vindo ao BrDias! 👋</h2>
-      <p class="muted">Entre na sua conta ou faça seu cadastro para pedir.</p>
-      <form id="authForm" class="grid">
-        <div class="field wide"><label>E-mail</label><input id="authEmail" type="email" required></div>
-        <div class="field wide"><label>Senha</label><input id="authPassword" type="password" minlength="6" required></div>
-        <div class="row wide"><button class="primary" type="submit">Entrar</button><button class="secondary" type="button" id="signup">Criar conta</button></div>
-      </form>
-      <button class="secondary" id="closeLogin">Voltar</button>
-    </div>
-  </section>
-
-  <section id="view-cart" class="hidden">
-    <div class="section-head"><div><h2>Seu carrinho 🛒</h2><span class="muted">Confira os itens antes de finalizar.</span></div></div>
-    <div class="panel"><div id="cartItems"></div><div class="cart-total" id="cartTotal">Total: R$ 0,00</div>
-      <div class="field"><label>Observações do pedido</label><textarea id="orderNotes" placeholder="Ex.: sem cebola, entregar no portão..."></textarea></div>
-      <div class="row" style="margin-top:14px"><button class="primary" id="checkout">Finalizar pedido</button><button class="secondary" id="backMenu">Continuar comprando</button></div>
-    </div>
-  </section>
+<section class="hero"><div><h1>Fome de coisa boa?</h1><p>Escolha seus lanches favoritos, peça pelo BrDias Lanches e acompanhe seu pedido até a entrega.</p></div><div class="emoji">🍔 🍟 🥤</div></section>
+<div id="notice" class="notice"></div>
+<nav class="tabs">
+ <button class="tab active" data-view="store">Cardápio</button><button class="tab" data-view="account">Minha conta</button><button class="tab" data-view="orders">Meus pedidos</button>
+ <button class="tab hidden" id="ownerTab" data-view="owner">Painel do dono</button><button class="tab hidden" id="courierTab" data-view="courier">Área do motoboy</button>
+</nav>
+<section id="view-store">
+ <div class="section-head"><div><h2>Nosso cardápio 😋</h2><span class="muted">Feito para matar sua fome.</span></div><span class="muted">Cardápio online</span></div>
+ <div class="categories"><button class="cat active" data-category="Todos">Todos</button><button class="cat" data-category="Lanches">🍔 Lanches</button><button class="cat" data-category="Bebidas">🥤 Bebidas</button><button class="cat" data-category="Porções">🍟 Porções</button></div>
+ <div id="products" class="products"><div class="empty">Carregando cardápio...</div></div>
+</section>
+<section id="view-account" class="hidden">
+ <div class="section-head"><div><h2>Minha conta</h2><span class="muted">Mantenha seus dados de entrega atualizados.</span></div></div>
+ <div class="panel"><div id="accountState" class="muted">Entre ou crie sua conta para salvar seus dados.</div>
+ <form id="profileForm" class="grid hidden">
+  <div class="field"><label>Nome completo</label><input id="pName" required></div><div class="field"><label>Instagram</label><input id="pInstagram" placeholder="@seuinstagram"></div>
+  <div class="field"><label>WhatsApp</label><input id="pWhatsapp" required placeholder="(84) 99999-9999"></div><div class="field"><label>CEP</label><input id="pCep"></div>
+  <div class="field wide"><label>Endereço completo</label><input id="pAddress" required placeholder="Rua, número, bairro, complemento"></div>
+  <div class="field"><label>Cidade</label><input id="pCity" required value="Mossoró"></div><div class="field"><label>Ponto de referência</label><input id="pReference"></div>
+  <div class="field wide"><label>Link/localização do Google Maps (opcional)</label><input id="pLocation" placeholder="Cole aqui o link de localização"></div>
+  <div class="wide"><button class="primary" type="submit">Salvar meus dados</button></div>
+ </form></div>
+</section>
+<section id="view-orders" class="hidden"><div class="section-head"><div><h2>Meus pedidos 📦</h2><span class="muted">Acompanhe o andamento dos seus pedidos.</span></div><button class="secondary" id="refreshOrders">Atualizar</button></div><div id="customerOrders" class="panel"><div class="empty">Entre na sua conta para visualizar seus pedidos.</div></div></section>
+<section id="view-owner" class="hidden">
+ <div class="section-head"><div><h2>Painel do proprietário 👑</h2><span class="muted">Gerencie cardápio, equipe e pedidos.</span></div><button class="secondary" id="refreshOwner">Atualizar painel</button></div>
+ <div class="admin-layout">
+  <div class="panel"><h3>➕ Cadastrar produto</h3><form id="productForm" class="grid">
+   <div class="field wide"><label>Nome do produto</label><input id="prodName" required></div><div class="field"><label>Categoria</label><select id="prodCategory"><option>Lanches</option><option>Bebidas</option><option>Porções</option></select></div>
+   <div class="field"><label>Preço (R$)</label><input id="prodPrice" type="number" min="0.01" step="0.01" required></div><div class="field wide"><label>Descrição</label><textarea id="prodDescription"></textarea></div>
+   <div class="field wide"><label>Foto do produto (JPG/PNG/GIF até 2 MB)</label><input id="prodImage" type="file" accept="image/png,image/jpeg,image/gif"></div><div class="wide"><button class="primary" type="submit">Salvar produto</button></div>
+  </form><p class="muted">A foto será armazenada no Firebase Storage.</p></div>
+  <div class="panel"><h3>🛵 Cadastrar motoboy</h3><form id="courierForm" class="grid">
+   <div class="field wide"><label>UID da conta do motoboy</label><input id="courierUid" required></div><div class="field wide"><label>Nome do motoboy</label><input id="courierName" required></div>
+   <div class="field wide"><label>WhatsApp</label><input id="courierWhatsapp"></div><div class="wide"><button class="primary" type="submit">Vincular motoboy</button></div>
+  </form><p class="muted">O motoboy precisa criar a própria conta. Ele encontra o UID em Minha conta; o proprietário pode vinculá-lo aqui.</p>
+  <h3>📋 Produtos cadastrados</h3><div id="ownerProducts" class="muted">Carregando...</div></div>
+ </div>
+ <div class="panel"><h3>🧾 Pedidos recebidos</h3><div id="ownerOrders">Carregando...</div></div>
+</section>
+<section id="view-courier" class="hidden"><div class="section-head"><div><h2>Área do motoboy 🛵</h2><span class="muted">Consulte suas entregas e atualize o status.</span></div><button class="secondary" id="refreshCourier">Atualizar</button></div><div id="courierOrders" class="panel">Carregando entregas...</div></section>
+<section id="view-login" class="hidden loginbox"><div class="panel"><h2>Bem-vindo ao BrDias! 👋</h2><p class="muted">Entre na sua conta ou faça seu cadastro para pedir.</p>
+ <form id="authForm" class="grid"><div class="field wide"><label>E-mail</label><input id="authEmail" type="email" required></div><div class="field wide"><label>Senha (mínimo 6 caracteres)</label><input id="authPassword" type="password" minlength="6" required></div><div class="row wide"><button class="primary" type="submit">Entrar</button><button class="secondary" type="button" id="signup">Criar conta</button></div></form><button class="secondary" id="closeLogin">Voltar</button></div></section>
+<section id="view-cart" class="hidden"><div class="section-head"><div><h2>Seu carrinho 🛒</h2><span class="muted">Confira os itens antes de finalizar.</span></div></div><div class="panel"><div id="cartItems"></div><div class="cart-total" id="cartTotal">Total: R$ 0,00</div><div class="field"><label>Observações do pedido</label><textarea id="orderNotes" placeholder="Ex.: sem cebola, entregar no portão..."></textarea></div><div class="row" style="margin-top:14px"><button class="primary" id="checkout">Finalizar pedido</button><button class="secondary" id="backMenu">Continuar comprando</button></div></div></section>
 </main>
 <footer class="footer">BrDias Lanches • Delivery com carinho ❤️</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-/* CONFIGURAÇÃO: substitua os dois valores abaixo pelos dados do seu projeto Supabase. */
-const SUPABASE_URL = "COLE_AQUI_A_URL_DO_SUPABASE";
-const SUPABASE_ANON_KEY = "COLE_AQUI_A_CHAVE_ANON_PUBLIC";
-const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_ANON_KEY.startsWith("COLE_AQUI");
-const db = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
-let currentUser = null, currentProfile = null, cart = [], activeCategory = "Todos", productsCache = [];
-const money = n => Number(n || 0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-const el = id => document.getElementById(id);
-function notify(msg, bad=false){const n=el("notice");n.textContent=msg;n.style.display="block";n.style.background=bad?"#ffe8e6":"#fff1d3";n.style.color=bad?"#9d2822":"#74460a";window.scrollTo({top:0,behavior:"smooth"});}
-function requireDb(){if(!db){notify("Falta configurar a URL e a chave pública do Supabase no final do arquivo index.html.",true);return false;}return true;}
-function showView(name){["store","account","orders","owner","courier","login","cart"].forEach(v=>el("view-"+v).classList.toggle("hidden",v!==name));document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===name));}
-document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>showView(t.dataset.view)));
-el("loginOpen").onclick=()=>showView("login");el("closeLogin").onclick=()=>showView("store");el("cartOpen").onclick=()=>{renderCart();showView("cart");};el("backMenu").onclick=()=>showView("store");
-function setRoleUI(){const role=currentProfile?.role;el("ownerTab").classList.toggle("hidden",role!=="owner");el("courierTab").classList.toggle("hidden",role!=="courier");el("loginOpen").textContent=currentUser?"Sair":"Entrar";}
+/* Configuração Firebase fornecida para o projeto BrDias Lanches. */
+const firebaseConfig = {
+ apiKey: "AIzaSyAkrIjDCv3liugwucjfA5auR5Xbm_wYvZc",
+ authDomain: "bellapes-maos.firebaseapp.com",
+ projectId: "bellapes-maos",
+ storageBucket: "bellapes-maos.firebasestorage.app",
+ messagingSenderId: "569461304335",
+ appId: "1:569461304335:web:7155c8879f9c165311077a",
+ measurementId: "G-SS0910MTHT"
+};
+
+const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app), storage=getStorage(app);
+let currentUser=null,currentProfile=null,cart=[],productsCache=[],activeCategory="Todos";
+const $=id=>document.getElementById(id), money=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function notify(msg,bad=false){const n=$("notice");n.textContent=msg;n.style.display="block";n.style.background=bad?"#ffe8e6":"#fff1d3";n.style.color=bad?"#9d2822":"#74460a";window.scrollTo({top:0,behavior:"smooth"});}
+function showView(v){["store","account","orders","owner","courier","login","cart"].forEach(x=>$("view-"+x).classList.toggle("hidden",x!==v));document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showView(t.dataset.view));
+$("loginOpen").onclick=async()=>{if(currentUser){await signOut(auth);notify("Você saiu da sua conta.");}else showView("login");};
+$("closeLogin").onclick=()=>showView("store");$("cartOpen").onclick=()=>{renderCart();showView("cart");};$("backMenu").onclick=()=>showView("store");
+function updateRoleUI(){const role=currentProfile?.role;$("ownerTab").classList.toggle("hidden",role!=="owner");$("courierTab").classList.toggle("hidden",role!=="courier");$("loginOpen").textContent=currentUser?"Sair":"Entrar";}
 async function loadProfile(){
  if(!currentUser)return;
- const {data,error}=await db.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
- if(error){notify(error.message,true);return;}
- currentProfile=data;
- if(data){el("pName").value=data.full_name||"";el("pInstagram").value=data.instagram||"";el("pWhatsapp").value=data.whatsapp||"";el("pCep").value=data.cep||"";el("pAddress").value=data.address||"";el("pCity").value=data.city||"Mossoró";el("pReference").value=data.reference||"";el("pLocation").value=data.location_url||"";}
- el("accountState").textContent="Conectado como "+currentUser.email+" • Perfil: "+(data?.role||"cliente");
- el("profileForm").classList.remove("hidden");setRoleUI();
+ const snap=await getDoc(doc(db,"profiles",currentUser.uid));currentProfile=snap.exists()?snap.data():null;
+ if(!currentProfile){currentProfile={uid:currentUser.uid,email:currentUser.email,role:"customer"};await setDoc(doc(db,"profiles",currentUser.uid),{...currentProfile,createdAt:serverTimestamp()});}
+ $("accountState").textContent="Conectado como "+currentUser.email+" • Perfil: "+(currentProfile.role||"cliente")+" • UID: "+currentUser.uid;
+ $("profileForm").classList.remove("hidden");
+ $("pName").value=currentProfile.fullName||"";$("pInstagram").value=currentProfile.instagram||"";$("pWhatsapp").value=currentProfile.whatsapp||"";$("pCep").value=currentProfile.cep||"";$("pAddress").value=currentProfile.address||"";$("pCity").value=currentProfile.city||"Mossoró";$("pReference").value=currentProfile.reference||"";$("pLocation").value=currentProfile.locationUrl||"";
+ updateRoleUI();
 }
 async function loadProducts(){
- if(!requireDb())return;
- const {data,error}=await db.from("products").select("*").eq("active",true).order("created_at",{ascending:false});
- if(error){el("products").innerHTML='<div class="empty">Não foi possível carregar o cardápio. Confira o SQL de instalação.</div>';return;}
- productsCache=data||[];renderProducts();
+ try{const snap=await getDocs(query(collection(db,"products"),where("active","==",true)));productsCache=snap.docs.map(d=>({id:d.id,...d.data()}));renderProducts();}
+ catch(e){$("products").innerHTML='<div class="empty">Não foi possível carregar o cardápio. Confira as regras do Firestore.</div>';console.error(e);}
 }
-function renderProducts(){
- const items=productsCache.filter(p=>activeCategory==="Todos"||p.category===activeCategory);
- el("products").innerHTML=items.length?items.map(p=>`<article class="product"><img src="${escapeHtml(p.image_url||"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=700")}" alt="${escapeHtml(p.name)}"><div class="product-body"><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.description||"Delicioso e preparado na hora.")}</p><div class="price-row"><span class="price">${money(p.price)}</span><button class="add" data-add="${p.id}">Adicionar +</button></div></div></article>`).join(""):'<div class="empty">Ainda não há produtos nesta categoria. Volte em breve!</div>';
- document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addCart(b.dataset.add));
-}
+function renderProducts(){const arr=productsCache.filter(p=>activeCategory==="Todos"||p.category===activeCategory);$("products").innerHTML=arr.length?arr.map(p=>`<article class="product"><img src="${esc(p.imageUrl||"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=700")}" alt="${esc(p.name)}"><div class="product-body"><h3>${esc(p.name)}</h3><p>${esc(p.description||"Delicioso e preparado na hora.")}</p><div class="price-row"><span class="price">${money(p.price)}</span><button class="add" data-add="${p.id}">Adicionar +</button></div></div></article>`).join(""):'<div class="empty">Ainda não há produtos nesta categoria. Volte em breve!</div>';document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addCart(b.dataset.add));}
 document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{activeCategory=b.dataset.category;document.querySelectorAll(".cat").forEach(x=>x.classList.toggle("active",x===b));renderProducts();});
-function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function addCart(id){const p=productsCache.find(x=>x.id===id);if(!p)return;const found=cart.find(x=>x.id===id);if(found)found.quantity++;else cart.push({id:p.id,name:p.name,price:Number(p.price),quantity:1});renderCount();notify(p.name+" adicionado ao carrinho!");}
-function renderCount(){el("cartCount").textContent=cart.reduce((a,b)=>a+b.quantity,0);}
-function renderCart(){el("cartItems").innerHTML=cart.length?cart.map((p,i)=>`<div class="cart-line"><div><strong>${escapeHtml(p.name)}</strong><div class="muted">${money(p.price)} cada</div></div><div class="row"><button class="secondary" data-minus="${i}">−</button><strong>${p.quantity}</strong><button class="secondary" data-plus="${i}">+</button><strong>${money(p.price*p.quantity)}</strong><button class="danger" data-remove="${i}">×</button></div></div>`).join(""):'<div class="empty">Seu carrinho está vazio.</div>';el("cartTotal").textContent="Total: "+money(cart.reduce((a,b)=>a+b.price*b.quantity,0));document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{cart[b.dataset.minus].quantity--;if(cart[b.dataset.minus].quantity<=0)cart.splice(b.dataset.minus,1);renderCart();renderCount();});document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{cart[b.dataset.plus].quantity++;renderCart();renderCount();});document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{cart.splice(b.dataset.remove,1);renderCart();renderCount();});}
-el("authForm").onsubmit=async e=>{e.preventDefault();if(!requireDb())return;const {data,error}=await db.auth.signInWithPassword({email:el("authEmail").value,password:el("authPassword").value});if(error){notify(error.message,true);return;}currentUser=data.user;await loadProfile();notify("Login realizado com sucesso!");showView("store");};
-el("signup").onclick=async()=>{if(!requireDb())return;const {data,error}=await db.auth.signUp({email:el("authEmail").value,password:el("authPassword").value});if(error){notify(error.message,true);return;}notify("Cadastro iniciado! Verifique seu e-mail para confirmar a conta. Depois faça login.");};
-el("loginOpen").addEventListener("click",async()=>{if(currentUser){await db.auth.signOut();currentUser=null;currentProfile=null;setRoleUI();el("accountState").textContent="Você saiu da sua conta.";el("profileForm").classList.add("hidden");notify("Você saiu da sua conta.");}});
-el("profileForm").onsubmit=async e=>{e.preventDefault();if(!currentUser)return notify("Entre primeiro.",true);const profile={id:currentUser.id,full_name:el("pName").value,instagram:el("pInstagram").value,whatsapp:el("pWhatsapp").value,cep:el("pCep").value,address:el("pAddress").value,city:el("pCity").value,reference:el("pReference").value,location_url:el("pLocation").value};const {error}=await db.from("profiles").upsert(profile);if(error)notify(error.message,true);else{notify("Seus dados foram salvos!");await loadProfile();}};
-el("checkout").onclick=async()=>{
- if(!requireDb())return;if(!currentUser){notify("Entre ou crie sua conta antes de finalizar o pedido.",true);showView("login");return;}if(!cart.length){notify("Adicione produtos ao carrinho.",true);return;}if(!currentProfile?.full_name||!currentProfile?.whatsapp||!currentProfile?.address){notify("Preencha e salve seu cadastro e endereço antes de pedir.",true);showView("account");return;}
+function addCart(id){const p=productsCache.find(x=>x.id===id);if(!p)return;const f=cart.find(x=>x.id===id);if(f)f.quantity++;else cart.push({id:p.id,name:p.name,price:Number(p.price),quantity:1});renderCount();notify(p.name+" adicionado ao carrinho!");}
+function renderCount(){$("cartCount").textContent=cart.reduce((a,b)=>a+b.quantity,0);}
+function renderCart(){$("cartItems").innerHTML=cart.length?cart.map((p,i)=>`<div class="cart-line"><div><strong>${esc(p.name)}</strong><div class="muted">${money(p.price)} cada</div></div><div class="row"><button class="secondary" data-minus="${i}">−</button><strong>${p.quantity}</strong><button class="secondary" data-plus="${i}">+</button><strong>${money(p.price*p.quantity)}</strong><button class="danger" data-remove="${i}">×</button></div></div>`).join(""):'<div class="empty">Seu carrinho está vazio.</div>';$("cartTotal").textContent="Total: "+money(cart.reduce((a,b)=>a+b.price*b.quantity,0));document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{cart[b.dataset.minus].quantity--;if(cart[b.dataset.minus].quantity<1)cart.splice(b.dataset.minus,1);renderCart();renderCount();});document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{cart[b.dataset.plus].quantity++;renderCart();renderCount();});document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{cart.splice(b.dataset.remove,1);renderCart();renderCount();});}
+$("authForm").onsubmit=async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("authEmail").value,$("authPassword").value);notify("Login realizado com sucesso!");showView("store");}catch(err){notify(err.message,true);}};
+$("signup").onclick=async()=>{try{await createUserWithEmailAndPassword(auth,$("authEmail").value,$("authPassword").value);notify("Conta criada! Você já pode completar seu cadastro.");showView("account");}catch(err){notify(err.message,true);}};
+onAuthStateChanged(auth,async user=>{currentUser=user;currentProfile=null;if(user){await loadProfile();}else{$("accountState").textContent="Entre ou crie sua conta para salvar seus dados.";$("profileForm").classList.add("hidden");updateRoleUI();}});
+$("profileForm").onsubmit=async e=>{e.preventDefault();if(!currentUser)return notify("Entre primeiro.",true);const fields={fullName:$("pName").value,instagram:$("pInstagram").value,whatsapp:$("pWhatsapp").value,cep:$("pCep").value,address:$("pAddress").value,city:$("pCity").value,reference:$("pReference").value,locationUrl:$("pLocation").value};try{await updateDoc(doc(db,"profiles",currentUser.uid),fields);currentProfile={...currentProfile,...fields};notify("Seus dados foram salvos!");}catch(err){notify(err.message,true);}};
+$("checkout").onclick=async()=>{
+ if(!currentUser){notify("Entre ou crie sua conta antes de finalizar.",true);showView("login");return;}if(!cart.length)return notify("Adicione produtos ao carrinho.",true);
+ if(!currentProfile?.fullName||!currentProfile?.whatsapp||!currentProfile?.address)return notify("Preencha e salve seu cadastro e endereço antes de pedir.",true);
  const total=cart.reduce((a,b)=>a+b.price*b.quantity,0);
- const {data:order,error}=await db.from("orders").insert({customer_id:currentUser.id,total,status:"pending",notes:el("orderNotes").value,delivery_address:currentProfile.address+", "+currentProfile.city,customer_name:currentProfile.full_name,customer_whatsapp:currentProfile.whatsapp}).select().single();
- if(error){notify(error.message,true);return;}
- const rows=cart.map(p=>({order_id:order.id,product_id:p.id,product_name:p.name,unit_price:p.price,quantity:p.quantity}));
- const result=await db.from("order_items").insert(rows);
- if(result.error){notify("Pedido criado, mas houve erro nos itens: "+result.error.message,true);return;}
- cart=[];renderCount();renderCart();el("orderNotes").value="";notify("Pedido enviado! A lanchonete já pode recebê-lo.");showView("orders");loadCustomerOrders();
+ try{const orderRef=await addDoc(collection(db,"orders"),{customerId:currentUser.uid,customerName:currentProfile.fullName,customerWhatsapp:currentProfile.whatsapp,deliveryAddress:currentProfile.address+", "+currentProfile.city,total,status:"pending",notes:$("orderNotes").value,items:cart.map(p=>({productId:p.id,productName:p.name,unitPrice:p.price,quantity:p.quantity})),courierId:null,createdAt:serverTimestamp()});cart=[];renderCount();renderCart();$("orderNotes").value="";notify("Pedido enviado! Código: "+orderRef.id.slice(0,8));showView("orders");loadCustomerOrders();}catch(err){notify(err.message,true);}
 };
-async function loadCustomerOrders(){if(!currentUser)return;const {data,error}=await db.from("orders").select("*,order_items(*)").eq("customer_id",currentUser.id).order("created_at",{ascending:false});if(error){el("customerOrders").textContent=error.message;return;}el("customerOrders").innerHTML=data.length?data.map(orderHtml).join(""):'<div class="empty">Você ainda não fez pedidos.</div>';}
-function statusName(s){return ({pending:"Aguardando confirmação",accepted:"Aceito pela loja",preparing:"Em preparação",ready:"Pronto para retirada",out_for_delivery:"Saiu para entrega",delivered:"Entregue",cancelled:"Cancelado"})[s]||s;}
-function orderHtml(o){return `<div class="order"><div><strong>Pedido #${o.id.slice(0,8)}</strong><div class="muted">${new Date(o.created_at).toLocaleString("pt-BR")} • ${escapeHtml(o.customer_name||"Cliente")}</div><div class="muted">${(o.order_items||[]).map(i=>`${i.quantity}x ${escapeHtml(i.product_name)}`).join(", ")}</div><span class="status ${o.status==="delivered"?"delivered":""}">${statusName(o.status)}</span></div><strong>${money(o.total)}</strong></div>`;}
-el("refreshOrders").onclick=loadCustomerOrders;
+function statusName(s){return({pending:"Aguardando confirmação",accepted:"Aceito pela loja",preparing:"Em preparação",ready:"Pronto para retirada",out_for_delivery:"Saiu para entrega",delivered:"Entregue",cancelled:"Cancelado"})[s]||s;}
+function orderHtml(o){return `<div class="order"><div><strong>Pedido #${o.id.slice(0,8)}</strong><div class="muted">${o.createdAt?.toDate?o.createdAt.toDate().toLocaleString("pt-BR"):"Pedido recente"} • ${esc(o.customerName||"Cliente")}</div><div class="muted">${(o.items||[]).map(i=>`${i.quantity}x ${esc(i.productName)}`).join(", ")}</div><span class="status ${o.status==="delivered"?"delivered":""}">${statusName(o.status)}</span></div><strong>${money(o.total)}</strong></div>`;}
+async function loadCustomerOrders(){if(!currentUser)return;$("customerOrders").innerHTML="Carregando...";try{const snap=await getDocs(query(collection(db,"orders"),where("customerId","==",currentUser.uid)));const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("customerOrders").innerHTML=arr.length?arr.map(orderHtml).join(""):'<div class="empty">Você ainda não fez pedidos.</div>';}catch(e){$("customerOrders").textContent=e.message;}}
+$("refreshOrders").onclick=loadCustomerOrders;
 async function ownerCheck(){if(currentProfile?.role!=="owner")return notify("Acesso restrito ao proprietário.",true);await loadOwnerOrders();await loadOwnerProducts();}
-el("refreshOwner").onclick=ownerCheck;
-el("productForm").onsubmit=async e=>{e.preventDefault();if(currentProfile?.role!=="owner")return notify("Somente o proprietário pode cadastrar produtos.",true);let image_url=null;const file=el("prodImage").files[0];if(file){if(file.size>2*1024*1024)return notify("A imagem deve ter até 2 MB.",true);const path=Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");const up=await db.storage.from("product-images").upload(path,file,{upsert:true});if(up.error)return notify(up.error.message,true);image_url=db.storage.from("product-images").getPublicUrl(path).data.publicUrl;}const {error}=await db.from("products").insert({name:el("prodName").value,category:el("prodCategory").value,price:Number(el("prodPrice").value),description:el("prodDescription").value,image_url,active:true});if(error)notify(error.message,true);else{notify("Produto cadastrado!");el("productForm").reset();loadProducts();loadOwnerProducts();}};
-async function loadOwnerProducts(){const {data,error}=await db.from("products").select("*").order("created_at",{ascending:false});el("ownerProducts").innerHTML=error?error.message:(data||[]).map(p=>`<div class="order"><span>${escapeHtml(p.name)} • ${money(p.price)} ${p.active?"":"(inativo)"}</span><button class="danger" data-delprod="${p.id}">Excluir</button></div>`).join("")||"Nenhum produto cadastrado.";document.querySelectorAll("[data-delprod]").forEach(b=>b.onclick=async()=>{if(!confirm("Excluir este produto do cardápio?"))return;const r=await db.from("products").update({active:false}).eq("id",b.dataset.delprod);if(r.error)notify(r.error.message,true);else{notify("Produto removido do cardápio.");loadProducts();loadOwnerProducts();}});}
-async function loadOwnerOrders(){const {data,error}=await db.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});el("ownerOrders").innerHTML=error?error.message:data.length?data.map(o=>`<div class="order"><div><strong>#${o.id.slice(0,8)} • ${escapeHtml(o.customer_name)}</strong><div class="muted">${escapeHtml(o.customer_whatsapp)} • ${escapeHtml(o.delivery_address)}</div><div class="muted">${(o.order_items||[]).map(i=>`${i.quantity}x ${escapeHtml(i.product_name)}`).join(", ")}</div><span class="status">${statusName(o.status)}</span></div><div><strong>${money(o.total)}</strong><div class="order-actions"><select data-status="${o.id}"><option value="pending">Pendente</option><option value="accepted">Aceito</option><option value="preparing">Preparando</option><option value="ready">Pronto</option><option value="out_for_delivery">Saiu para entrega</option><option value="delivered">Entregue</option><option value="cancelled">Cancelado</option></select><button class="success" data-save-status="${o.id}">Salvar</button></div></div></div>`).join(""):'<div class="empty">Nenhum pedido recebido ainda.</div>';data?.forEach(o=>{const s=document.querySelector(`[data-status="${o.id}"]`);if(s)s.value=o.status;});document.querySelectorAll("[data-save-status]").forEach(b=>b.onclick=async()=>{const id=b.dataset.saveStatus;const status=document.querySelector(`[data-status="${id}"]`).value;const r=await db.from("orders").update({status}).eq("id",id);if(r.error)notify(r.error.message,true);else{notify("Status do pedido atualizado.");loadOwnerOrders();}});}
-el("courierForm").onsubmit=async e=>{e.preventDefault();if(currentProfile?.role!=="owner")return notify("Acesso restrito.",true);const {data:person,error:findError}=await db.from("profiles").select("id").eq("email",el("courierEmail").value.toLowerCase()).maybeSingle();if(findError||!person)return notify("Não encontrei esse usuário. Peça ao motoboy para criar a conta e tentar novamente.",true);const {error}=await db.from("profiles").update({role:"courier",full_name:el("courierName").value,whatsapp:el("courierWhatsapp").value}).eq("id",person.id);if(error)notify(error.message,true);else{notify("Motoboy vinculado com sucesso.");el("courierForm").reset();}};
-async function loadCourierOrders(){if(currentProfile?.role!=="courier")return notify("Acesso restrito aos motoboys.",true);const {data,error}=await db.from("orders").select("*,order_items(*)").in("status",["ready","out_for_delivery"]).order("created_at",{ascending:true});el("courierOrders").innerHTML=error?error.message:data.length?data.map(o=>`<div class="order"><div><strong>Pedido #${o.id.slice(0,8)}</strong><div>${escapeHtml(o.customer_name)} • ${escapeHtml(o.customer_whatsapp)}</div><div class="muted">${escapeHtml(o.delivery_address)}</div><div class="muted">${(o.order_items||[]).map(i=>`${i.quantity}x ${escapeHtml(i.product_name)}`).join(", ")}</div></div><div class="order-actions"><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.delivery_address)}">Abrir rota</a><button class="success" data-deliver="${o.id}">Marcar entregue</button></div></div>`).join(""):'<div class="empty">Nenhuma entrega aguardando.</div>';document.querySelectorAll("[data-deliver]").forEach(b=>b.onclick=async()=>{const r=await db.from("orders").update({status:"delivered"}).eq("id",b.dataset.deliver);if(r.error)notify(r.error.message,true);else{notify("Entrega marcada como concluída.");loadCourierOrders();}});}
-el("refreshCourier").onclick=loadCourierOrders;
-async function init(){if(!configured){notify("O visual do aplicativo já está pronto. Para ativar login, pedidos e painel, configure o Supabase no final do arquivo index.html.");return;}const {data}=await db.auth.getUser();currentUser=data.user||null;if(currentUser)await loadProfile();else setRoleUI();await loadProducts();db.auth.onAuthStateChange(async(_event,session)=>{currentUser=session?.user||null;if(currentUser)await loadProfile();else{currentProfile=null;setRoleUI();}});}
-init();
+$("refreshOwner").onclick=ownerCheck;
+$("productForm").onsubmit=async e=>{e.preventDefault();if(currentProfile?.role!=="owner")return notify("Somente o proprietário pode cadastrar produtos.",true);try{let imageUrl="";const file=$("prodImage").files[0];if(file){if(file.size>2*1024*1024)return notify("A imagem deve ter até 2 MB.",true);const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_"),path="products/"+Date.now()+"_"+safe;const fileRef=ref(storage,path);await uploadBytes(fileRef,file);imageUrl=await getDownloadURL(fileRef);}await addDoc(collection(db,"products"),{name:$("prodName").value,category:$("prodCategory").value,price:Number($("prodPrice").value),description:$("prodDescription").value,imageUrl,active:true,createdAt:serverTimestamp()});notify("Produto cadastrado!");$("productForm").reset();await loadProducts();await loadOwnerProducts();}catch(err){notify(err.message,true);}};
+async function loadOwnerProducts(){try{const snap=await getDocs(collection(db,"products"));const arr=snap.docs.map(d=>({id:d.id,...d.data()}));$("ownerProducts").innerHTML=arr.map(p=>`<div class="order"><span>${esc(p.name)} • ${money(p.price)} ${p.active?"":"(inativo)"}</span><button class="danger" data-delprod="${p.id}">Excluir</button></div>`).join("")||"Nenhum produto cadastrado.";document.querySelectorAll("[data-delprod]").forEach(b=>b.onclick=async()=>{if(!confirm("Remover este produto do cardápio?"))return;try{await updateDoc(doc(db,"products",b.dataset.delprod),{active:false});notify("Produto removido.");loadProducts();loadOwnerProducts();}catch(e){notify(e.message,true);}});}catch(e){$("ownerProducts").textContent=e.message;}}
+async function loadOwnerOrders(){try{const snap=await getDocs(collection(db,"orders"));const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("ownerOrders").innerHTML=arr.length?arr.map(o=>`<div class="order"><div><strong>#${o.id.slice(0,8)} • ${esc(o.customerName)}</strong><div class="muted">${esc(o.customerWhatsapp)} • ${esc(o.deliveryAddress)}</div><div class="muted">${(o.items||[]).map(i=>`${i.quantity}x ${esc(i.productName)}`).join(", ")}</div><span class="status">${statusName(o.status)}</span></div><div><strong>${money(o.total)}</strong><div class="order-actions"><select data-status="${o.id}"><option value="pending">Pendente</option><option value="accepted">Aceito</option><option value="preparing">Preparando</option><option value="ready">Pronto</option><option value="out_for_delivery">Saiu para entrega</option><option value="delivered">Entregue</option><option value="cancelled">Cancelado</option></select><button class="success" data-save-status="${o.id}">Salvar</button></div></div></div>`).join(""):'<div class="empty">Nenhum pedido recebido ainda.</div>';arr.forEach(o=>{const s=document.querySelector(`[data-status="${o.id}"]`);if(s)s.value=o.status;});document.querySelectorAll("[data-save-status]").forEach(b=>b.onclick=async()=>{try{await updateDoc(doc(db,"orders",b.dataset.saveStatus),{status:document.querySelector(`[data-status="${b.dataset.saveStatus}"]`).value});notify("Status atualizado.");loadOwnerOrders();}catch(e){notify(e.message,true);}});}catch(e){$("ownerOrders").textContent=e.message;}}
+$("courierForm").onsubmit=async e=>{e.preventDefault();if(currentProfile?.role!=="owner")return notify("Acesso restrito.",true);const uid=$("courierUid").value.trim();try{await updateDoc(doc(db,"profiles",uid),{role:"courier",fullName:$("courierName").value,whatsapp:$("courierWhatsapp").value});notify("Motoboy vinculado!");$("courierForm").reset();}catch(err){notify("Não foi possível vincular. Confira o UID e se o motoboy já criou a conta. "+err.message,true);}};
+async function loadCourierOrders(){if(currentProfile?.role!=="courier")return notify("Acesso restrito aos motoboys.",true);try{const snap=await getDocs(query(collection(db,"orders"),where("courierId","==",currentUser.uid)));const arr=snap.docs.map(d=>({id:d.id,...d.data()}));$("courierOrders").innerHTML=arr.length?arr.map(o=>`<div class="order"><div><strong>Pedido #${o.id.slice(0,8)}</strong><div>${esc(o.customerName)} • ${esc(o.customerWhatsapp)}</div><div class="muted">${esc(o.deliveryAddress)}</div><div class="muted">${(o.items||[]).map(i=>`${i.quantity}x ${esc(i.productName)}`).join(", ")}</div><span class="status">${statusName(o.status)}</span></div><div class="order-actions"><a class="link" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.deliveryAddress)}">Abrir rota</a><button class="success" data-deliver="${o.id}">Marcar entregue</button></div></div>`).join(""):'<div class="empty">Nenhuma entrega atribuída a você.</div>';document.querySelectorAll("[data-deliver]").forEach(b=>b.onclick=async()=>{try{await updateDoc(doc(db,"orders",b.dataset.deliver),{status:"delivered"});notify("Entrega concluída!");loadCourierOrders();}catch(e){notify(e.message,true);}});}catch(e){$("courierOrders").textContent=e.message;}}
+$("refreshCourier").onclick=loadCourierOrders;
 </script>
 </body>
 </html>
+'''
+
+rules = r'''rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function myProfile() {
+      return get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data;
+    }
+    function isOwner() { return signedIn() && myProfile().role == 'owner'; }
+    function isCourier() { return signedIn() && myProfile().role == 'courier'; }
+
+    match /profiles/{uid} {
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.role == 'customer';
+      allow read: if signedIn() && (request.auth.uid == uid || isOwner());
+      allow update: if signedIn() && (
+        (request.auth.uid == uid
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.uid == resource.data.uid)
+        || isOwner()
+      );
+      allow delete: if isOwner();
+    }
+
+    match /products/{productId} {
+      allow read: if resource.data.active == true || isOwner();
+      allow create: if isOwner();
+      allow update, delete: if isOwner();
+    }
+
+    match /orders/{orderId} {
+      allow create: if signedIn()
+        && request.resource.data.customerId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0;
+      allow read: if signedIn() && (
+        resource.data.customerId == request.auth.uid
+        || isOwner()
+        || (isCourier() && resource.data.courierId == request.auth.uid)
+      );
+      allow update: if signedIn() && (
+        isOwner()
+        || (isCourier()
+          && resource.data.courierId == request.auth.uid
+          && request.resource.data.customerId == resource.data.customerId
+          && request.resource.data.courierId == resource.data.courierId
+          && request.resource.data.status in ['out_for_delivery','delivered'])
+      );
+      allow delete: if isOwner();
+    }
+  }
+}
+'''
+
+storage_rules = r'''rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() { return request.auth != null; }
+    function isOwner() {
+      return signedIn()
+        && firestore.get(/databases/(default)/documents/profiles/$(request.auth.uid)).data.role == 'owner';
+    }
+    match /products/{fileName} {
+      allow read: if true;
+      allow write: if isOwner()
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|gif)');
+    }
+  }
+}
+'''
+
+readme = r'''BRDIAS LANCHES — VERSÃO FIREBASE
+
+ARQUIVOS
+- index.html: aplicativo web completo.
+- firestore.rules: regras de segurança do banco Firestore.
+- storage.rules: regras de segurança das fotos dos produtos.
+- LEIA-ME.txt: este guia.
+
+ATENÇÃO AO PROJETO
+O firebaseConfig informado aponta para o projeto "bellapes-maos". Confirme que esse é mesmo o projeto que deseja usar para o BrDias Lanches antes de publicar. O firebaseConfig e a apiKey web não são senhas administrativas. Nunca publique chaves privadas ou credenciais de service account.
+
+1) ATIVAR SERVIÇOS NO FIREBASE
+Acesse https://console.firebase.google.com/ e abra o projeto bellapes-maos.
+- Authentication > Sign-in method > ative Email/Password.
+- Firestore Database > Create database.
+- Storage > Get started.
+O aplicativo usa Firebase Authentication, Cloud Firestore e Firebase Storage.
+
+2) PUBLICAR REGRAS
+- Firestore Database > Rules: cole o conteúdo de firestore.rules e clique em Publish.
+- Storage > Rules: cole o conteúdo de storage.rules e clique em Publish.
+
+3) CADASTRAR O PRIMEIRO PROPRIETÁRIO
+- Publique/abra index.html pelo GitHub Pages ou por um servidor local.
+- Crie uma conta no aplicativo com seu e-mail.
+- No Firebase Console > Firestore Database > Data, abra a coleção profiles.
+- Abra o documento cujo ID é o UID da sua conta (o UID aparece em Minha conta).
+- Altere o campo role para o texto owner.
+- Saia e entre novamente no aplicativo. A aba Painel do dono aparecerá.
+Não permita que usuários se promovam a owner. Faça essa alteração manualmente no Console, com acesso administrativo protegido.
+
+4) CADASTRAR MOTOboy
+- O motoboy cria sua própria conta no aplicativo.
+- Ele copia o UID que aparece em Minha conta e envia ao proprietário.
+- O proprietário informa esse UID no painel e vincula o perfil como courier.
+- Para atribuir uma entrega, o documento do pedido deve receber o campo courierId com o UID do motoboy. Nesta primeira interface, a atribuição automática/seleção do motoboy ainda não foi adicionada; pode ser feita no Firestore Console ou implementada na próxima etapa.
+
+5) PUBLICAR NO GITHUB PAGES
+- Envie index.html para a raiz do repositório.
+- GitHub > Settings > Pages > Deploy from a branch > main > /(root) > Save.
+- Aguarde a publicação.
+
+FUNCIONALIDADES NESTA VERSÃO
+- Cadastro e login por e-mail/senha.
+- Perfil do cliente: nome, Instagram, WhatsApp, CEP, endereço, cidade, referência e link de localização.
+- Cardápio por categoria, fotos e preços.
+- Carrinho e criação de pedido.
+- Painel do proprietário para produtos, fotos e status de pedidos.
+- Cadastro/vínculo de motoboy.
+- Área do motoboy para consultar pedidos atribuídos, abrir rota no Google Maps e marcar entrega.
+- Histórico de pedidos do cliente.
+
+LIMITAÇÕES / PRÓXIMAS MELHORIAS
+- O frete não está incluído no cálculo do total.
+- Pagamentos online ainda não foram integrados.
+- A atribuição de pedidos ao motoboy é manual nesta versão.
+- As regras do Firestore protegem os dados por usuário/perfil. Faça testes completos com contas separadas (cliente, dono e motoboy) antes de operar comercialmente.
+- Para produção, recomendamos Cloud Functions para validar preço/total no servidor, atribuir entregas com segurança, e evitar que o navegador determine valores finais de pedidos.
+- Se houver erro "Missing or insufficient permissions", confirme as regras publicadas e se a conta está com o perfil correto.
+'''
+
+(base/"index.html").write_text(html, encoding="utf-8")
+(base/"firestore.rules").write_text(rules, encoding="utf-8")
+(base/"storage.rules").write_text(storage_rules, encoding="utf-8")
+(base/"LEIA-ME.txt").write_text(readme, encoding="utf-8")
+zip_path=Path("/mnt/data/BrDias_Lanches_Firebase_Completo.zip")
+with zipfile.ZipFile(zip_path,"w",zipfile.ZIP_DEFLATED) as z:
+    for p in base.iterdir(): z.write(p,arcname=f"BrDias_Lanches_Firebase/{p.name}")
+print("Pacote Firebase criado:")
+for p in base.iterdir(): print(p.name, p.stat().st_size, "bytes")
+print(zip_path, zip_path.stat().st_size, "bytes")
