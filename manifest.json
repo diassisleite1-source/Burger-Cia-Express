@@ -1,0 +1,11 @@
+{
+  "name": "BrDias Lanches",
+  "short_name": "BrDias",
+  "description": "Peça seus lanches e bebidas favoritos.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff8f3",
+  "theme_color": "#e94b16",
+  "lang": "pt-BR",
+  "icons": []
+}
