@@ -23,7 +23,7 @@
 <body class="bg-gray-100 font-sans text-gray-800 antialiased min-h-screen flex flex-col">
 
     <!-- ========================================== -->
-    <!-- TELA 1: PORTAL DE ENTRADA / SELEÇÃO DE PERFIL -->
+    <!-- TELA 1: PORTAL DE ENTRADA (SÓ O CLIENTE) -->
     <!-- ========================================== -->
     <div id="view-portal" class="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-brand-700 z-50 flex flex-col items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center relative overflow-hidden">
@@ -37,18 +37,17 @@
             <p class="text-sm text-gray-500 mb-8">O melhor sabor da cidade direto na sua casa</p>
 
             <div class="space-y-4">
-                <button onclick="entrarComoCliente()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3 text-lg">
-                    <i class="fa-solid fa-user"></i> Sou Cliente / Fazer Pedido
-                </button>
-
-                <button onclick="entrarComoMotoboy()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3 text-lg">
-                    <i class="fa-solid fa-motorcycle"></i> Portal do Motoboy
+                <button onclick="entrarComoCliente()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-4 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3 text-lg">
+                    <i class="fa-solid fa-bag-shopping"></i> Fazer Pedido / Cardápio
                 </button>
             </div>
 
-            <!-- Acesso do Dono discretíssimo no rodapé do portal -->
-            <div class="mt-10 pt-4 border-t border-gray-100 flex justify-center">
-                <button onclick="entrarComoDono()" class="text-xs text-gray-400 hover:text-gray-600 transition flex items-center gap-1.5 py-1 px-3 rounded hover:bg-gray-50">
+            <!-- Acessos internos discretíssimos no rodapé para o Dono e Motoboy -->
+            <div class="mt-12 pt-4 border-t border-gray-100 flex justify-center gap-4">
+                <button onclick="entrarComoMotoboy()" class="text-xs text-gray-400 hover:text-gray-600 transition flex items-center gap-1 py-1 px-2 rounded hover:bg-gray-50">
+                    <i class="fa-solid fa-motorcycle"></i> Área do Motoboy
+                </button>
+                <button onclick="entrarComoDono()" class="text-xs text-gray-400 hover:text-gray-600 transition flex items-center gap-1 py-1 px-2 rounded hover:bg-gray-50">
                     <i class="fa-solid fa-lock"></i> Painel da Lanchonete
                 </button>
             </div>
@@ -102,7 +101,6 @@
     <!-- TELA 3: PAINEL DO CLIENTE (CARDÁPIO & PEDIDOS) -->
     <!-- ========================================== -->
     <div id="view-cliente-app" class="hidden flex-col flex-1">
-        <!-- Header do Cliente -->
         <header class="bg-white shadow-sm sticky top-0 z-30">
             <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -128,7 +126,6 @@
             </div>
         </header>
 
-        <!-- Conteúdo do Cardápio -->
         <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full pb-24">
             <div class="mb-6 bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl p-5 text-white shadow-lg flex items-center justify-between">
                 <div>
@@ -138,7 +135,6 @@
                 <div class="hidden md:block text-4xl opacity-80"><i class="fa-solid fa-utensils"></i></div>
             </div>
 
-            <!-- Lista de Produtos -->
             <div id="lista-cardapio" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Preenchido via JavaScript -->
             </div>
@@ -171,10 +167,7 @@
                 <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-box text-brand-600"></i> Entregas Atribuídas a Você</h3>
                 <button onclick="carregarDadosMotoboy()" class="text-xs bg-white border border-gray-300 hover:bg-gray-100 px-3 py-1.5 rounded-lg font-semibold text-gray-700 transition flex items-center gap-1.5"><i class="fa-solid fa-rotate"></i> Atualizar</button>
             </div>
-
-            <div id="lista-entregas-motoboy" class="space-y-4">
-                <!-- Preenchido via JS -->
-            </div>
+            <div id="lista-entregas-motoboy" class="space-y-4"></div>
         </main>
     </div>
 
@@ -195,7 +188,6 @@
                 </div>
                 <button onclick="voltarAoPortal()" class="text-xs bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
             </div>
-            <!-- Abas do Dono -->
             <div class="bg-gray-800 px-4 flex gap-2 border-t border-gray-700 text-xs font-semibold overflow-x-auto">
                 <button onclick="mudarAbaDono('pedidos')" id="tab-btn-pedidos" class="py-2.5 px-4 text-brand-400 border-b-2 border-brand-500 transition whitespace-nowrap"><i class="fa-solid fa-receipt"></i> Pedidos na Cozinha</button>
                 <button onclick="mudarAbaDono('motoboys')" id="tab-btn-motoboys" class="py-2.5 px-4 text-gray-400 hover:text-white transition whitespace-nowrap"><i class="fa-solid fa-motorcycle"></i> Gestão de Motoboys</button>
@@ -204,18 +196,14 @@
         </header>
 
         <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full">
-            <!-- ABA 1: PEDIDOS -->
             <div id="dono-aba-pedidos" class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-gray-800 text-lg">Fila de Pedidos em Tempo Real</h3>
                     <button onclick="renderizarPedidosDono()" class="text-xs bg-white border border-gray-300 hover:bg-gray-100 px-3 py-1.5 rounded-lg font-semibold text-gray-700 transition"><i class="fa-solid fa-rotate"></i> Atualizar Fila</button>
                 </div>
-                <div id="lista-pedidos-dono" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Preenchido via JS -->
-                </div>
+                <div id="lista-pedidos-dono" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <!-- ABA 2: MOTOBOYS -->
             <div id="dono-aba-motoboys" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="font-bold text-gray-800 text-base mb-3"><i class="fa-solid fa-user-plus text-brand-600"></i> Cadastrar Novo Motoboy</h3>
@@ -226,16 +214,12 @@
                         <button type="submit" class="bg-gray-900 hover:bg-black text-white font-semibold rounded-lg text-sm py-2 transition">Cadastrar Motoboy</button>
                     </form>
                 </div>
-
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="font-bold text-gray-800 text-base mb-3">Motoboys Cadastrados</h3>
-                    <div id="lista-motoboys-cadastrados" class="space-y-2">
-                        <!-- Preenchido via JS -->
-                    </div>
+                    <div id="lista-motoboys-cadastrados" class="space-y-2"></div>
                 </div>
             </div>
 
-            <!-- ABA 3: CARDÁPIO -->
             <div id="dono-aba-cardapio" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="font-bold text-gray-800 text-base mb-3"><i class="fa-solid fa-plus text-brand-600"></i> Adicionar Novo Item ao Cardápio</h3>
@@ -246,32 +230,23 @@
                         <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg text-sm py-2 transition">Adicionar Produto</button>
                     </form>
                 </div>
-
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="font-bold text-gray-800 text-base mb-3">Itens Ativos no Cardápio</h3>
-                    <div id="lista-cardapio-dono" class="space-y-2">
-                        <!-- Preenchido via JS -->
-                    </div>
+                    <div id="lista-cardapio-dono" class="space-y-2"></div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL: CARRINHO DE COMPRAS E CHECKOUT -->
-    <!-- ========================================== -->
+    <!-- MODAL: CARRINHO -->
     <div id="modal-carrinho" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end md:items-center justify-center p-0 md:p-4">
-        <div class="bg-white w-full max-w-lg rounded-t-3xl md:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up">
+        <div class="bg-white w-full max-w-lg rounded-t-3xl md:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
                 <h3 class="font-bold text-base"><i class="fa-solid fa-cart-shopping"></i> Seu Carrinho</h3>
                 <button onclick="fecharCarrinho()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            
             <div class="p-4 overflow-y-auto flex-1 space-y-4">
-                <div id="itens-carrinho-modal" class="divide-y divide-gray-100">
-                    <!-- Itens do Carrinho -->
-                </div>
-
+                <div id="itens-carrinho-modal" class="divide-y divide-gray-100"></div>
                 <div class="border-t border-gray-200 pt-4 space-y-3">
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Forma de Pagamento</label>
@@ -281,17 +256,14 @@
                             <option value="dinheiro">Dinheiro (Espécie)</option>
                         </select>
                     </div>
-
                     <div id="bloco-troco" class="hidden">
                         <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Troco para quanto?</label>
                         <input type="text" id="pagamento-troco" placeholder="Ex: R$ 50,00 ou Não preciso" class="w-full px-3 py-2 border rounded-xl text-sm">
                     </div>
-
                     <div id="bloco-pix-info" class="bg-brand-50 border border-brand-200 p-3 rounded-xl text-xs text-brand-800">
                         <p class="font-bold mb-1"><i class="fa-solid fa-qrcode"></i> Chave Pix para Pagamento:</p>
                         <p class="font-mono bg-white p-2 rounded border border-brand-200 text-center select-all">00020126580014br.gov.bcb.pix... (Chave CNPJ Burger & Cia)</p>
                     </div>
-
                     <div class="bg-gray-50 p-3 rounded-xl space-y-1 text-sm">
                         <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="resumo-subtotal">R$ 0,00</span></div>
                         <div class="flex justify-between text-gray-600"><span>Taxa de Entrega</span><span>R$ 5,00</span></div>
@@ -299,7 +271,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="p-4 bg-gray-50 border-t border-gray-200">
                 <button onclick="finalizarPedido()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-md transition text-base">
                     Enviar Pedido para a Lanchonete 🚀
@@ -308,24 +279,18 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL: ACOMPANHAR MEUS PEDIDOS -->
-    <!-- ========================================== -->
+    <!-- MODAL: MEUS PEDIDOS -->
     <div id="modal-meus-pedidos" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
                 <h3 class="font-bold text-base"><i class="fa-solid fa-clock-rotate-left"></i> Meus Pedidos Realizados</h3>
                 <button onclick="fecharMeusPedidos()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 space-y-3" id="lista-meus-pedidos-container">
-                <!-- Preenchido via JS -->
-            </div>
+            <div class="p-4 overflow-y-auto flex-1 space-y-3" id="lista-meus-pedidos-container"></div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL: MAPA DA ROTA DO MOTOBOY -->
-    <!-- ========================================== -->
+    <!-- MODAL: MAPA DO MOTOBOY -->
     <div id="modal-mapa-motoboy" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-xl rounded-2xl flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
@@ -338,7 +303,6 @@
                     <p class="text-gray-700" id="mapa-cliente-end">Endereço: -</p>
                     <p class="text-brand-700 font-semibold" id="mapa-cliente-pagamento">Pagamento: -</p>
                 </div>
-                <!-- Mapa Visual Estilizado simulando GPS -->
                 <div class="bg-gray-200 h-64 rounded-xl relative overflow-hidden flex items-center justify-center border border-gray-300">
                     <div class="absolute inset-0 opacity-40 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px]"></div>
                     <div class="text-center z-10 space-y-2 p-4 bg-white/90 backdrop-blur rounded-xl shadow-md max-w-xs">
@@ -354,11 +318,8 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT LOGIC -->
-    <!-- ========================================== -->
+    <!-- SCRIPTS -->
     <script>
-        // --- BANCO DE DADOS LOCAL (LocalStorage) ---
         let db = {
             clienteLogado: JSON.parse(localStorage.getItem('burger_cliente')) || null,
             motoboyLogado: localStorage.getItem('burger_motoboy_atual') || 'Carlos Entregador',
@@ -367,11 +328,11 @@
                 { id: 2, nome: 'X-Bacon Supremo', preco: 34.00, desc: 'Pão brioche, carne 160g, muito bacon crocante e maionese verde.' },
                 { id: 3, nome: 'Burger Duplo Monster', preco: 42.00, desc: 'Dois blends de 160g, dobro de queijo, bacon e cebola caramelizada.' },
                 { id: 4, nome: 'Batata Frita com Cheddar e Bacon', preco: 22.00, desc: 'Porção generosa de batatas sequinhas com cheddar cremoso e bacon.' },
-                { id: 5, nome: 'Refrigerant Lata 350ml', preco: 6.00, desc: 'Coca-Cola, Guaraná Antarctica ou Sprite.' }
+                { id: 5, nome: 'Refrigerante Lata 350ml', preco: 6.00, desc: 'Coca-Cola, Guaraná Antarctica ou Sprite.' }
             ],
             motoboys: JSON.parse(localStorage.getItem('burger_motoboys')) || [
-                { nome: 'Carlos Entregador', tel: '(84) 98888-1111', moto: 'Honda Fan 160 - Placa ABC-1234', pix: 'carlos@pix.com' },
-                { nome: 'João da Moto', tel: '(84) 99999-2222', moto: 'Yamaha Fazer 150 - Placa XYZ-9876', pix: 'joao@pix.com' }
+                { nome: 'Carlos Entregador', tel: '(84) 98888-1111', moto: 'Honda Fan 160 - Placa ABC-1234' },
+                { nome: 'João da Moto', tel: '(84) 99999-2222', moto: 'Yamaha Fazer 150 - Placa XYZ-9876' }
             ],
             pedidos: JSON.parse(localStorage.getItem('burger_pedidos')) || []
         };
@@ -385,7 +346,6 @@
             if(db.clienteLogado) localStorage.setItem('burger_cliente', JSON.stringify(db.clienteLogado));
         }
 
-        // --- CONTROLE DE TELAS E PORTAL ---
         function mudarTela(telaId) {
             ['view-portal', 'view-cliente-cadastro', 'view-cliente-app', 'view-motoboy-app', 'view-dono-app'].forEach(t => {
                 document.getElementById(t).classList.add('hidden');
@@ -400,7 +360,6 @@
             mudarTela('view-portal');
         }
 
-        // --- FLUXO CLIENTE ---
         function entrarComoCliente() {
             if(!db.clienteLogado) {
                 mudarTela('view-cliente-cadastro');
@@ -409,7 +368,7 @@
             }
         }
 
-        let gpsTemp = { lat: -5.1878, lng: -37.3441 }; // Padrão Mossoró / Exemplo
+        let gpsTemp = { lat: -5.1878, lng: -37.3441 };
         function capturarGPSCliente() {
             const status = document.getElementById('cad-gps-status');
             if(navigator.geolocation) {
@@ -468,7 +427,6 @@
             `).join('');
         }
 
-        // --- CARRINHO ---
         function adicionarAoCarrinho(id) {
             const item = db.cardapio.find(p => p.id === id);
             const existe = carrinho.find(c => c.id === id);
@@ -510,7 +468,7 @@
             container.innerHTML = carrinho.map((item, idx) => {
                 subtotal += item.preco * item.qtd;
                 return `
-                    py-3 flex items-center justify-between text-sm">
+                    <div class="py-3 flex items-center justify-between text-sm">
                         <div>
                             <p class="font-bold text-gray-800">${item.nome}</p>
                             <p class="text-xs text-gray-500">R$ ${item.preco.toFixed(2)} un</p>
@@ -548,7 +506,7 @@
                 itens: [...carrinho],
                 total: total,
                 pagamento: tipoPagamento === 'dinheiro' ? `Dinheiro (Troco para: ${troco || 'Não informado'})` : (tipoPagamento === 'pix' ? 'Pix (Pago)' : 'Cartão na Entrega'),
-                status: 'Recebido', // Recebido -> Em Preparo -> Saiu para Entrega -> Entregue
+                status: 'Recebido',
                 motoboyAtribuido: null,
                 data: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
@@ -608,7 +566,7 @@
             }
         }
 
-        // --- FLUXO MOTOBOY ---
+        // Motoboy
         function entrarComoMotoboy() {
             mudarTela('view-motoboy-app');
             popularSelectMotoboys();
@@ -686,7 +644,7 @@
             }
         }
 
-        // --- FLUXO DONO / LANCHONETE ---
+        // Dono
         function entrarComoDono() {
             mudarTela('view-dono-app');
             renderizarPedidosDono();
@@ -775,7 +733,6 @@
             }
         }
 
-        // Gestão de Motoboys Interna
         function cadastrarMotoboy(e) {
             e.preventDefault();
             const novo = {
@@ -811,7 +768,6 @@
             renderizarMotoboysDono();
         }
 
-        // Gestão de Cardápio Interna
         function cadastrarItemCardapio(e) {
             e.preventDefault();
             const novo = {
