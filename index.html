@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burger & Cia Express — Sistema de Delivery</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Scrollbar personalizada suave */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Animação Toast */
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .toast-enter {
+            animation: slideInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        /* Esconder scrollbar horizontal em categorias mantendo rolagem */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Animação tracejada da rota no mapa */
+        @keyframes dashFlow {
+            to {
+                stroke-dashoffset: -24;
+            }
+        }
+        .route-line-anim {
+            animation: dashFlow 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-20 md:pb-8">
+
+    <!-- BARRA SUPERIOR DE SESSÃO ATIVA -->
+    <div id="top-session-bar" class="hidden bg-slate-900 text-white sticky top-0 z-50 shadow-lg border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <div class="text-xs sm:text-sm">
+                    <span class="text-slate-400">Conectado como:</span>
+                    <strong id="session-user-label" class="text-white font-bold ml-1">Usuário</strong>
+                    <span id="session-role-badge" class="ml-1.5 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-[#EA1D2C] text-white">Perfil</span>
+                </div>
+            </div>
+            
+            <button onclick="logoutUser()" class="bg-slate-800 hover:bg-red-600 text-slate-200 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-slate-700">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Sair / Trocar Perfil</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTAINER DE NOTIFICAÇÕES TOAST -->
+    <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- ===================================================================== -->
+    <!-- PORTAL DE ENTRADA: LOGIN & CADASTRO SEPARADO POR PERFIL               -->
+    <!-- ===================================================================== -->
+    <div id="view-auth" class="min-h-screen flex flex-col justify-center py-6 px-4 bg-gradient-to-br from-slate-100 via-red-50/40 to-slate-100">
+        <div class="max-w-xl w-full mx-auto">
+            <!-- Marca -->
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-[#EA1D2C] text-white text-3xl flex items-center justify-center mx-auto shadow-lg shadow-red-600/25 mb-3">
+                    🍔
+                </div>
+                <h1 id="auth-store-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Burger & Cia Express</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Plataforma Integrada de Pedidos, Gestão e Entregas GPS</p>
+            </div>
+
+            <!-- Card Principal de Autenticação -->
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden">
+                <!-- Seletor de Perfil (3 Abas) -->
+                <div class="grid grid-cols-3 bg-slate-900 p-1.5 gap-1">
+                    <button type="button" onclick="selectAuthRole('cliente')" id="auth-role-cliente" class="py-2.5 px-2 rounded-2xl text-xs sm:text-sm font-extrabold transition flex flex-col sm:flex-row items-center justify-center gap-1.5 bg-[#EA1D2C] text-white shadow">
+                        <i class="fa-solid fa-burger"></i>
+                        <span>Sou Cliente</span>
+                    </button>
+                    <button type="button" onclick="selectAuthRole('motoboy')" id="auth-role-motoboy" class="py-2.5 px-2 rounded-2xl text-xs sm:text-sm font-extrabold transition flex flex-col sm:flex-row items-center justify-center gap-1.5 text-slate-300 hover:text-white">
+                        <i class="fa-solid fa-motorcycle"></i>
+                        <span>Sou Motoboy</span>
+                    </button>
+                    <button type="button" onclick="selectAuthRole('lanchonete')" id="auth-role-lanchonete" class="py-2.5 px-2 rounded-2xl text-xs sm:text-sm font-extrabold transition flex flex-col sm:flex-row items-center justify-center gap-1.5 text-slate-300 hover:text-white">
+                        <i class="fa-solid fa-store"></i>
+                        <span>Lanchonete</span>
+                    </button>
+                </div>
+
+                <!-- Sub-abas: Entrar vs Criar Cadastro -->
+                <div class="flex border-b border-slate-100 bg-slate-50/70">
+                    <button type="button" onclick="selectAuthMode('login')" id="auth-mode-login" class="flex-1 py-3 text-xs sm:text-sm font-extrabold border-b-2 border-[#EA1D2C] text-[#EA1D2C] transition">
+                        <i class="fa-solid fa-right-to-bracket mr-1.5"></i>Entrar na Conta
+                    </button>
+                    <button type="button" onclick="selectAuthMode('register')" id="auth-mode-register" class="flex-1 py-3 text-xs sm:text-sm font-extrabold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
+                        <i class="fa-solid fa-user-plus mr-1.5"></i><span id="auth-register-tab-label">Criar Cadastro</span>
+                    </button>
+                </div>
+
+                <div class="p-5 sm:p-7">
+                    <!-- FORMULÁRIO 1: LOGIN -->
+                    <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label id="login-identifier-label" class="block text-xs font-bold text-slate-700 mb-1">E-mail ou WhatsApp *</label>
+                            <input type="text" id="login-identifier" required placeholder="Digite seu e-mail ou telefone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Senha *</label>
+                            <input type="password" id="login-password" required placeholder="••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#EA1D2C] hover:bg-red-700 text-white font-extrabold py-3.5 rounded-xl shadow-md shadow-red-600/20 transition text-sm">
+                            Entrar Agora
+                        </button>
+                    </form>
+
+                    <!-- FORMULÁRIO 2A: CADASTRO DE CLIENTE -->
+                    <form id="form-register-cliente" onsubmit="handleRegisterClient(event)" class="hidden space-y-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nome Completo *</label>
+                                <input type="text" id="reg-cli-name" required placeholder="Ex: Ana Paula Souza" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp *</label>
+                                <input type="tel" id="reg-cli-phone" required placeholder="(84) 99999-0000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">E-mail *</label>
+                                <input type="email" id="reg-cli-email" required placeholder="ana@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Senha *</label>
+                                <input type="password" id="reg-cli-pass" required placeholder="Crie uma senha" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-3">
+                            <p class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2">Endereço & Localização de Entrega</p>
+                            <div class="grid grid-cols-3 gap-2 mb-2">
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Rua / Avenida *</label>
+                                    <input type="text" id="reg-cli-street" required placeholder="Ex: Rua João Pessoa" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Número *</label>
+                                    <input type="text" id="reg-cli-number" required placeholder="123" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Bairro *</label>
+                                    <select id="reg-cli-neighborhood" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:border-[#EA1D2C]">
+                                        <option value="Centro">Centro (Taxa R$ 5,00)</option>
+                                        <option value="Nova Betânia">Nova Betânia (Taxa R$ 6,00)</option>
+                                        <option value="Alto de São Manoel">Alto de São Manoel (Taxa R$ 7,50)</option>
+                                        <option value="Abolição">Abolição (Taxa R$ 8,00)</option>
+                                        <option value="Bairros Afastados">Bairros Afastados (Taxa R$ 10,00)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Ponto de Referência</label>
+                                    <input type="text" id="reg-cli-ref" placeholder="Ex: Próximo à praça" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bloco de Captura GPS do Cliente -->
+                        <div class="bg-blue-50/80 border border-blue-200 rounded-2xl p-3.5 space-y-2.5">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <p class="text-xs font-extrabold text-blue-950 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-location-crosshairs text-blue-600"></i> Localização GPS para o Motoboy
+                                    </p>
+                                    <p class="text-[11px] text-blue-700">Libere sua localização para traçarmos a rota exata até você.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2">
+                                <button type="button" onclick="captureGPS('client-reg')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-satellite-dish"></i> Capturar Minha Localização GPS Atual
+                                </button>
+                                <button type="button" onclick="simulateGPS('client-reg')" class="bg-white hover:bg-blue-100 text-blue-700 border border-blue-300 text-xs font-bold py-2.5 px-3 rounded-xl transition" title="Simular coordenadas para teste">
+                                    Simular GPS
+                                </button>
+                            </div>
+
+                            <input type="hidden" id="reg-cli-lat">
+                            <input type="hidden" id="reg-cli-lng">
+
+                            <!-- Preview Visual do GPS Capturado -->
+                            <div id="client-reg-gps-preview" class="hidden bg-white rounded-xl p-2.5 border border-blue-200 flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg shrink-0">
+                                        <i class="fa-solid fa-map-pin"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[11px] font-extrabold text-emerald-700 block">GPS Liberado com Sucesso!</span>
+                                        <span id="client-reg-coords-text" class="text-[11px] font-mono text-slate-600">Lat: 0.0000, Lng: 0.0000</span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-1 rounded-lg border border-emerald-200">Rota Ativa</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#EA1D2C] hover:bg-red-700 text-white font-extrabold py-3.5 rounded-xl shadow-md transition text-sm">
+                            Concluir Cadastro e Entrar
+                        </button>
+                    </form>
+
+                    <!-- FORMULÁRIO 2B: CADASTRO DE MOTOBOY -->
+                    <form id="form-register-motoboy" onsubmit="handleRegisterMotoboy(event)" class="hidden space-y-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nome Completo *</label>
+                                <input type="text" id="reg-moto-name" required placeholder="Ex: Carlos Eduardo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp *</label>
+                                <input type="tel" id="reg-moto-phone" required placeholder="(84) 98888-7777" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Placa da Moto *</label>
+                                <input type="text" id="reg-moto-plate" required placeholder="ABC-1D23" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm uppercase font-mono focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Modelo da Moto *</label>
+                                <input type="text" id="reg-moto-model" required placeholder="Honda CG 160" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Chave Pix (Repasse) *</label>
+                                <input type="text" id="reg-moto-pix" required placeholder="CPF, Celular ou E-mail" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Senha de Acesso *</label>
+                                <input type="password" id="reg-moto-pass" required placeholder="Crie uma senha" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
+                            <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i> Ao finalizar, seu perfil ficará disponível imediatamente para a lanchonete despachar corridas.
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#EA1D2C] hover:bg-red-700 text-white font-extrabold py-3.5 rounded-xl shadow-md transition text-sm">
+                            Cadastrar Motoboy e Acessar
+                        </button>
+                    </form>
+
+                    <!-- FORMULÁRIO 2C: CADASTRO / CONFIGURAÇÃO DA LANCHONETE -->
+                    <form id="form-register-lanchonete" onsubmit="handleRegisterStore(event)" class="hidden space-y-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nome da Lanchonete *</label>
+                                <input type="text" id="reg-store-name" required placeholder="Burger & Cia Express" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp da Loja *</label>
+                                <input type="tel" id="reg-store-phone" required placeholder="(84) 99999-1111" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Endereço Completo da Loja (Ponto de Partida) *</label>
+                            <input type="text" id="reg-store-address" required placeholder="Av. Alberto Maranhão, 1500 - Centro" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Taxa Padrão (R$)</label>
+                                <input type="number" step="0.50" id="reg-store-fee" value="5.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Chave Pix Loja *</label>
+                                <input type="text" id="reg-store-pix" required placeholder="CNPJ ou E-mail" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Senha Admin *</label>
+                                <input type="password" id="reg-store-pass" required placeholder="Senha" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                        </div>
+
+                        <!-- GPS da Lanchonete -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2">
+                            <p class="text-xs font-extrabold text-slate-800"><i class="fa-solid fa-store text-[#EA1D2C] mr-1"></i>GPS Base da Lanchonete (Saída dos Motoboys)</p>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="captureGPS('store-reg')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 px-3 rounded-xl transition">
+                                    <i class="fa-solid fa-location-crosshairs mr-1"></i> Capturar GPS da Loja
+                                </button>
+                                <button type="button" onclick="simulateGPS('store-reg')" class="bg-white border border-slate-300 text-slate-700 text-xs font-bold py-2 px-3 rounded-xl">
+                                    Simular GPS
+                                </button>
+                            </div>
+                            <input type="hidden" id="reg-store-lat">
+                            <input type="hidden" id="reg-store-lng">
+                            <p id="store-reg-coords-text" class="text-[11px] font-mono text-emerald-700 font-bold hidden"></p>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#EA1D2C] hover:bg-red-700 text-white font-extrabold py-3.5 rounded-xl shadow-md transition text-sm">
+                            Salvar Lanchonete e Abrir Painel
+                        </button>
+                    </form>
+
+                    <!-- BARRA DE ACESSO RÁPIDO PARA DEMONSTRAÇÃO -->
+                    <div class="mt-6 pt-5 border-t border-slate-100">
+                        <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 text-center mb-2.5">
+                            ⚡ Acesso Rápido Demo (1 Clique para Testar)
+                        </p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="quickDemoLogin('cliente')" class="bg-red-50 hover:bg-red-100 text-[#EA1D2C] border border-red-200 py-2 px-2 rounded-xl text-xs font-extrabold transition flex flex-col items-center gap-1">
+                                <i class="fa-solid fa-user"></i>
+                                <span>Demo Cliente</span>
+                            </button>
+                            <button type="button" onclick="quickDemoLogin('motoboy')" class="bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 py-2 px-2 rounded-xl text-xs font-extrabold transition flex flex-col items-center gap-1">
+                                <i class="fa-solid fa-motorcycle"></i>
+                                <span>Demo Motoboy</span>
+                            </button>
+                            <button type="button" onclick="quickDemoLogin('lanchonete')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 py-2 px-2 rounded-xl text-xs font-extrabold transition flex flex-col items-center gap-1">
+                                <i class="fa-solid fa-store"></i>
+                                <span>Demo Loja</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 1: VISÃO DO CLIENTE (CARDÁPIO DIGITAL, PEDIDOS & PERFIL GPS)   -->
+    <!-- ===================================================================== -->
+    <div id="view-cliente" class="role-view hidden max-w-6xl mx-auto px-4 pt-4">
+        
+        <!-- Cabeçalho da Lanchonete -->
+        <header class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+            <div class="bg-gradient-to-r from-[#EA1D2C] via-red-500 to-orange-500 h-28 sm:h-36 relative">
+                <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="absolute top-3 right-3 bg-black/30 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5">
+                    <i class="fa-solid fa-star text-amber-400"></i> 4.9 (1.2k avaliações)
+                </div>
+            </div>
+            
+            <div class="px-5 pb-5 relative">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-10 sm:-mt-12 gap-4">
+                    <div class="flex items-end gap-4">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white p-1.5 shadow-md border border-slate-100 flex items-center justify-center text-4xl sm:text-5xl">
+                            🍔
+                        </div>
+                        <div class="pt-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h1 id="client-header-store-name" class="text-xl sm:text-2xl font-extrabold text-slate-900">Burger & Cia Express</h1>
+                                <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aberto
+                                </span>
+                            </div>
+                            <p id="client-header-store-address" class="text-xs sm:text-sm text-slate-500 mt-0.5">Artesanais na Brasa • Entrega Própria</p>
+                        </div>
+                    </div>
+
+                    <!-- Info Rápida -->
+                    <div class="flex items-center gap-4 text-xs sm:text-sm bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                        <div>
+                            <span class="text-slate-400 block text-[11px] uppercase font-semibold">Tempo Estimado</span>
+                            <span class="font-bold text-slate-800"><i class="fa-regular fa-clock text-[#EA1D2C] mr-1"></i>30 - 45 min</span>
+                        </div>
+                        <div class="h-6 w-px bg-slate-200"></div>
+                        <div>
+                            <span class="text-slate-400 block text-[11px] uppercase font-semibold">Pedido Mínimo</span>
+                            <span class="font-bold text-slate-800">R$ 20,00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navegação Sub-abas Cliente (Cardápio vs Meus Pedidos vs Meu Perfil GPS) -->
+        <div class="flex items-center justify-between border-b border-slate-200 mb-5 overflow-x-auto no-scrollbar">
+            <div class="flex gap-6">
+                <button onclick="switchClientTab('cardapio')" id="tab-client-cardapio" class="pb-3 text-sm font-bold border-b-2 border-[#EA1D2C] text-[#EA1D2C] transition whitespace-nowrap">
+                    <i class="fa-solid fa-utensils mr-1.5"></i>Cardápio
+                </button>
+                <button onclick="switchClientTab('meus-pedidos')" id="tab-client-pedidos" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-receipt"></i>Meus Pedidos
+                    <span id="client-orders-count" class="bg-red-100 text-[#EA1D2C] text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                </button>
+                <button onclick="switchClientTab('perfil')" id="tab-client-perfil" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-location-dot"></i>Meu Cadastro & GPS
+                </button>
+            </div>
+        </div>
+
+        <!-- SUB-ABA 1.1: CARDÁPIO + CARRINHO LATERAL -->
+        <div id="client-sub-cardapio" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Coluna Esquerda (2/3): Filtros e Lista de Produtos -->
+            <div class="lg:col-span-2">
+                <div class="mb-4 space-y-3">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="search-product" oninput="renderMenu()" placeholder="Buscar lanche, bebida ou porção..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-[#EA1D2C]">
+                    </div>
+
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="category-filters">
+                        <button onclick="filterCategory('Todos')" class="cat-pill active bg-[#EA1D2C] text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm">Todos</button>
+                        <button onclick="filterCategory('Hambúrgueres')" class="cat-pill bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition">🍔 Hambúrgueres</button>
+                        <button onclick="filterCategory('Combos')" class="cat-pill bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition">🍟 Combos</button>
+                        <button onclick="filterCategory('Porções')" class="cat-pill bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition">🧅 Porções</button>
+                        <button onclick="filterCategory('Bebidas')" class="cat-pill bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition">🥤 Bebidas</button>
+                    </div>
+                </div>
+
+                <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- Coluna Direita (1/3): Carrinho / Sacola Desktop -->
+            <div class="lg:col-span-1">
+                <div id="cart-sidebar" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sticky top-16">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                        <h2 class="font-extrabold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-bag-shopping text-[#EA1D2C]"></i> Sua Sacola
+                        </h2>
+                        <button onclick="clearCart()" id="btn-clear-cart" class="hidden text-xs text-slate-400 hover:text-[#EA1D2C] font-semibold">Limpar</button>
+                    </div>
+
+                    <div id="cart-items-container" class="space-y-3 max-h-60 overflow-y-auto pr-1"></div>
+
+                    <!-- Formulário de Checkout (Puxa dados do Cliente Logado) -->
+                    <div id="checkout-form" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Bairro de Entrega *</label>
+                            <select id="checkout-neighborhood" onchange="updateCartTotals()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#EA1D2C]">
+                                <option value="5.00">Centro — Taxa R$ 5,00</option>
+                                <option value="6.00">Nova Betânia — Taxa R$ 6,00</option>
+                                <option value="7.50">Alto de São Manoel — Taxa R$ 7,50</option>
+                                <option value="8.00">Abolição — Taxa R$ 8,00</option>
+                                <option value="10.00">Bairros Afastados — Taxa R$ 10,00</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Endereço Completo *</label>
+                            <input type="text" id="checkout-address" placeholder="Rua, Nº, Ref." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-[#EA1D2C]">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Seu Nome *</label>
+                                <input type="text" id="checkout-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp *</label>
+                                <input type="tel" id="checkout-phone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-[#EA1D2C]">
+                            </div>
+                        </div>
+
+                        <!-- Status GPS no Checkout -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-2.5 flex items-center justify-between gap-2">
+                            <div class="text-[11px]">
+                                <span class="font-extrabold text-blue-950 block"><i class="fa-solid fa-location-dot text-blue-600 mr-1"></i>Localização GPS do Pedido</span>
+                                <span id="checkout-gps-status" class="font-mono text-blue-700">Não capturada</span>
+                            </div>
+                            <button type="button" onclick="captureGPS('checkout')" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg shrink-0">
+                                Atualizar GPS
+                            </button>
+                        </div>
+
+                        <!-- Forma de Pagamento -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Forma de Pagamento</label>
+                            <div class="grid grid-cols-3 gap-1.5">
+                                <button type="button" onclick="selectPayment('Pix')" id="pay-btn-Pix" class="pay-btn bg-red-50 border-2 border-[#EA1D2C] text-red-700 py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center gap-1">
+                                    <i class="fa-brands fa-pix text-base"></i> Pix
+                                </button>
+                                <button type="button" onclick="selectPayment('Cartão')" id="pay-btn-Cartão" class="pay-btn bg-slate-50 border border-slate-200 text-slate-600 py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center gap-1">
+                                    <i class="fa-regular fa-credit-card text-base"></i> Cartão
+                                </button>
+                                <button type="button" onclick="selectPayment('Dinheiro')" id="pay-btn-Dinheiro" class="pay-btn bg-slate-50 border border-slate-200 text-slate-600 py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center gap-1">
+                                    <i class="fa-solid fa-money-bill-wave text-base"></i> Dinheiro
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Box Condicional Pix -->
+                        <div id="payment-pix-box" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs">
+                            <p class="font-bold text-emerald-800 mb-1"><i class="fa-brands fa-pix mr-1"></i>Chave Pix da Loja:</p>
+                            <div class="flex items-center gap-1.5">
+                                <input type="text" readonly id="pix-key-input" value="burgercia@delivery.com.br" class="w-full bg-white border border-emerald-200 rounded-lg px-2 py-1 text-[11px] text-slate-600 font-mono">
+                                <button type="button" onclick="copyPixKey()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg font-bold shrink-0">Copiar</button>
+                            </div>
+                        </div>
+
+                        <!-- Box Condicional Dinheiro (Troco) -->
+                        <div id="payment-cash-box" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs">
+                            <label class="block font-bold text-amber-900 mb-1">Precisa de troco para quanto?</label>
+                            <input type="number" id="checkout-change" placeholder="Ex: 50" class="w-full bg-white border border-amber-300 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none">
+                        </div>
+
+                        <!-- Resumo de Valores -->
+                        <div class="bg-slate-50 rounded-xl p-3 space-y-1.5 text-xs">
+                            <div class="flex justify-between text-slate-500">
+                                <span>Subtotal</span>
+                                <span id="cart-subtotal">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between text-slate-500">
+                                <span>Taxa de Entrega</span>
+                                <span id="cart-delivery-fee">R$ 5,00</span>
+                            </div>
+                            <div class="flex justify-between text-base font-extrabold text-slate-900 pt-1.5 border-t border-slate-200">
+                                <span>Total</span>
+                                <span id="cart-total" class="text-[#EA1D2C]">R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        <button onclick="submitOrder()" class="w-full bg-[#EA1D2C] hover:bg-red-700 active:scale-[0.99] text-white font-extrabold py-3.5 rounded-xl shadow-md shadow-red-600/20 transition flex items-center justify-center gap-2 text-sm">
+                            <span>Finalizar Pedido</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUB-ABA 1.2: MEUS PEDIDOS -->
+        <div id="client-sub-pedidos" class="hidden max-w-3xl mx-auto">
+            <div id="client-orders-list" class="space-y-4"></div>
+        </div>
+
+        <!-- SUB-ABA 1.3: MEU PERFIL & ATUALIZAÇÃO GPS -->
+        <div id="client-sub-perfil" class="hidden max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="text-lg font-extrabold text-slate-900">Meus Dados e Localização GPS</h2>
+                    <p class="text-xs text-slate-500">Mantenha seu endereço e GPS atualizados para que o motoboy encontre você sem demora.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nome Completo</label>
+                        <input type="text" id="prof-cli-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp</label>
+                        <input type="tel" id="prof-cli-phone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Endereço Completo</label>
+                    <input type="text" id="prof-cli-address" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-extrabold text-blue-950">Coordenadas GPS Salvas no Perfil</p>
+                            <p id="prof-cli-coords-display" class="text-xs font-mono text-blue-700 mt-0.5">Nenhuma coordenada salva</p>
+                        </div>
+                        <button type="button" onclick="captureGPS('client-profile')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs">
+                            <i class="fa-solid fa-location-crosshairs mr-1"></i> Capturar GPS Atual
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="saveClientProfileChanges()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3 rounded-xl text-sm transition">
+                    Salvar Alterações do Perfil
+                </button>
+            </div>
+        </div>
+
+        <!-- Barra Flutuante Mobile -->
+        <div id="mobile-cart-bar" class="fixed bottom-3 left-3 right-3 lg:hidden z-40 hidden">
+            <button onclick="scrollToCart()" class="w-full bg-[#EA1D2C] text-white p-3.5 rounded-2xl shadow-xl flex items-center justify-between font-bold text-sm">
+                <div class="flex items-center gap-2">
+                    <span id="mobile-cart-count" class="bg-white text-[#EA1D2C] w-6 h-6 rounded-full flex items-center justify-center text-xs font-extrabold">0</span>
+                    <span>Ver Sacola</span>
+                </div>
+                <span id="mobile-cart-total">R$ 0,00</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 2: VISÃO DA LANCHONETE (PAINEL DE GESTÃO / COZINHA)            -->
+    <!-- ===================================================================== -->
+    <div id="view-lanchonete" class="role-view hidden max-w-7xl mx-auto px-4 pt-5">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                    <span class="bg-[#EA1D2C] text-white w-9 h-9 rounded-xl flex items-center justify-center text-base"><i class="fa-solid fa-fire-burner"></i></span>
+                    <span id="kitchen-header-title">Painel da Cozinha & Gestão</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Gerencie pedidos, despache motoboys cadastrados e configure sua loja.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="simulateIncomingOrder()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-bolt"></i> Simular Pedido
+                </button>
+                <button onclick="switchKitchenTab('kanban')" id="btn-kitchen-kanban" class="bg-slate-900 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition">
+                    <i class="fa-solid fa-list-check mr-1"></i> Pedidos
+                </button>
+                <button onclick="switchKitchenTab('cardapio')" id="btn-kitchen-cardapio" class="bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition">
+                    <i class="fa-solid fa-book-open mr-1"></i> Cardápio
+                </button>
+                <button onclick="switchKitchenTab('config')" id="btn-kitchen-config" class="bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition">
+                    <i class="fa-solid fa-gear mr-1"></i> Loja & Equipe
+                </button>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase">Faturamento Hoje</p>
+                    <p id="kpi-revenue" class="text-xl sm:text-2xl font-extrabold text-slate-900">R$ 0,00</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase">Em Andamento</p>
+                    <p id="kpi-active" class="text-xl sm:text-2xl font-extrabold text-slate-900">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase">Pedidos Entregues</p>
+                    <p id="kpi-delivered" class="text-xl sm:text-2xl font-extrabold text-slate-900">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUB-ABA 2.1: KANBAN DE PEDIDOS -->
+        <div id="kitchen-sub-kanban" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="bg-slate-100/80 rounded-2xl p-3 border border-slate-200/60 flex flex-col">
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <h3 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span> Novos Pedidos
+                    </h3>
+                    <span id="count-col-novo" class="bg-red-100 text-red-700 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="col-novo" class="space-y-3 flex-1 min-h-[200px]"></div>
+            </div>
+
+            <div class="bg-slate-100/80 rounded-2xl p-3 border border-slate-200/60 flex flex-col">
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <h3 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Em Preparo
+                    </h3>
+                    <span id="count-col-preparo" class="bg-amber-100 text-amber-800 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="col-preparo" class="space-y-3 flex-1 min-h-[200px]"></div>
+            </div>
+
+            <div class="bg-slate-100/80 rounded-2xl p-3 border border-slate-200/60 flex flex-col">
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <h3 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Pronto / Despachar
+                    </h3>
+                    <span id="count-col-pronto" class="bg-blue-100 text-blue-800 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="col-pronto" class="space-y-3 flex-1 min-h-[200px]"></div>
+            </div>
+
+            <div class="bg-slate-100/80 rounded-2xl p-3 border border-slate-200/60 flex flex-col">
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <h3 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Em Rota & Entregues
+                    </h3>
+                    <span id="count-col-rota" class="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="col-rota" class="space-y-3 flex-1 min-h-[200px]"></div>
+            </div>
+        </div>
+
+        <!-- SUB-ABA 2.2: GERENCIAR CARDÁPIO -->
+        <div id="kitchen-sub-cardapio" class="hidden bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-5">
+                <div>
+                    <h2 class="text-lg font-extrabold text-slate-900">Gerenciamento de Produtos</h2>
+                    <p class="text-xs text-slate-500">Pause itens esgotados ou cadastre novidades instantaneamente no app do cliente.</p>
+                </div>
+                <button onclick="openNewProductModal()" class="bg-[#EA1D2C] hover:bg-red-700 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 self-start">
+                    <i class="fa-solid fa-plus"></i> Novo Produto
+                </button>
+            </div>
+
+            <div id="kitchen-menu-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- SUB-ABA 2.3: CONFIGURAÇÕES DA LOJA & MOTOBOYS CADASTRADOS -->
+        <div id="kitchen-sub-config" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Dados da Lanchonete -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <h2 class="text-lg font-extrabold text-slate-900 border-b border-slate-100 pb-3">Dados & GPS da Lanchonete</h2>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nome da Lanchonete</label>
+                    <input type="text" id="cfg-store-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Endereço da Loja (Ponto de Saída)</label>
+                    <input type="text" id="cfg-store-address" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Chave Pix Recebimento</label>
+                        <input type="text" id="cfg-store-pix" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp Loja</label>
+                        <input type="text" id="cfg-store-phone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+                    <div class="text-xs">
+                        <span class="font-bold text-slate-700 block">GPS da Lanchonete:</span>
+                        <span id="cfg-store-coords" class="font-mono text-emerald-700">Não definido</span>
+                    </div>
+                    <button type="button" onclick="captureGPS('store-config')" class="bg-slate-800 text-white text-xs font-bold px-3 py-2 rounded-xl">
+                        Atualizar GPS Loja
+                    </button>
+                </div>
+                <button onclick="saveStoreConfigFromPanel()" class="w-full bg-[#EA1D2C] hover:bg-red-700 text-white font-extrabold py-3 rounded-xl text-sm">
+                    Salvar Configurações da Loja
+                </button>
+            </div>
+
+            <!-- Lista de Motoboys Cadastrados -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900">Motoboys Cadastrados</h2>
+                        <p class="text-xs text-slate-500">Entregadores registrados que aparecem na fila de despacho.</p>
+                    </div>
+                    <span id="cfg-motoboys-count" class="bg-orange-100 text-orange-700 text-xs font-extrabold px-2.5 py-1 rounded-full">0</span>
+                </div>
+                <div id="cfg-motoboys-list" class="space-y-2.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 3: VISÃO DO MOTOBOY (EXCLUSIVA DO ENTREGADOR LOGADO)           -->
+    <!-- ===================================================================== -->
+    <div id="view-motoboy" class="role-view hidden max-w-3xl mx-auto px-4 pt-5">
+        
+        <!-- Cabeçalho do Entregador Logado -->
+        <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-md mb-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-14 h-14 rounded-2xl bg-orange-500 text-white flex items-center justify-center text-2xl font-bold shadow">
+                        <i class="fa-solid fa-helmet-safety"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] uppercase tracking-wider text-orange-400 font-extrabold block">Entregador Autenticado</span>
+                        <h2 id="motoboy-logged-name" class="text-xl font-extrabold text-white">Nome do Motoboy</h2>
+                        <p id="motoboy-logged-vehicle" class="text-xs text-slate-300 mt-0.5">Moto • Placa</p>
+                    </div>
+                </div>
+
+                <!-- Botão Online/Offline -->
+                <button onclick="toggleMotoboyStatus()" id="btn-motoboy-status" class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Online / Disponível</span>
+                </button>
+            </div>
+
+            <!-- Resumo de Ganhos e Chave Pix -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5 pt-4 border-t border-slate-800">
+                <div class="bg-slate-800/70 p-3 rounded-xl">
+                    <span class="text-xs text-slate-400 block">Entregas Concluídas</span>
+                    <span id="motoboy-deliveries-count" class="text-xl font-extrabold text-white">0</span>
+                </div>
+                <div class="bg-slate-800/70 p-3 rounded-xl">
+                    <span class="text-xs text-slate-400 block">Ganhos em Taxas</span>
+                    <span id="motoboy-earnings" class="text-xl font-extrabold text-emerald-400">R$ 0,00</span>
+                </div>
+                <div class="col-span-2 sm:col-span-1 bg-slate-800/70 p-3 rounded-xl">
+                    <span class="text-xs text-slate-400 block">Chave Pix Repasse</span>
+                    <span id="motoboy-logged-pix" class="text-xs font-mono font-bold text-orange-300 truncate block mt-1">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Entregas Atribuídas -->
+        <div class="mb-3 flex items-center justify-between">
+            <h2 class="font-extrabold text-lg text-slate-900">Minhas Entregas em Rota</h2>
+            <span class="text-xs text-slate-500 font-medium">Rota GPS integrada</span>
+        </div>
+
+        <div id="motoboy-orders-list" class="space-y-4"></div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 1: PERSONALIZAÇÃO DE PRODUTO (CLIENTE)                          -->
+    <!-- ===================================================================== -->
+    <div id="product-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="relative bg-gradient-to-br from-orange-50 to-red-50 p-6 flex items-center justify-center border-b border-slate-100">
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 text-slate-600 hover:text-slate-900 shadow flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <span id="modal-prod-emoji" class="text-6xl drop-shadow-sm">🍔</span>
+            </div>
+
+            <div class="p-5 overflow-y-auto space-y-4 flex-1">
+                <div>
+                    <div class="flex items-start justify-between gap-2">
+                        <h3 id="modal-prod-name" class="text-xl font-extrabold text-slate-900">Nome do Produto</h3>
+                        <span id="modal-prod-base-price" class="text-lg font-extrabold text-[#EA1D2C] shrink-0">R$ 0,00</span>
+                    </div>
+                    <p id="modal-prod-desc" class="text-xs sm:text-sm text-slate-500 mt-1">Descrição detalhada do lanche.</p>
+                </div>
+
+                <div id="modal-addons-section" class="border-t border-slate-100 pt-4">
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2.5">Turbine seu lanche (Opcional)</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                            <div class="flex items-center gap-2.5">
+                                <input type="checkbox" class="addon-checkbox w-4 h-4 accent-[#EA1D2C] rounded" data-name="Bacon Crocante Extra" data-price="4.50" onchange="updateModalTotal()">
+                                <span class="text-sm font-semibold text-slate-700">Bacon Crocante Extra</span>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600">+ R$ 4,50</span>
+                        </label>
+
+                        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                            <div class="flex items-center gap-2.5">
+                                <input type="checkbox" class="addon-checkbox w-4 h-4 accent-[#EA1D2C] rounded" data-name="Cheddar Cremoso" data-price="3.50" onchange="updateModalTotal()">
+                                <span class="text-sm font-semibold text-slate-700">Cheddar Cremoso</span>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600">+ R$ 3,50</span>
+                        </label>
+
+                        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                            <div class="flex items-center gap-2.5">
+                                <input type="checkbox" class="addon-checkbox w-4 h-4 accent-[#EA1D2C] rounded" data-name="Ovo na Chapa" data-price="2.50" onchange="updateModalTotal()">
+                                <span class="text-sm font-semibold text-slate-700">Ovo na Chapa</span>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600">+ R$ 2,50</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 pt-4">
+                    <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Alguma observação?</label>
+                    <textarea id="modal-prod-notes" rows="2" placeholder="Ex: Tirar cebola, carne bem passada..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#EA1D2C]"></textarea>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-slate-100 flex items-center gap-3">
+                <div class="flex items-center border border-slate-200 rounded-xl bg-slate-50">
+                    <button type="button" onclick="changeModalQty(-1)" class="w-10 h-11 font-bold text-slate-600 hover:text-[#EA1D2C]">-</button>
+                    <span id="modal-prod-qty" class="w-8 text-center font-extrabold text-sm">1</span>
+                    <button type="button" onclick="changeModalQty(1)" class="w-10 h-11 font-bold text-slate-600 hover:text-[#EA1D2C]">+</button>
+                </div>
+                <button type="button" onclick="confirmAddToCart()" class="flex-1 bg-[#EA1D2C] hover:bg-red-700 text-white font-extrabold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-between text-sm">
+                    <span>Adicionar</span>
+                    <span id="modal-total-btn">R$ 0,00</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 2: ADICIONAR NOVO PRODUTO AO CARDÁPIO (LANCHONETE)              -->
+    <!-- ===================================================================== -->
+    <div id="new-product-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-extrabold text-lg text-slate-900">Cadastrar Novo Item</h3>
+                <button onclick="closeNewProductModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ícone (Emoji)</label>
+                        <input type="text" id="new-prod-emoji" value="🍔" class="w-full border border-slate-200 rounded-xl p-2.5 text-center text-xl">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Categoria</label>
+                        <select id="new-prod-cat" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm font-medium bg-white">
+                            <option value="Hambúrgueres">Hambúrgueres</option>
+                            <option value="Combos">Combos</option>
+                            <option value="Porções">Porções</option>
+                            <option value="Bebidas">Bebidas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nome do Produto *</label>
+                    <input type="text" id="new-prod-name" placeholder="Ex: X-Tudão da Casa" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Preço (R$) *</label>
+                    <input type="number" step="0.50" id="new-prod-price" placeholder="Ex: 29.90" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Descrição</label>
+                    <textarea id="new-prod-desc" rows="2" placeholder="Ingredientes do produto..." class="w-full border border-slate-200 rounded-xl p-2.5 text-sm"></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeNewProductModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                <button onclick="saveNewProduct()" class="px-5 py-2 rounded-xl text-xs font-bold bg-[#EA1D2C] hover:bg-red-700 text-white shadow">Salvar no Cardápio</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 3: MAPA INTERATIVO DE ROTA GPS (MOTOBOY)                        -->
+    <!-- ===================================================================== -->
+    <div id="route-map-modal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] uppercase tracking-wider text-orange-400 font-extrabold block">Navegação GPS da Entrega</span>
+                    <h3 id="map-modal-title" class="font-extrabold text-base sm:text-lg">Rota para Pedido #0000</h3>
+                </div>
+                <button onclick="closeRouteMapModal()" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Visualização Gráfica Interativa da Rota -->
+            <div class="relative bg-slate-100 p-4">
+                <div class="w-full h-64 rounded-2xl bg-[#e8eef5] border border-slate-300 relative overflow-hidden shadow-inner">
+                    <!-- Malha Urbana Estilizada SVG -->
+                    <svg viewBox="0 0 500 260" class="w-full h-full">
+                        <!-- Quarteirões e Ruas -->
+                        <rect width="500" height="260" fill="#eef2f6"/>
+                        <path d="M0 60 H500 M0 130 H500 M0 200 H500 M90 0 V260 M210 0 V260 M340 0 V260 M430 0 V260" stroke="#ffffff" stroke-width="10"/>
+                        <path d="M0 60 H500 M0 130 H500 M0 200 H500 M90 0 V260 M210 0 V260 M340 0 V260 M430 0 V260" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4"/>
+                        <!-- Área Verde / Praça -->
+                        <rect x="225" y="72" width="100" height="46" rx="8" fill="#bbf7d0" opacity="0.7"/>
+                        <text x="275" y="99" font-size="10" fill="#15803d" text-anchor="middle" font-weight="bold">Praça Central</text>
+
+                        <!-- Linha da Rota Traçada -->
+                        <path d="M 90 200 L 90 130 L 340 130 L 340 60 L 410 60" fill="none" stroke="#93c5fd" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M 90 200 L 90 130 L 340 130 L 340 60 L 410 60" fill="none" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 6" stroke-linecap="round" stroke-linejoin="round" class="route-line-anim"/>
+
+                        <!-- Ponto A: Lanchonete -->
+                        <circle cx="90" cy="200" r="14" fill="#EA1D2C" stroke="#ffffff" stroke-width="3"/>
+                        <text x="90" y="204" font-size="12" text-anchor="middle">🍔</text>
+                        <rect x="35" y="220" width="110" height="22" rx="6" fill="#0f172a"/>
+                        <text x="90" y="234" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="bold">Lanchonete (Saída)</text>
+
+                        <!-- Ponto B: Cliente -->
+                        <circle cx="410" cy="60" r="15" fill="#16a34a" stroke="#ffffff" stroke-width="3"/>
+                        <text x="410" y="64" font-size="12" text-anchor="middle">🏠</text>
+                        <rect x="345" y="22" width="130" height="22" rx="6" fill="#15803d"/>
+                        <text x="410" y="36" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="bold">Destino do Cliente</text>
+                    </svg>
+
+                    <!-- Badges de Distância e Tempo Estimado -->
+                    <div class="absolute bottom-3 right-3 bg-white/95 backdrop-blur-xs px-3 py-2 rounded-xl shadow border border-slate-200 flex items-center gap-3 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 uppercase font-bold block">Distância</span>
+                            <span id="map-modal-distance" class="font-extrabold text-slate-900">2.4 km</span>
+                        </div>
+                        <div class="h-6 w-px bg-slate-200"></div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 uppercase font-bold block">Tempo Moto</span>
+                            <span id="map-modal-duration" class="font-extrabold text-emerald-600">~7 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coordenadas Técnicas -->
+                <div class="mt-3 bg-white rounded-xl p-3 border border-slate-200 text-xs space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500 font-semibold">Origem (Loja):</span>
+                        <span id="map-modal-origin-coords" class="font-mono text-slate-700">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500 font-semibold">Destino (Cliente):</span>
+                        <span id="map-modal-dest-coords" class="font-mono text-emerald-700 font-bold">-</span>
+                    </div>
+                    <p id="map-modal-address" class="text-slate-800 font-bold pt-1 border-t border-slate-100 mt-1"></p>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-slate-100 flex flex-col sm:flex-row gap-2.5">
+                <a id="map-modal-external-link" href="#" target="_blank" rel="noopener noreferrer" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow transition">
+                    <i class="fa-solid fa-diamond-turn-right"></i> Iniciar Navegação no Google Maps
+                </a>
+                <button onclick="closeRouteMapModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-5 rounded-xl text-xs sm:text-sm">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- JAVASCRIPT: AUTENTICAÇÃO, GEOLOCALIZAÇÃO GPS E GESTÃO INTEGRADA       -->
+    <!-- ===================================================================== -->
+    <script>
+        // --- CHAVES DO LOCALSTORAGE ---
+        const STORAGE_PRODUCTS_KEY = 'burgercia_products_v2';
+        const STORAGE_ORDERS_KEY = 'burgercia_orders_v2';
+        const STORAGE_CART_KEY = 'burgercia_cart_v2';
+        const STORAGE_CLIENTS_KEY = 'burgercia_clients_v2';
+        const STORAGE_MOTOBOYS_KEY = 'burgercia_motoboys_v2';
+        const STORAGE_STORE_KEY = 'burgercia_store_v2';
+        const STORAGE_SESSION_KEY = 'burgercia_session_v2';
+
+        // --- DADOS INICIAIS PADRÃO ---
+        const defaultStore = {
+            name: 'Burger & Cia Express',
+            phone: '(84) 99999-0001',
+            address: 'Av. Alberto Maranhão, 1500 - Centro, Mossoró - RN',
+            defaultFee: 5.00,
+            pixKey: 'burgercia@delivery.com.br',
+            password: '123',
+            lat: -5.1875,
+            lng: -37.3441
+        };
+
+        const defaultClients = [
+            {
+                id: 'cli-1',
+                name: 'Mariana Costa',
+                phone: '(84) 98812-3456',
+                email: 'cliente@teste.com',
+                password: '123',
+                street: 'Rua João Pessoa',
+                number: '410',
+                neighborhood: 'Centro',
+                reference: 'Em frente à praça',
+                lat: -5.1842,
+                lng: -37.3478
+            }
+        ];
+
+        const defaultMotoboys = [
+            {
+                id: 'moto-1',
+                name: 'Carlos',
+                phone: '(84) 98800-1122',
+                plate: 'QGA-4B12',
+                model: 'Honda CG 160',
+                pixKey: 'carlos.moto@pix.com',
+                password: '123'
+            },
+            {
+                id: 'moto-2',
+                name: 'João',
+                phone: '(84) 98800-3344',
+                plate: 'RGH-9C88',
+                model: 'Yamaha Factor 150',
+                pixKey: '84988003344',
+                password: '123'
+            }
+        ];
+
+        const defaultProducts = [
+            { id: 1, name: 'Classic Smash Burger', category: 'Hambúrgueres', price: 22.90, emoji: '🍔', desc: 'Pão brioche selado na manteiga, blend bovino 140g, queijo prato derretido, alface, tomate e molho especial.', available: true },
+            { id: 2, name: 'Cheddar Bacon Supremo', category: 'Hambúrgueres', price: 28.90, emoji: '🥓', desc: 'Hambúrguer artesanal 180g na brasa, duplo cheddar cremoso, bacon crocante e cebola caramelizada.', available: true },
+            { id: 3, name: 'Monstro Duplo Brasa', category: 'Hambúrgueres', price: 34.50, emoji: '🔥', desc: 'Dois blends de 160g, queijo mussarela empanado, picles artesanal, bacon e maionese defumada.', available: true },
+            { id: 4, name: 'Combo Smash Duplo + Refri', category: 'Combos', price: 34.90, emoji: '🍟', desc: '1 Classic Smash Duplo + Batata frita crocante + Refrigerante lata 350ml.', available: true },
+            { id: 5, name: 'Combo Família (4 Burgers)', category: 'Combos', price: 89.90, emoji: '🍱', desc: '4 Classic Smash Burgers + 2 Porções médias de batata cheddar e bacon + Refrigerante 2L.', available: true },
+            { id: 6, name: 'Batata Frita Cheddar & Bacon', category: 'Porções', price: 24.00, emoji: '🧀', desc: 'Porção 400g de batatas crocantes cobertas com cheddar cremoso e cubos de bacon.', available: true },
+            { id: 7, name: 'Coca-Cola Lata 350ml', category: 'Bebidas', price: 6.00, emoji: '🥤', desc: 'Lata 350ml estupidamente gelada.', available: true }
+        ];
+
+        // --- ESTADO DA APLICAÇÃO ---
+        let storeConfig = { ...defaultStore };
+        let clients = [];
+        let motoboys = [];
+        let products = [];
+        let orders = [];
+        let cart = [];
+        let currentSession = null; // { role: 'cliente'|'motoboy'|'lanchonete', userId: string }
+
+        let authRole = 'cliente';
+        let authMode = 'login';
+        let currentCategory = 'Todos';
+        let selectedPayment = 'Pix';
+        let activeModalProduct = null;
+        let modalQty = 1;
+        let motoboyOnline = true;
+        let checkoutTempGPS = null; // { lat, lng }
+
+        // --- INICIALIZAÇÃO ---
+        window.onload = function () {
+            loadAllState();
+            applyStoreBranding();
+            checkActiveSession();
+
+            window.addEventListener('storage', (e) => {
+                loadAllState();
+                if (currentSession) renderActiveRoleView();
+            });
+        };
+
+        function loadAllState() {
+            storeConfig = JSON.parse(localStorage.getItem(STORAGE_STORE_KEY)) || { ...defaultStore };
+            clients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY)) || [...defaultClients];
+            motoboys = JSON.parse(localStorage.getItem(STORAGE_MOTOBOYS_KEY)) || [...defaultMotoboys];
+            products = JSON.parse(localStorage.getItem(STORAGE_PRODUCTS_KEY)) || [...defaultProducts];
+            orders = JSON.parse(localStorage.getItem(STORAGE_ORDERS_KEY)) || createInitialDemoOrders();
+            cart = JSON.parse(localStorage.getItem(STORAGE_CART_KEY)) || [];
+            currentSession = JSON.parse(localStorage.getItem(STORAGE_SESSION_KEY)) || null;
+
+            saveAllState();
+        }
+
+        function saveAllState() {
+            localStorage.setItem(STORAGE_STORE_KEY, JSON.stringify(storeConfig));
+            localStorage.setItem(STORAGE_CLIENTS_KEY, JSON.stringify(clients));
+            localStorage.setItem(STORAGE_MOTOBOYS_KEY, JSON.stringify(motoboys));
+            localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(products));
+            localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(orders));
+            localStorage.setItem(STORAGE_CART_KEY, JSON.stringify(cart));
+            if (currentSession) {
+                localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(currentSession));
+            } else {
+                localStorage.removeItem(STORAGE_SESSION_KEY);
+            }
+        }
+
+        function createInitialDemoOrders() {
+            return [
+                {
+                    id: 1041,
+                    clientId: 'cli-1',
+                    customerName: 'Mariana Costa',
+                    customerPhone: '(84) 98812-3456',
+                    address: 'Rua João Pessoa, 410 - Centro',
+                    neighborhood: 'Centro',
+                    deliveryFee: 5.00,
+                    lat: -5.1842,
+                    lng: -37.3478,
+                    items: [
+                        { name: 'Cheddar Bacon Supremo', qty: 1, price: 28.90, addons: ['Bacon Crocante Extra'], notes: 'Sem cebola' }
+                    ],
+                    subtotal: 33.40,
+                    total: 38.40,
+                    paymentMethod: 'Pix',
+                    changeFor: null,
+                    status: 'em_rota',
+                    motoboyId: 'moto-1',
+                    motoboyName: 'Carlos',
+                    createdAt: new Date(Date.now() - 18 * 60000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                }
+            ];
+        }
+
+        function applyStoreBranding() {
+            document.getElementById('auth-store-title').textContent = storeConfig.name;
+            document.getElementById('client-header-store-name').textContent = storeConfig.name;
+            document.getElementById('client-header-store-address').textContent = `${storeConfig.address} • Entrega Própria`;
+            document.getElementById('kitchen-header-title').textContent = `${storeConfig.name} — Gestão`;
+            document.getElementById('pix-key-input').value = storeConfig.pixKey;
+        }
+
+        function formatBRL(val) {
+            return Number(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-emerald-600 text-white',
+                warning: 'bg-amber-500 text-slate-950',
+                danger: 'bg-[#EA1D2C] text-white',
+                info: 'bg-slate-900 text-white'
+            };
+            const icons = {
+                success: 'fa-circle-check',
+                warning: 'fa-bell',
+                danger: 'fa-circle-exclamation',
+                info: 'fa-info-circle'
+            };
+            toast.className = `${colors[type] || colors.info} px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-xs sm:text-sm font-bold toast-enter pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base shrink-0"></i><span class="flex-1">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // =====================================================================
+        // SISTEMA DE AUTENTICAÇÃO & PORTAL DE ENTRADA
+        // =====================================================================
+        function selectAuthRole(role) {
+            authRole = role;
+            ['cliente', 'motoboy', 'lanchonete'].forEach(r => {
+                const btn = document.getElementById(`auth-role-${r}`);
+                if (r === role) {
+                    btn.className = 'py-2.5 px-2 rounded-2xl text-xs sm:text-sm font-extrabold transition flex flex-col sm:flex-row items-center justify-center gap-1.5 bg-[#EA1D2C] text-white shadow';
+                } else {
+                    btn.className = 'py-2.5 px-2 rounded-2xl text-xs sm:text-sm font-extrabold transition flex flex-col sm:flex-row items-center justify-center gap-1.5 text-slate-300 hover:text-white';
+                }
+            });
+
+            // Ajusta textos dinâmicos
+            const idLabel = document.getElementById('login-identifier-label');
+            const regTabLabel = document.getElementById('auth-register-tab-label');
+            if (role === 'cliente') {
+                idLabel.textContent = 'E-mail ou WhatsApp do Cliente *';
+                regTabLabel.textContent = 'Cadastrar Cliente';
+            } else if (role === 'motoboy') {
+                idLabel.textContent = 'Nome ou WhatsApp do Motoboy *';
+                regTabLabel.textContent = 'Cadastrar Motoboy';
+            } else {
+                idLabel.textContent = 'Nome ou WhatsApp da Lanchonete *';
+                regTabLabel.textContent = 'Configurar Lanchonete';
+            }
+
+            updateAuthFormsVisibility();
+        }
+
+        function selectAuthMode(mode) {
+            authMode = mode;
+            const btnLogin = document.getElementById('auth-mode-login');
+            const btnReg = document.getElementById('auth-mode-register');
+
+            if (mode === 'login') {
+                btnLogin.className = 'flex-1 py-3 text-xs sm:text-sm font-extrabold border-b-2 border-[#EA1D2C] text-[#EA1D2C] transition';
+                btnReg.className = 'flex-1 py-3 text-xs sm:text-sm font-extrabold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition';
+            } else {
+                btnReg.className = 'flex-1 py-3 text-xs sm:text-sm font-extrabold border-b-2 border-[#EA1D2C] text-[#EA1D2C] transition';
+                btnLogin.className = 'flex-1 py-3 text-xs sm:text-sm font-extrabold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition';
+            }
+            updateAuthFormsVisibility();
+        }
+
+        function updateAuthFormsVisibility() {
+            document.getElementById('form-login').classList.add('hidden');
+            document.getElementById('form-register-cliente').classList.add('hidden');
+            document.getElementById('form-register-motoboy').classList.add('hidden');
+            document.getElementById('form-register-lanchonete').classList.add('hidden');
+
+            if (authMode === 'login') {
+                document.getElementById('form-login').classList.remove('hidden');
+            } else {
+                document.getElementById(`form-register-${authRole}`).classList.remove('hidden');
+                if (authRole === 'lanchonete') {
+                    // Preenche dados atuais da loja para facilitar edição
+                    document.getElementById('reg-store-name').value = storeConfig.name;
+                    document.getElementById('reg-store-phone').value = storeConfig.phone;
+                    document.getElementById('reg-store-address').value = storeConfig.address;
+                    document.getElementById('reg-store-fee').value = storeConfig.defaultFee;
+                    document.getElementById('reg-store-pix').value = storeConfig.pixKey;
+                }
+            }
+        }
+
+        // --- GEOLOCALIZAÇÃO GPS (REAL + SIMULAÇÃO) ---
+        function captureGPS(targetContext) {
+            if (!navigator.geolocation) {
+                showToast('Seu navegador não suporta GPS. Use o botão "Simular GPS".', 'warning');
+                return;
+            }
+            showToast('Obtendo satélites GPS... Aguarde um instante.', 'info');
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    applyCapturedCoords(targetContext, pos.coords.latitude, pos.coords.longitude);
+                    showToast('Localização GPS capturada com precisão!', 'success');
+                },
+                (err) => {
+                    showToast('Permissão GPS bloqueada pelo navegador. Aplicando coordenadas simuladas.', 'warning');
+                    simulateGPS(targetContext);
+                },
+                { enableHighAccuracy: true, timeout: 7000 }
+            );
+        }
+
+        function simulateGPS(targetContext) {
+            // Gera coordenadas realistas próximas à lanchonete
+            const offsetLat = (Math.random() - 0.5) * 0.025;
+            const offsetLng = (Math.random() - 0.5) * 0.025;
+            const lat = parseFloat((storeConfig.lat + offsetLat).toFixed(5));
+            const lng = parseFloat((storeConfig.lng + offsetLng).toFixed(5));
+            applyCapturedCoords(targetContext, lat, lng);
+            showToast(`GPS Simulado ativado: ${lat}, ${lng}`, 'success');
+        }
+
+        function applyCapturedCoords(targetContext, lat, lng) {
+            if (targetContext === 'client-reg') {
+                document.getElementById('reg-cli-lat').value = lat;
+                document.getElementById('reg-cli-lng').value = lng;
+                document.getElementById('client-reg-gps-preview').classList.remove('hidden');
+                document.getElementById('client-reg-coords-text').textContent = `Lat: ${lat}, Lng: ${lng}`;
+            } else if (targetContext === 'store-reg') {
+                document.getElementById('reg-store-lat').value = lat;
+                document.getElementById('reg-store-lng').value = lng;
+                const el = document.getElementById('store-reg-coords-text');
+                el.textContent = `✅ GPS da Loja Salvo: ${lat}, ${lng}`;
+                el.classList.remove('hidden');
+            } else if (targetContext === 'checkout') {
+                checkoutTempGPS = { lat, lng };
+                document.getElementById('checkout-gps-status').textContent = `✅ GPS Ativo (${lat}, ${lng})`;
+                if (currentSession && currentSession.role === 'cliente') {
+                    const cli = clients.find(c => c.id === currentSession.userId);
+                    if (cli) {
+                        cli.lat = lat;
+                        cli.lng = lng;
+                        saveAllState();
+                    }
+                }
+            } else if (targetContext === 'client-profile') {
+                if (currentSession && currentSession.role === 'cliente') {
+                    const cli = clients.find(c => c.id === currentSession.userId);
+                    if (cli) {
+                        cli.lat = lat;
+                        cli.lng = lng;
+                        saveAllState();
+                        document.getElementById('prof-cli-coords-display').textContent = `Lat: ${lat}, Lng: ${lng}`;
+                    }
+                }
+            } else if (targetContext === 'store-config') {
+                storeConfig.lat = lat;
+                storeConfig.lng = lng;
+                saveAllState();
+                document.getElementById('cfg-store-coords').textContent = `Lat: ${lat}, Lng: ${lng}`;
+            }
+        }
+
+        // --- HANDLERS DE LOGIN & CADASTRO ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const identifier = document.getElementById('login-identifier').value.trim().toLowerCase();
+            const pass = document.getElementById('login-password').value.trim();
+
+            if (authRole === 'cliente') {
+                const found = clients.find(c =>
+                    (c.email.toLowerCase() === identifier || c.phone.toLowerCase().includes(identifier)) &&
+                    c.password === pass
+                );
+                if (!found) {
+                    showToast('Cliente não encontrado ou senha incorreta. Crie seu cadastro ou use Demo Cliente.', 'danger');
+                    return;
+                }
+                startSession('cliente', found.id);
+            } else if (authRole === 'motoboy') {
+                const found = motoboys.find(m =>
+                    (m.name.toLowerCase() === identifier || m.phone.toLowerCase().includes(identifier)) &&
+                    m.password === pass
+                );
+                if (!found) {
+                    showToast('Motoboy não encontrado ou senha incorreta.', 'danger');
+                    return;
+                }
+                startSession('motoboy', found.id);
+            } else if (authRole === 'lanchonete') {
+                if (pass === storeConfig.password || pass === '123') {
+                    startSession('lanchonete', 'store-admin');
+                } else {
+                    showToast('Senha administrativa incorreta.', 'danger');
+                }
+            }
+        }
+
+        function handleRegisterClient(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-cli-name').value.trim();
+            const phone = document.getElementById('reg-cli-phone').value.trim();
+            const email = document.getElementById('reg-cli-email').value.trim();
+            const password = document.getElementById('reg-cli-pass').value.trim();
+            const street = document.getElementById('reg-cli-street').value.trim();
+            const number = document.getElementById('reg-cli-number').value.trim();
+            const neighborhood = document.getElementById('reg-cli-neighborhood').value;
+            const reference = document.getElementById('reg-cli-ref').value.trim();
+
+            let lat = parseFloat(document.getElementById('reg-cli-lat').value);
+            let lng = parseFloat(document.getElementById('reg-cli-lng').value);
+
+            // Se o cliente não clicou no GPS, gera automaticamente com base no bairro para nunca quebrar a rota
+            if (isNaN(lat) || isNaN(lng)) {
+                lat = parseFloat((storeConfig.lat + 0.0065).toFixed(5));
+                lng = parseFloat((storeConfig.lng - 0.0052).toFixed(5));
+            }
+
+            const newClient = {
+                id: 'cli-' + Date.now(),
+                name,
+                phone,
+                email,
+                password,
+                street,
+                number,
+                neighborhood,
+                reference,
+                lat,
+                lng
+            };
+
+            clients.push(newClient);
+            saveAllState();
+            showToast(`Bem-vindo(a), ${name}! Cadastro e localização GPS salvos.`, 'success');
+            startSession('cliente', newClient.id);
+        }
+
+        function handleRegisterMotoboy(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-moto-name').value.trim();
+            const phone = document.getElementById('reg-moto-phone').value.trim();
+            const plate = document.getElementById('reg-moto-plate').value.trim().toUpperCase();
+            const model = document.getElementById('reg-moto-model').value.trim();
+            const pixKey = document.getElementById('reg-moto-pix').value.trim();
+            const password = document.getElementById('reg-moto-pass').value.trim();
+
+            const newMoto = {
+                id: 'moto-' + Date.now(),
+                name,
+                phone,
+                plate,
+                model,
+                pixKey,
+                password
+            };
+
+            motoboys.push(newMoto);
+            saveAllState();
+            showToast(`Motoboy ${name} (${plate}) cadastrado e disponível para entregas!`, 'success');
+            startSession('motoboy', newMoto.id);
+        }
+
+        function handleRegisterStore(e) {
+            e.preventDefault();
+            storeConfig.name = document.getElementById('reg-store-name').value.trim();
+            storeConfig.phone = document.getElementById('reg-store-phone').value.trim();
+            storeConfig.address = document.getElementById('reg-store-address').value.trim();
+            storeConfig.defaultFee = parseFloat(document.getElementById('reg-store-fee').value) || 5.00;
+            storeConfig.pixKey = document.getElementById('reg-store-pix').value.trim();
+            storeConfig.password = document.getElementById('reg-store-pass').value.trim();
+
+            const lat = parseFloat(document.getElementById('reg-store-lat').value);
+            const lng = parseFloat(document.getElementById('reg-store-lng').value);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                storeConfig.lat = lat;
+                storeConfig.lng = lng;
+            }
+
+            saveAllState();
+            applyStoreBranding();
+            showToast('Dados da Lanchonete atualizados com sucesso!', 'success');
+            startSession('lanchonete', 'store-admin');
+        }
+
+        function quickDemoLogin(role) {
+            if (role === 'cliente') {
+                startSession('cliente', clients[0].id);
+            } else if (role === 'motoboy') {
+                startSession('motoboy', motoboys[0].id);
+            } else {
+                startSession('lanchonete', 'store-admin');
+            }
+        }
+
+        function startSession(role, userId) {
+            currentSession = { role, userId };
+            saveAllState();
+            checkActiveSession();
+        }
+
+        function logoutUser() {
+            currentSession = null;
+            saveAllState();
+            checkActiveSession();
+            showToast('Você saiu da conta. Escolha um perfil para entrar.', 'info');
+        }
+
+        function checkActiveSession() {
+            const authView = document.getElementById('view-auth');
+            const topBar = document.getElementById('top-session-bar');
+            document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
+
+            if (!currentSession) {
+                authView.classList.remove('hidden');
+                topBar.classList.add('hidden');
+                return;
+            }
+
+            authView.classList.add('hidden');
+            topBar.classList.remove('hidden');
+
+            const userLabel = document.getElementById('session-user-label');
+            const roleBadge = document.getElementById('session-role-badge');
+
+            if (currentSession.role === 'cliente') {
+                const cli = clients.find(c => c.id === currentSession.userId) || clients[0];
+                userLabel.textContent = cli.name;
+                roleBadge.textContent = 'Cliente';
+                document.getElementById('view-cliente').classList.remove('hidden');
+                populateClientCheckoutAndProfile(cli);
+            } else if (currentSession.role === 'motoboy') {
+                const moto = motoboys.find(m => m.id === currentSession.userId) || motoboys[0];
+                userLabel.textContent = `${moto.name} (${moto.plate})`;
+                roleBadge.textContent = 'Motoboy';
+                document.getElementById('view-motoboy').classList.remove('hidden');
+            } else if (currentSession.role === 'lanchonete') {
+                userLabel.textContent = storeConfig.name;
+                roleBadge.textContent = 'Lanchonete';
+                document.getElementById('view-lanchonete').classList.remove('hidden');
+            }
+
+            renderActiveRoleView();
+        }
+
+        function renderActiveRoleView() {
+            if (!currentSession) return;
+            if (currentSession.role === 'cliente') {
+                renderMenu();
+                renderCart();
+                renderClientOrders();
+            } else if (currentSession.role === 'lanchonete') {
+                renderKitchenKanban();
+                renderKitchenMenu();
+                renderKitchenConfig();
+            } else if (currentSession.role === 'motoboy') {
+                renderMotoboyView();
+            }
+        }
+
+        // =====================================================================
+        // MÓDULO 1: CLIENTE (CARDÁPIO, CHECKOUT GPS E PERFIL)
+        // =====================================================================
+        function populateClientCheckoutAndProfile(cli) {
+            if (!cli) return;
+            const fullAddr = `${cli.street}, ${cli.number}${cli.reference ? ` (${cli.reference})` : ''}`;
+            document.getElementById('checkout-name').value = cli.name;
+            document.getElementById('checkout-phone').value = cli.phone;
+            document.getElementById('checkout-address').value = fullAddr;
+
+            // Seleciona bairro correspondente
+            const selectBairro = document.getElementById('checkout-neighborhood');
+            for (let i = 0; i < selectBairro.options.length; i++) {
+                if (selectBairro.options[i].text.includes(cli.neighborhood)) {
+                    selectBairro.selectedIndex = i;
+                    break;
+                }
+            }
+
+            if (cli.lat && cli.lng) {
+                checkoutTempGPS = { lat: cli.lat, lng: cli.lng };
+                document.getElementById('checkout-gps-status').textContent = `✅ GPS Salvo (${cli.lat}, ${cli.lng})`;
+                document.getElementById('prof-cli-coords-display').textContent = `Lat: ${cli.lat}, Lng: ${cli.lng}`;
+            }
+
+            // Preenche aba Meu Cadastro & GPS
+            document.getElementById('prof-cli-name').value = cli.name;
+            document.getElementById('prof-cli-phone').value = cli.phone;
+            document.getElementById('prof-cli-address').value = fullAddr;
+        }
+
+        function saveClientProfileChanges() {
+            if (!currentSession || currentSession.role !== 'cliente') return;
+            const cli = clients.find(c => c.id === currentSession.userId);
+            if (!cli) return;
+
+            cli.name = document.getElementById('prof-cli-name').value.trim() || cli.name;
+            cli.phone = document.getElementById('prof-cli-phone').value.trim() || cli.phone;
+            const newAddr = document.getElementById('prof-cli-address').value.trim();
+            if (newAddr) {
+                cli.street = newAddr;
+                cli.number = '';
+                cli.reference = '';
+            }
+
+            saveAllState();
+            populateClientCheckoutAndProfile(cli);
+            document.getElementById('session-user-label').textContent = cli.name;
+            showToast('Dados e localização GPS atualizados!', 'success');
+        }
+
+        function switchClientTab(tab) {
+            ['cardapio', 'pedidos', 'perfil'].forEach(t => {
+                const sub = document.getElementById(`client-sub-${t}`);
+                const btn = document.getElementById(`tab-client-${t}`);
+                if (t === tab || (tab === 'meus-pedidos' && t === 'pedidos')) {
+                    sub.classList.remove('hidden');
+                    btn.className = 'pb-3 text-sm font-bold border-b-2 border-[#EA1D2C] text-[#EA1D2C] transition whitespace-nowrap flex items-center gap-1.5';
+                } else {
+                    sub.classList.add('hidden');
+                    btn.className = 'pb-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition whitespace-nowrap flex items-center gap-1.5';
+                }
+            });
+            if (tab === 'meus-pedidos') renderClientOrders();
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                if (btn.textContent.includes(category)) {
+                    btn.className = 'cat-pill active bg-[#EA1D2C] text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm';
+                } else {
+                    btn.className = 'cat-pill bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition';
+                }
+            });
+            renderMenu();
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            const search = document.getElementById('search-product').value.toLowerCase().trim();
+            const filtered = products.filter(p => {
+                const matchCat = currentCategory === 'Todos' || p.category === currentCategory;
+                const matchSearch = p.name.toLowerCase().includes(search) || p.desc.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-8 text-center border border-slate-200"><p class="font-bold text-slate-700">Nenhum item encontrado</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(prod => `
+                <div onclick="${prod.available ? `openProductModal(${prod.id})` : ''}" class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs hover:shadow-md transition flex justify-between gap-3 ${prod.available ? 'cursor-pointer group' : 'opacity-60 cursor-not-allowed'}">
+                    <div class="flex flex-col justify-between flex-1">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm sm:text-base group-hover:text-[#EA1D2C] transition">${prod.name}</h3>
+                            <p class="text-xs text-slate-500 line-clamp-2 mt-1">${prod.desc}</p>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="font-extrabold text-slate-900 text-sm sm:text-base">${formatBRL(prod.price)}</span>
+                            ${prod.available
+                                ? `<span class="text-xs font-bold text-[#EA1D2C] bg-red-50 group-hover:bg-[#EA1D2C] group-hover:text-white px-3 py-1 rounded-lg transition">+ Adicionar</span>`
+                                : `<span class="text-[11px] font-bold bg-slate-200 text-slate-600 px-2.5 py-1 rounded-lg">Esgotado</span>`
+                            }
+                        </div>
+                    </div>
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100 flex items-center justify-center text-4xl sm:text-5xl shrink-0 group-hover:scale-105 transition-transform">
+                        ${prod.emoji}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openProductModal(productId) {
+            const prod = products.find(p => p.id === productId);
+            if (!prod || !prod.available) return;
+            activeModalProduct = prod;
+            modalQty = 1;
+            document.getElementById('modal-prod-emoji').textContent = prod.emoji;
+            document.getElementById('modal-prod-name').textContent = prod.name;
+            document.getElementById('modal-prod-base-price').textContent = formatBRL(prod.price);
+            document.getElementById('modal-prod-desc').textContent = prod.desc;
+            document.getElementById('modal-prod-qty').textContent = modalQty;
+            document.getElementById('modal-prod-notes').value = '';
+            document.querySelectorAll('.addon-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('modal-addons-section').classList.toggle('hidden', prod.category === 'Bebidas');
+            updateModalTotal();
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+            activeModalProduct = null;
+        }
+
+        function changeModalQty(delta) {
+            if (modalQty + delta >= 1) {
+                modalQty += delta;
+                document.getElementById('modal-prod-qty').textContent = modalQty;
+                updateModalTotal();
+            }
+        }
+
+        function updateModalTotal() {
+            if (!activeModalProduct) return;
+            let unitPrice = activeModalProduct.price;
+            document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
+                unitPrice += parseFloat(cb.dataset.price);
+            });
+            document.getElementById('modal-total-btn').textContent = formatBRL(unitPrice * modalQty);
+        }
+
+        function confirmAddToCart() {
+            if (!activeModalProduct) return;
+            const selectedAddons = [];
+            let addonsTotal = 0;
+            document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
+                selectedAddons.push(cb.dataset.name);
+                addonsTotal += parseFloat(cb.dataset.price);
+            });
+            const notes = document.getElementById('modal-prod-notes').value.trim();
+            cart.push({
+                cartItemId: Date.now(),
+                productId: activeModalProduct.id,
+                name: activeModalProduct.name,
+                emoji: activeModalProduct.emoji,
+                qty: modalQty,
+                unitPrice: activeModalProduct.price + addonsTotal,
+                addons: selectedAddons,
+                notes
+            });
+            saveAllState();
+            renderCart();
+            closeProductModal();
+            showToast(`${modalQty}x ${activeModalProduct.name} adicionado!`, 'success');
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const checkoutForm = document.getElementById('checkout-form');
+            const btnClear = document.getElementById('btn-clear-cart');
+            const mobileBar = document.getElementById('mobile-cart-bar');
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-8"><span class="text-4xl block mb-2 opacity-60">🛍️</span><p class="text-sm font-bold text-slate-600">Sua sacola está vazia</p></div>`;
+                checkoutForm.classList.add('hidden');
+                btnClear.classList.add('hidden');
+                mobileBar.classList.add('hidden');
+                return;
+            }
+
+            checkoutForm.classList.remove('hidden');
+            btnClear.classList.remove('hidden');
+            mobileBar.classList.remove('hidden');
+
+            container.innerHTML = cart.map((item, idx) => `
+                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex justify-between items-start gap-2">
+                    <div class="flex-1">
+                        <p class="text-xs sm:text-sm font-bold text-slate-800">${item.qty}x ${item.name}</p>
+                        ${item.addons.length > 0 ? `<p class="text-[11px] text-emerald-700 font-medium">+ ${item.addons.join(', ')}</p>` : ''}
+                        ${item.notes ? `<p class="text-[11px] text-slate-500 italic">Obs: "${item.notes}"</p>` : ''}
+                        <p class="text-xs font-extrabold text-slate-900 mt-1">${formatBRL(item.unitPrice * item.qty)}</p>
+                    </div>
+                    <button onclick="removeCartItem(${idx})" class="text-slate-400 hover:text-[#EA1D2C] p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                </div>
+            `).join('');
+
+            updateCartTotals();
+        }
+
+        function removeCartItem(idx) {
+            cart.splice(idx, 1);
+            saveAllState();
+            renderCart();
+        }
+
+        function clearCart() {
+            cart = [];
+            saveAllState();
+            renderCart();
+        }
+
+        function updateCartTotals() {
+            const subtotal = cart.reduce((acc, item) => acc + (item.unitPrice * item.qty), 0);
+            const deliveryFee = parseFloat(document.getElementById('checkout-neighborhood').value) || 0;
+            const total = subtotal + deliveryFee;
+            document.getElementById('cart-subtotal').textContent = formatBRL(subtotal);
+            document.getElementById('cart-delivery-fee').textContent = formatBRL(deliveryFee);
+            document.getElementById('cart-total').textContent = formatBRL(total);
+            document.getElementById('mobile-cart-count').textContent = cart.reduce((acc, item) => acc + item.qty, 0);
+            document.getElementById('mobile-cart-total').textContent = formatBRL(total);
+        }
+
+        function scrollToCart() {
+            document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function selectPayment(method) {
+            selectedPayment = method;
+            ['Pix', 'Cartão', 'Dinheiro'].forEach(m => {
+                const btn = document.getElementById(`pay-btn-${m}`);
+                btn.className = m === method
+                    ? 'pay-btn bg-red-50 border-2 border-[#EA1D2C] text-red-700 py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center gap-1'
+                    : 'pay-btn bg-slate-50 border border-slate-200 text-slate-600 py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center gap-1';
+            });
+            document.getElementById('payment-pix-box').classList.toggle('hidden', method !== 'Pix');
+            document.getElementById('payment-cash-box').classList.toggle('hidden', method !== 'Dinheiro');
+        }
+
+        function copyPixKey() {
+            const input = document.getElementById('pix-key-input');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            showToast('Chave Pix copiada!', 'success');
+        }
+
+        function submitOrder() {
+            if (cart.length === 0) return;
+            const address = document.getElementById('checkout-address').value.trim();
+            const name = document.getElementById('checkout-name').value.trim();
+            const phone = document.getElementById('checkout-phone').value.trim();
+            const neighborhoodSelect = document.getElementById('checkout-neighborhood');
+            const neighborhood = neighborhoodSelect.options[neighborhoodSelect.selectedIndex].text.split('—')[0].trim();
+            const deliveryFee = parseFloat(neighborhoodSelect.value);
+
+            if (!address || !name || !phone) {
+                showToast('Preencha Nome, WhatsApp e Endereço completo.', 'danger');
+                return;
+            }
+
+            const cli = currentSession ? clients.find(c => c.id === currentSession.userId) : null;
+            const lat = checkoutTempGPS?.lat || cli?.lat || parseFloat((storeConfig.lat + 0.006).toFixed(5));
+            const lng = checkoutTempGPS?.lng || cli?.lng || parseFloat((storeConfig.lng - 0.005).toFixed(5));
+
+            const subtotal = cart.reduce((acc, item) => acc + (item.unitPrice * item.qty), 0);
+            const total = subtotal + deliveryFee;
+            const changeVal = selectedPayment === 'Dinheiro' ? parseFloat(document.getElementById('checkout-change').value) : null;
+
+            const newOrder = {
+                id: Math.floor(1042 + orders.length),
+                clientId: cli ? cli.id : 'guest',
+                customerName: name,
+                customerPhone: phone,
+                address: `${address} - ${neighborhood}`,
+                neighborhood,
+                deliveryFee,
+                lat,
+                lng,
+                items: cart.map(c => ({ name: c.name, qty: c.qty, price: c.unitPrice, addons: c.addons, notes: c.notes })),
+                subtotal,
+                total,
+                paymentMethod: selectedPayment,
+                changeFor: changeVal && changeVal > total ? changeVal : null,
+                status: 'novo',
+                motoboyId: null,
+                motoboyName: null,
+                createdAt: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            orders.unshift(newOrder);
+            cart = [];
+            saveAllState();
+            renderCart();
+            switchClientTab('meus-pedidos');
+            showToast(`Pedido #${newOrder.id} enviado com localização GPS!`, 'success');
+        }
+
+        function renderClientOrders() {
+            const container = document.getElementById('client-orders-list');
+            const myOrders = currentSession
+                ? orders.filter(o => o.clientId === currentSession.userId || o.customerName === (clients.find(c => c.id === currentSession.userId)?.name))
+                : orders;
+
+            document.getElementById('client-orders-count').textContent = myOrders.length;
+
+            if (myOrders.length === 0) {
+                container.innerHTML = `<div class="bg-white rounded-2xl p-10 text-center border border-slate-200"><h3 class="font-extrabold text-slate-800">Nenhum pedido realizado ainda</h3></div>`;
+                return;
+            }
+
+            const statusSteps = {
+                'novo': { step: 1, label: 'Aguardando Confirmação da Loja', color: 'text-amber-600', bar: 'w-1/4 bg-amber-500' },
+                'preparo': { step: 2, label: 'Em Preparo na Chapa 🔥', color: 'text-orange-600', bar: 'w-2/4 bg-orange-500' },
+                'pronto': { step: 2, label: 'Pronto! Aguardando Motoboy', color: 'text-blue-600', bar: 'w-3/5 bg-blue-500' },
+                'em_rota': { step: 3, label: 'Saiu para Entrega 🛵', color: 'text-indigo-600', bar: 'w-3/4 bg-indigo-600' },
+                'entregue': { step: 4, label: 'Pedido Entregue ✅', color: 'text-emerald-600', bar: 'w-full bg-emerald-500' },
+                'cancelado': { step: 0, label: 'Pedido Cancelado ❌', color: 'text-red-600', bar: 'w-full bg-red-500' }
+            };
+
+            container.innerHTML = myOrders.map(order => {
+                const st = statusSteps[order.status] || statusSteps['novo'];
+                return `
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-3">
+                            <div>
+                                <span class="text-xs font-bold text-slate-400">PEDIDO #${order.id} • ${order.createdAt}</span>
+                                <h3 class="font-extrabold text-base sm:text-lg ${st.color}">${st.label}</h3>
+                            </div>
+                            <span class="bg-slate-100 text-slate-800 text-xs font-extrabold px-3 py-1.5 rounded-xl">Total: ${formatBRL(order.total)}</span>
+                        </div>
+                        <div class="mb-4">
+                            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full ${st.bar} transition-all duration-500 rounded-full"></div>
+                            </div>
+                        </div>
+                        ${order.motoboyName ? `
+                            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 mb-3 flex items-center gap-3 text-xs">
+                                <span class="text-xl">🛵</span>
+                                <div>
+                                    <p class="font-bold text-indigo-950">Entregador: ${order.motoboyName}</p>
+                                    <p class="text-indigo-700">Rota GPS traçada para: ${order.address}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+                        <div class="space-y-1 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl">
+                            ${order.items.map(i => `<div class="flex justify-between"><span><strong>${i.qty}x</strong> ${i.name}</span><span class="font-semibold">${formatBRL(i.price * i.qty)}</span></div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // =====================================================================
+        // MÓDULO 2: LANCHONETE (COZINHA, DESPACHO DINÂMICO E CONFIGURAÇÕES)
+        // =====================================================================
+        function switchKitchenTab(tab) {
+            ['kanban', 'cardapio', 'config'].forEach(t => {
+                document.getElementById(`kitchen-sub-${t}`).classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById(`btn-kitchen-${t}`);
+                btn.className = t === tab
+                    ? 'bg-slate-900 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition'
+                    : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition';
+            });
+            if (tab === 'cardapio') renderKitchenMenu();
+            if (tab === 'config') renderKitchenConfig();
+        }
+
+        function renderKitchenKanban() {
+            const validOrders = orders.filter(o => o.status !== 'cancelado');
+            document.getElementById('kpi-revenue').textContent = formatBRL(validOrders.reduce((s, o) => s + o.total, 0));
+            document.getElementById('kpi-active').textContent = orders.filter(o => ['novo', 'preparo', 'pronto', 'em_rota'].includes(o.status)).length;
+            document.getElementById('kpi-delivered').textContent = orders.filter(o => o.status === 'entregue').length;
+
+            const cols = {
+                novo: orders.filter(o => o.status === 'novo'),
+                preparo: orders.filter(o => o.status === 'preparo'),
+                pronto: orders.filter(o => o.status === 'pronto'),
+                rota: orders.filter(o => o.status === 'em_rota' || o.status === 'entregue')
+            };
+
+            document.getElementById('count-col-novo').textContent = cols.novo.length;
+            document.getElementById('count-col-preparo').textContent = cols.preparo.length;
+            document.getElementById('count-col-pronto').textContent = cols.pronto.length;
+            document.getElementById('count-col-rota').textContent = cols.rota.length;
+
+            renderKanbanColumn('col-novo', cols.novo);
+            renderKanbanColumn('col-preparo', cols.preparo);
+            renderKanbanColumn('col-pronto', cols.pronto);
+            renderKanbanColumn('col-rota', cols.rota);
+        }
+
+        function renderKanbanColumn(elementId, list) {
+            const container = document.getElementById(elementId);
+            if (list.length === 0) {
+                container.innerHTML = `<div class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center text-xs text-slate-400">Nenhum pedido</div>`;
+                return;
+            }
+
+            // Monta opções dinâmicas de todos os motoboys cadastrados
+            const motoboyOptionsHtml = motoboys.map(m =>
+                `<option value="${m.id}">🛵 ${m.name} (${m.plate})</option>`
+            ).join('');
+
+            container.innerHTML = list.map(order => {
+                let actionButtons = '';
+                if (order.status === 'novo') {
+                    actionButtons = `
+                        <div class="flex gap-2 mt-3 pt-2.5 border-t border-slate-100">
+                            <button onclick="updateOrderStatus(${order.id}, 'preparo')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-xl transition">Aceitar</button>
+                            <button onclick="updateOrderStatus(${order.id}, 'cancelado')" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-3 py-2 rounded-xl"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    `;
+                } else if (order.status === 'preparo') {
+                    actionButtons = `
+                        <div class="mt-3 pt-2.5 border-t border-slate-100">
+                            <button onclick="updateOrderStatus(${order.id}, 'pronto')" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-xl transition">Marcar como Pronto</button>
+                        </div>
+                    `;
+                } else if (order.status === 'pronto') {
+                    actionButtons = `
+                        <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-2">
+                            <label class="block text-[11px] font-bold text-slate-600">Despachar para Motoboy:</label>
+                            <div class="flex gap-1.5">
+                                <select id="select-moto-${order.id}" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold">
+                                    ${motoboyOptionsHtml}
+                                </select>
+                                <button onclick="dispatchOrder(${order.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shrink-0">Enviar</button>
+                            </div>
+                        </div>
+                    `;
+                } else if (order.status === 'em_rota') {
+                    actionButtons = `<div class="mt-3 pt-2 border-t border-slate-100 text-xs font-bold text-indigo-600"><i class="fa-solid fa-motorcycle mr-1"></i> Em rota com ${order.motoboyName}</div>`;
+                } else if (order.status === 'entregue') {
+                    actionButtons = `<div class="mt-3 pt-2 border-t border-slate-100 text-xs font-bold text-emerald-600"><i class="fa-solid fa-circle-check mr-1"></i> Entregue (${order.motoboyName})</div>`;
+                }
+
+                return `
+                    <div class="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/90 text-xs">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-extrabold text-slate-900 text-sm">#${order.id}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700"><i class="fa-solid fa-location-dot mr-0.5"></i>GPS OK</span>
+                        </div>
+                        <p class="font-bold text-slate-800">${order.customerName}</p>
+                        <p class="text-[11px] text-slate-500 truncate mb-2">${order.address}</p>
+                        <div class="bg-slate-50 rounded-lg p-2 space-y-1 border border-slate-100">
+                            ${order.items.map(i => `<div><strong>${i.qty}x</strong> ${i.name}</div>`).join('')}
+                        </div>
+                        <div class="flex items-center justify-between mt-2.5">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-slate-100 text-slate-700">${order.paymentMethod}</span>
+                            <span class="font-extrabold text-slate-900 text-sm">${formatBRL(order.total)}</span>
+                        </div>
+                        ${actionButtons}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            order.status = newStatus;
+            saveAllState();
+            renderKitchenKanban();
+            showToast(`Pedido #${orderId} atualizado!`, 'info');
+        }
+
+        function dispatchOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            const selectEl = document.getElementById(`select-moto-${orderId}`);
+            if (!order || !selectEl) return;
+
+            const chosenMoto = motoboys.find(m => m.id === selectEl.value);
+            if (!chosenMoto) return;
+
+            order.motoboyId = chosenMoto.id;
+            order.motoboyName = chosenMoto.name;
+            order.status = 'em_rota';
+            saveAllState();
+            renderKitchenKanban();
+            showToast(`Pedido #${orderId} despachado para ${chosenMoto.name} (${chosenMoto.plate})!`, 'success');
+        }
+
+        function simulateIncomingOrder() {
+            const lat = parseFloat((storeConfig.lat + (Math.random() - 0.5) * 0.02).toFixed(5));
+            const lng = parseFloat((storeConfig.lng + (Math.random() - 0.5) * 0.02).toFixed(5));
+            const prod = products[0];
+
+            const newOrder = {
+                id: Math.floor(1042 + orders.length),
+                clientId: 'cli-1',
+                customerName: 'Lucas Oliveira (Demo)',
+                customerPhone: '(84) 99123-4455',
+                address: 'Rua Rui Barbosa, 215 - Centro',
+                neighborhood: 'Centro',
+                deliveryFee: storeConfig.defaultFee,
+                lat,
+                lng,
+                items: [{ name: prod.name, qty: 1, price: prod.price, addons: ['Bacon Crocante Extra'], notes: '' }],
+                subtotal: prod.price + 4.50,
+                total: prod.price + 4.50 + storeConfig.defaultFee,
+                paymentMethod: 'Pix',
+                changeFor: null,
+                status: 'novo',
+                motoboyId: null,
+                motoboyName: null,
+                createdAt: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            orders.unshift(newOrder);
+            saveAllState();
+            renderKitchenKanban();
+            showToast(`🔔 Novo pedido #${newOrder.id} recebido com coordenadas GPS!`, 'warning');
+        }
+
+        function renderKitchenMenu() {
+            const container = document.getElementById('kitchen-menu-list');
+            container.innerHTML = products.map(prod => `
+                <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between gap-3 ${prod.available ? 'bg-white' : 'bg-slate-50 opacity-75'}">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">${prod.emoji}</span>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">${prod.name}</h4>
+                            <p class="text-xs font-extrabold text-[#EA1D2C]">${formatBRL(prod.price)}</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleProductAvailability(${prod.id})" class="px-3 py-1.5 rounded-xl text-xs font-bold ${prod.available ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">
+                        ${prod.available ? 'Ativo' : 'Pausado'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleProductAvailability(prodId) {
+            const prod = products.find(p => p.id === prodId);
+            if (!prod) return;
+            prod.available = !prod.available;
+            saveAllState();
+            renderKitchenMenu();
+        }
+
+        function openNewProductModal() { document.getElementById('new-product-modal').classList.remove('hidden'); }
+        function closeNewProductModal() { document.getElementById('new-product-modal').classList.add('hidden'); }
+
+        function saveNewProduct() {
+            const emoji = document.getElementById('new-prod-emoji').value.trim() || '🍔';
+            const category = document.getElementById('new-prod-cat').value;
+            const name = document.getElementById('new-prod-name').value.trim();
+            const price = parseFloat(document.getElementById('new-prod-price').value);
+            const desc = document.getElementById('new-prod-desc').value.trim() || 'Preparado na hora.';
+
+            if (!name || isNaN(price) || price <= 0) {
+                showToast('Preencha nome e preço válidos.', 'danger');
+                return;
+            }
+            products.unshift({ id: Date.now(), name, category, price, emoji, desc, available: true });
+            saveAllState();
+            renderKitchenMenu();
+            closeNewProductModal();
+            showToast(`"${name}" adicionado ao cardápio!`, 'success');
+        }
+
+        function renderKitchenConfig() {
+            document.getElementById('cfg-store-name').value = storeConfig.name;
+            document.getElementById('cfg-store-address').value = storeConfig.address;
+            document.getElementById('cfg-store-pix').value = storeConfig.pixKey;
+            document.getElementById('cfg-store-phone').value = storeConfig.phone;
+            document.getElementById('cfg-store-coords').textContent = `Lat: ${storeConfig.lat}, Lng: ${storeConfig.lng}`;
+
+            document.getElementById('cfg-motoboys-count').textContent = motoboys.length;
+            document.getElementById('cfg-motoboys-list').innerHTML = motoboys.map(m => `
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-motorcycle"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-extrabold text-slate-900">${m.name}</p>
+                            <p class="text-xs text-slate-500">${m.model} • <span class="font-mono font-bold text-slate-700">${m.plate}</span></p>
+                        </div>
+                    </div>
+                    <span class="text-[11px] font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg">Ativo</span>
+                </div>
+            `).join('');
+        }
+
+        function saveStoreConfigFromPanel() {
+            storeConfig.name = document.getElementById('cfg-store-name').value.trim() || storeConfig.name;
+            storeConfig.address = document.getElementById('cfg-store-address').value.trim() || storeConfig.address;
+            storeConfig.pixKey = document.getElementById('cfg-store-pix').value.trim() || storeConfig.pixKey;
+            storeConfig.phone = document.getElementById('cfg-store-phone').value.trim() || storeConfig.phone;
+            saveAllState();
+            applyStoreBranding();
+            showToast('Configurações da loja salvas!', 'success');
+        }
+
+        // =====================================================================
+        // MÓDULO 3: MOTOBOY (PAINEL EXCLUSIVO & ROTA GPS EXATA)
+        // =====================================================================
+        function toggleMotoboyStatus() {
+            motoboyOnline = !motoboyOnline;
+            const btn = document.getElementById('btn-motoboy-status');
+            if (motoboyOnline) {
+                btn.className = 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition';
+                btn.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span><span>Online / Disponível</span>`;
+                showToast('Você está ONLINE para entregas.', 'success');
+            } else {
+                btn.className = 'bg-slate-800 border border-slate-700 text-slate-400 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition';
+                btn.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span>Offline / Pausa</span>`;
+                showToast('Você está Offline.', 'info');
+            }
+        }
+
+        function renderMotoboyView() {
+            const loggedMoto = (currentSession && currentSession.role === 'motoboy')
+                ? motoboys.find(m => m.id === currentSession.userId)
+                : motoboys[0];
+
+            if (!loggedMoto) return;
+
+            document.getElementById('motoboy-logged-name').textContent = loggedMoto.name;
+            document.getElementById('motoboy-logged-vehicle').textContent = `${loggedMoto.model} • Placa ${loggedMoto.plate}`;
+            document.getElementById('motoboy-logged-pix').textContent = loggedMoto.pixKey;
+
+            const myCompleted = orders.filter(o => (o.motoboyId === loggedMoto.id || o.motoboyName === loggedMoto.name) && o.status === 'entregue');
+            document.getElementById('motoboy-deliveries-count').textContent = myCompleted.length;
+            document.getElementById('motoboy-earnings').textContent = formatBRL(myCompleted.reduce((s, o) => s + o.deliveryFee, 0));
+
+            const myActive = orders.filter(o => (o.motoboyId === loggedMoto.id || o.motoboyName === loggedMoto.name) && o.status === 'em_rota');
+            const container = document.getElementById('motoboy-orders-list');
+
+            if (myActive.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-10 text-center border border-slate-200 shadow-xs">
+                        <span class="text-5xl block mb-3">🛵</span>
+                        <h3 class="font-extrabold text-slate-800">Nenhuma entrega atribuída a ${loggedMoto.name} no momento</h3>
+                        <p class="text-xs text-slate-500 mt-1">Aguarde a cozinha finalizar e despachar um pedido para você.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = myActive.map(order => {
+                const paymentAlertHtml = order.paymentMethod === 'Pix'
+                    ? `<div class="bg-emerald-50 border-2 border-emerald-500 rounded-xl p-3.5 flex items-center gap-3">
+                           <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-check"></i></div>
+                           <div><p class="text-xs font-extrabold uppercase text-emerald-800">JÁ PAGO VIA PIX</p><p class="text-sm font-bold text-emerald-950">Não cobrar nada — Apenas entregar!</p></div>
+                       </div>`
+                    : `<div class="bg-amber-50 border-2 border-amber-500 rounded-xl p-3.5 flex items-center gap-3">
+                           <div class="w-10 h-10 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                           <div>
+                               <p class="text-xs font-extrabold uppercase text-amber-800">COBRAR NA ENTREGA (${order.paymentMethod.toUpperCase()})</p>
+                               <p class="text-base font-extrabold text-[#EA1D2C]">Valor: ${formatBRL(order.total)}</p>
+                               ${order.changeFor ? `<p class="text-xs font-bold text-amber-950 mt-0.5">⚠️ Levar troco para ${formatBRL(order.changeFor)}</p>` : ''}
+                           </div>
+                       </div>`;
+
+                // Monta URL exata de rota do Google Maps usando coordenadas da Loja -> Cliente
+                const mapsDirUrl = (order.lat && order.lng)
+                    ? `https://www.google.com/maps/dir/?api=1&origin=${storeConfig.lat},${storeConfig.lng}&destination=${order.lat},${order.lng}&travelmode=driving`
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.address)}`;
+
+                return `
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div>
+                                <span class="bg-indigo-100 text-indigo-700 text-xs font-extrabold px-2.5 py-1 rounded-lg">PEDIDO #${order.id}</span>
+                                <h3 class="font-extrabold text-lg text-slate-900 mt-1">${order.customerName}</h3>
+                                <p class="text-xs text-slate-500"><i class="fa-brands fa-whatsapp text-emerald-500 mr-1"></i>${order.customerPhone}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[11px] text-slate-400 block font-semibold">Sua Taxa</span>
+                                <span class="text-base font-extrabold text-emerald-600">+ ${formatBRL(order.deliveryFee)}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/70 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold uppercase text-slate-400">Destino de Entrega</span>
+                                <span class="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">GPS: ${order.lat}, ${order.lng}</span>
+                            </div>
+                            <p class="text-sm font-extrabold text-slate-900"><i class="fa-solid fa-location-dot text-[#EA1D2C] mr-1.5"></i>${order.address}</p>
+                        </div>
+
+                        ${paymentAlertHtml}
+
+                        <!-- Botões de Rota GPS + Confirmação -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                            <button onclick="openRouteMapModal(${order.id})" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition">
+                                <i class="fa-solid fa-route"></i> Ver Rota no Mapa (GPS Exato)
+                            </button>
+                            <button onclick="completeDelivery(${order.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition">
+                                <i class="fa-solid fa-circle-check"></i> Confirmar Entrega
+                            </button>
+                        </div>
+                        <a href="${mapsDirUrl}" target="_blank" rel="noopener noreferrer" class="block text-center text-xs font-bold text-blue-600 hover:underline pt-1">
+                            Abrir direto no aplicativo externo Google Maps <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- MODAL DE MAPA INTERATIVO DA ROTA ---
+        function openRouteMapModal(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            // Calcula distância aproximada (Haversine simplificado)
+            const distKm = calculateDistanceKm(storeConfig.lat, storeConfig.lng, order.lat, order.lng);
+            const estMinutes = Math.max(4, Math.round(distKm * 3.2));
+
+            document.getElementById('map-modal-title').textContent = `Rota GPS — Pedido #${order.id} (${order.customerName})`;
+            document.getElementById('map-modal-distance').textContent = `${distKm.toFixed(1)} km`;
+            document.getElementById('map-modal-duration').textContent = `~${estMinutes} min`;
+            document.getElementById('map-modal-origin-coords').textContent = `${storeConfig.lat}, ${storeConfig.lng}`;
+            document.getElementById('map-modal-dest-coords').textContent = `${order.lat}, ${order.lng}`;
+            document.getElementById('map-modal-address').textContent = `Destino: ${order.address}`;
+
+            const mapsDirUrl = (order.lat && order.lng)
+                ? `https://www.google.com/maps/dir/?api=1&origin=${storeConfig.lat},${storeConfig.lng}&destination=${order.lat},${order.lng}&travelmode=driving`
+                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.address)}`;
+
+            document.getElementById('map-modal-external-link').href = mapsDirUrl;
+            document.getElementById('route-map-modal').classList.remove('hidden');
+        }
+
+        function closeRouteMapModal() {
+            document.getElementById('route-map-modal').classList.add('hidden');
+        }
+
+        function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+            if (!lat1 || !lon1 || !lat2 || !lon2) return 2.4;
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return Math.max(0.8, R * c * 1.3); // Fator de ruas urbanas
+        }
+
+        function completeDelivery(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            order.status = 'entregue';
+            saveAllState();
+            renderMotoboyView();
+            showToast(`Entrega #${orderId} concluída! Taxa de ${formatBRL(order.deliveryFee)} creditada.`, 'success');
+        }
+    </script>
+</body>
+</html>
