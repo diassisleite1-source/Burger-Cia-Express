@@ -13,17 +13,17 @@
             theme: {
                 extend: {
                     colors: {
-                        ifood: { 50: '#fff1f2', 500: '#ef4444', 600: '#ea580c', 700: '#c2410c', default: '#ea580c' }
+                        ifood: { 500: '#ef4444', 600: '#ea580c', 700: '#c2410c' }
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col pb-20">
+<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col pb-24">
 
     <!-- ========================================== -->
-    <!-- TOPO / HEADER ESTILO iFOOD -->
+    <!-- TOPO / HEADER DO CLIENTE -->
     <!-- ========================================== -->
     <header class="bg-white shadow-sm sticky top-0 z-30 border-b border-gray-100">
         <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -32,15 +32,15 @@
                     <i class="fa-solid fa-burger"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-sm text-gray-900 flex items-center gap-1">Burger & Cia Express <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i></h1>
-                    <p class="text-xs text-gray-500 flex items-center gap-1 truncate max-w-[200px]" id="header-endereco-txt">
+                    <h1 class="font-bold text-sm text-gray-900">Burger & Cia Express</h1>
+                    <p class="text-xs text-gray-500 truncate max-w-[200px]" id="header-end-txt">
                         <i class="fa-solid fa-location-dot text-orange-500"></i> Toque para definir endereço
                     </p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
-                <button onclick="abrirMeusPedidos()" class="relative p-2.5 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition" title="Meus Pedidos">
+                <button onclick="abrirMeusPedidos()" class="relative p-2.5 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition">
                     <i class="fa-solid fa-receipt text-sm"></i>
                     <span id="badge-pedidos" class="absolute -top-1 -right-1 bg-orange-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden font-bold">0</span>
                 </button>
@@ -49,100 +49,107 @@
     </header>
 
     <!-- ========================================== -->
-    <!-- CONTEÚDO PRINCIPAL: VITRINE DO CLIENTE -->
+    <!-- VISÃO 1: CLIENTE (VITRINE iFOOD) -->
     <!-- ========================================== -->
-    <main id="app-view-cliente" class="max-w-3xl mx-auto px-4 py-4 flex-1 w-full space-y-5">
-        
-        <!-- Banner Destaque iFood Style -->
+    <main id="app-view-cliente" class="max-w-3xl mx-auto px-4 py-4 flex-1 w-full space-y-4">
+        <!-- Banner Destaque -->
         <div class="bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex items-center justify-between">
             <div class="relative z-10 space-y-1">
-                <span class="bg-white/20 text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full">Entrega Rápida 🚀</span>
+                <span class="bg-white/20 text-[10px] uppercase font-bold px-2.5 py-1 rounded-full">Entrega Rápida 🚀</span>
                 <h2 class="text-xl font-black">Fome de Burger Artesanal?</h2>
-                <p class="text-xs text-orange-100">Pão brioche fresquinho, carne suculenta e queijo derretido.</p>
+                <p class="text-xs text-orange-100">Ingredientes frescos e carnes suculentas na brasa.</p>
             </div>
-            <div class="text-5xl opacity-30 md:opacity-80 z-10"><i class="fa-solid fa-utensils"></i></div>
-            <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+            <div class="text-4xl opacity-40 md:opacity-90"><i class="fa-solid fa-utensils"></i></div>
         </div>
 
-        <!-- Categorias (Filtros Rápidos) -->
+        <!-- Categorias -->
         <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <button onclick="filtrarCategoria('todos')" class="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-full shadow-sm whitespace-nowrap transition">🔥 Todos</button>
-            <button onclick="filtrarCategoria('Burger')" class="px-4 py-2 bg-white text-gray-700 border border-gray-200 text-xs font-bold rounded-full hover:bg-gray-50 whitespace-nowrap transition">🍔 Burgers</button>
-            <button onclick="filtrarCategoria('Porção')" class="px-4 py-2 bg-white text-gray-700 border border-gray-200 text-xs font-bold rounded-full hover:bg-gray-50 whitespace-nowrap transition">🍟 Porções</button>
-            <button onclick="filtrarCategoria('Bebida')" class="px-4 py-2 bg-white text-gray-700 border border-gray-200 text-xs font-bold rounded-full hover:bg-gray-50 whitespace-nowrap transition">🥤 Bebidas</button>
+            <button onclick="filtrarCat('todos')" class="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-full shadow-sm whitespace-nowrap">🔥 Todos</button>
+            <button onclick="filtrarCat('Burger')" class="px-4 py-2 bg-white text-gray-700 border text-xs font-bold rounded-full whitespace-nowrap">🍔 Burgers</button>
+            <button onclick="filtrarCat('Porção')" class="px-4 py-2 bg-white text-gray-700 border text-xs font-bold rounded-full whitespace-nowrap">🍟 Porções</button>
+            <button onclick="filtrarCat('Bebida')" class="px-4 py-2 bg-white text-gray-700 border text-xs font-bold rounded-full whitespace-nowrap">🥤 Bebidas</button>
         </div>
 
         <!-- Lista de Produtos -->
         <div>
-            <h3 class="font-bold text-gray-900 text-base mb-3">Mais Pedidos</h3>
-            <div id="vitrine-cardapio" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <!-- Preenchido via JS -->
-            </div>
+            <h3 class="font-bold text-gray-900 text-base mb-3">Cardápio Disponível</h3>
+            <div id="vitrine-cardapio" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
         </div>
     </main>
 
     <!-- ========================================== -->
-    <!-- PAINEL SECRETO / INTERNO DA LANCHONETE (DONO) -->
+    <!-- VISÃO 2: PAINEL DO DONO (LANCHONETE) -->
     <!-- ========================================== -->
     <main id="app-view-dono" class="max-w-4xl mx-auto px-4 py-4 flex-1 w-full space-y-4 hidden">
         <div class="bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-between shadow">
             <div>
-                <h2 class="font-bold text-sm">Painel da Lanchonete (Gestão)</h2>
-                <p class="text-xs text-gray-400">Controle de Cozinha e Pedidos</p>
+                <h2 class="font-bold text-sm">Painel da Lanchonete (Gestão do Dono)</h2>
+                <p class="text-xs text-gray-400">Controle total de pedidos, cardápio e equipe</p>
             </div>
-            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-lg text-white font-semibold transition"><i class="fa-solid fa-arrow-left"></i> Voltar ao App</button>
+            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg text-white font-semibold"><i class="fa-solid fa-arrow-left"></i> Sair</button>
         </div>
 
         <!-- Abas do Dono -->
-        <div class="flex gap-2 border-b border-gray-200 pb-2 text-xs font-bold">
-            <button onclick="mudarAbaGestao('pedidos')" id="aba-btn-pedidos" class="px-3 py-1.5 bg-orange-600 text-white rounded-lg shadow-sm">Fila de Pedidos</button>
-            <button onclick="mudarAbaGestao('motoboys')" id="aba-btn-motoboys" class="px-3 py-1.5 bg-white text-gray-700 border rounded-lg">Gerenciar Motoboys</button>
-            <button onclick="mudarAbaGestao('cardapio')" id="aba-btn-cardapio" class="px-3 py-1.5 bg-white text-gray-700 border rounded-lg">Gerenciar Cardápio</button>
+        <div class="flex gap-2 border-b pb-2 text-xs font-bold">
+            <button onclick="mudarAbaDono('pedidos')" id="tab-dono-pedidos" class="px-3 py-1.5 bg-orange-600 text-white rounded-lg shadow-sm">Fila de Pedidos</button>
+            <button onclick="mudarAbaDono('cardapio')" id="tab-dono-cardapio" class="px-3 py-1.5 bg-white text-gray-700 border rounded-lg">Cadastrar Comidas</button>
+            <button onclick="mudarAbaDono('motoboys')" id="tab-dono-motoboys" class="px-3 py-1.5 bg-white text-gray-700 border rounded-lg">Cadastrar Motoboy</button>
         </div>
 
-        <!-- Conteúdo Fila de Pedidos -->
-        <div id="gestao-conteudo-pedidos" class="space-y-3">
+        <!-- ABA 1: PEDIDOS -->
+        <div id="dono-conteudo-pedidos" class="space-y-3">
             <div class="flex justify-between items-center">
-                <h4 class="font-bold text-gray-800 text-sm">Pedidos Chegando em Tempo Real</h4>
-                <button onclick="renderizarGestaoPedidos()" class="text-xs bg-white border px-2.5 py-1 rounded-lg font-semibold"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+                <h4 class="font-bold text-gray-800 text-sm">Pedidos na Cozinha</h4>
+                <div class="flex gap-2">
+                    <button onclick="testarVozAlerta()" class="text-xs bg-amber-500 text-white px-3 py-1 rounded-lg font-bold shadow"><i class="fa-solid fa-volume-high"></i> Testar Alerta Voz</button>
+                    <button onclick="renderizarPedidosDono()" class="text-xs bg-white border px-3 py-1 rounded-lg font-semibold"><i class="fa-solid fa-rotate"></i></button>
+                </div>
             </div>
             <div id="lista-pedidos-cozinha" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
         </div>
 
-        <!-- Conteúdo Gestão Motoboys -->
-        <div id="gestao-conteudo-motoboys" class="space-y-4 hidden">
+        <!-- ABA 2: CADASTRAR COMIDAS -->
+        <div id="dono-conteudo-cardapio" class="space-y-4 hidden">
             <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
-                <h4 class="font-bold text-gray-800 text-xs uppercase">Cadastrar Novo Motoboy</h4>
-                <form onsubmit="cadastrarMotoboyDono(event)" class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                    <input type="text" id="cad-m-nome" placeholder="Nome" required class="px-3 py-2 border rounded-lg text-xs">
-                    <input type="text" id="cad-m-tel" placeholder="WhatsApp" required class="px-3 py-2 border rounded-lg text-xs">
-                    <button type="submit" class="bg-gray-900 text-white rounded-lg text-xs font-bold py-2">Salvar Motoboy</button>
-                </form>
-            </div>
-            <div id="lista-motoboys-cadastrados" class="space-y-2"></div>
-        </div>
-
-        <!-- Conteúdo Gestão Cardápio -->
-        <div id="gestao-conteudo-cardapio" class="space-y-4 hidden">
-            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
-                <h4 class="font-bold text-gray-800 text-xs uppercase">Adicionar Novo Produto</h4>
-                <form onsubmit="cadastrarProdutoDono(event)" class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                    <input type="text" id="cad-p-nome" placeholder="Nome" required class="px-3 py-2 border rounded-lg text-xs">
-                    <input type="number" step="0.01" id="cad-p-preco" placeholder="Preço (R$)" required class="px-3 py-2 border rounded-lg text-xs">
-                    <select id="cad-p-cat" class="px-3 py-2 border rounded-lg text-xs">
+                <h4 class="font-bold text-gray-800 text-xs uppercase"><i class="fa-solid fa-burger text-orange-600"></i> Cadastrar Nova Comida / Bebida</h4>
+                <form onsubmit="cadastrarProdutoDono(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <input type="text" id="cp-nome" placeholder="Nome do Lanche (Ex: X-Tudo)" required class="px-3 py-2 border rounded-lg">
+                    <input type="number" step="0.01" id="cp-preco" placeholder="Preço (R$)" required class="px-3 py-2 border rounded-lg">
+                    <select id="cp-cat" class="px-3 py-2 border rounded-lg">
                         <option value="Burger">Burger</option>
                         <option value="Porção">Porção</option>
                         <option value="Bebida">Bebida</option>
                     </select>
-                    <button type="submit" class="bg-orange-600 text-white rounded-lg text-xs font-bold py-2">Adicionar</button>
+                    <input type="url" id="cp-foto" placeholder="Link da Imagem (URL da foto)" required class="px-3 py-2 border rounded-lg">
+                    <textarea id="cp-desc" rows="2" placeholder="Descrição dos ingredientes" required class="md:col-span-2 px-3 py-2 border rounded-lg"></textarea>
+                    <button type="submit" class="md:col-span-2 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-lg">Salvar Comida no Cardápio</button>
                 </form>
             </div>
-            <div id="lista-produtos-cadastrados" class="space-y-2"></div>
+            <div class="bg-white p-4 rounded-xl border shadow-sm">
+                <h4 class="font-bold text-gray-800 text-xs uppercase mb-3">Comidas Cadastradas</h4>
+                <div id="lista-produtos-dono" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- ABA 3: CADASTRAR MOTOBOY -->
+        <div id="dono-conteudo-motoboys" class="space-y-4 hidden">
+            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
+                <h4 class="font-bold text-gray-800 text-xs uppercase"><i class="fa-solid fa-motorcycle text-orange-600"></i> Cadastrar Novo Motoboy</h4>
+                <form onsubmit="cadastrarMotoboyDono(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <input type="text" id="cm-nome" placeholder="Nome do Motoboy" required class="px-3 py-2 border rounded-lg">
+                    <input type="tel" id="cm-tel" placeholder="WhatsApp" required class="px-3 py-2 border rounded-lg">
+                    <button type="submit" class="bg-gray-900 text-white font-bold py-2 rounded-lg">Cadastrar Motoboy</button>
+                </form>
+            </div>
+            <div class="bg-white p-4 rounded-xl border shadow-sm">
+                <h4 class="font-bold text-gray-800 text-xs uppercase mb-3">Motoboys da Equipe</h4>
+                <div id="lista-motoboys-dono" class="space-y-2"></div>
+            </div>
         </div>
     </main>
 
     <!-- ========================================== -->
-    <!-- PAINEL SECRETO / INTERNO DO MOTOBOY -->
+    <!-- VISÃO 3: PAINEL DO MOTOBOY -->
     <!-- ========================================== -->
     <main id="app-view-motoboy" class="max-w-3xl mx-auto px-4 py-4 flex-1 w-full space-y-4 hidden">
         <div class="bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-between shadow">
@@ -151,147 +158,118 @@
                     <i class="fa-solid fa-motorcycle text-sm"></i>
                 </div>
                 <div>
-                    <select id="select-motoboy-ativo" onchange="mudarMotoboyLogado()" class="bg-gray-800 text-amber-400 font-bold text-xs px-2 py-1 rounded border border-gray-700">
-                        <!-- Preenchido via JS -->
-                    </select>
+                    <select id="select-motoboy-logado" onchange="renderizarEntregasMotoboy()" class="bg-gray-800 text-amber-400 font-bold text-xs px-2 py-1 rounded border border-gray-700"></select>
                     <p class="text-[10px] text-gray-400">Portal do Entregador</p>
                 </div>
             </div>
-            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-lg text-white font-semibold transition"><i class="fa-solid fa-arrow-left"></i> Sair</button>
+            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg text-white font-semibold"><i class="fa-solid fa-arrow-left"></i> Sair</button>
         </div>
-
         <div class="space-y-3" id="lista-entregas-motoboy"></div>
     </main>
 
     <!-- ========================================== -->
-    <!-- BARRA INFERIOR FLUTUANTE (CARRINHO iFOOD STYLE) -->
+    <!-- BARRA INFERIOR FLUTUANTE (CARRINHO) -->
     <!-- ========================================== -->
-    <div id="barra-carrinho-flutuante" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-2xl z-40 hidden">
+    <div id="barra-carrinho" class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 shadow-2xl z-40 hidden">
         <div class="max-w-3xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 font-bold">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 font-semibold" id="resumo-qtd-itens">0 itens</p>
-                    <p class="text-sm font-black text-gray-900" id="resumo-valor-total">R$ 0,00</p>
+                    <p class="text-xs text-gray-500 font-semibold" id="resumo-qtd">0 itens</p>
+                    <p class="text-sm font-black text-gray-900" id="resumo-valor">R$ 0,00</p>
                 </div>
             </div>
-            <button onclick="abrirCheckout()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition text-sm flex items-center gap-2">
+            <button onclick="abrirCheckout()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-3 rounded-xl shadow transition text-sm">
                 Ver Sacola <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL: CHECKOUT / FINALIZAR PEDIDO -->
+    <!-- MODAL: CHECKOUT (FINALIZAR PEDIDO) -->
     <!-- ========================================== -->
     <div id="modal-checkout" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end md:items-center justify-center p-0 md:p-4">
         <div class="bg-white w-full max-w-lg rounded-t-3xl md:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-sm"><i class="fa-solid fa-bag-shopping"></i> Sacola de Compras</h3>
-                <button onclick="fecharCheckout()" class="text-gray-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-bag-shopping"></i> Sacola e Entrega</h3>
+                <button onclick="fecharCheckout()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            
             <div class="p-4 overflow-y-auto flex-1 space-y-4 text-xs">
                 <div id="itens-sacola-modal" class="divide-y divide-gray-100"></div>
 
-                <!-- Dados do Cliente & Endereço -->
                 <div class="bg-gray-50 p-3 rounded-xl space-y-2 border">
-                    <p class="font-bold text-gray-900 uppercase">Seus Dados de Entrega</p>
-                    <input type="text" id="checkout-nome" placeholder="Seu Nome Completo" class="w-full px-3 py-2 border rounded-lg bg-white">
-                    <input type="tel" id="checkout-tel" placeholder="WhatsApp / Telefone" class="w-full px-3 py-2 border rounded-lg bg-white">
-                    <textarea id="checkout-end" rows="2" placeholder="Endereço (Rua, Número, Bairro)" class="w-full px-3 py-2 border rounded-lg bg-white"></textarea>
-                    <button type="button" onclick="capturarGPSCheckout()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-location-crosshairs"></i> Capturar Localização GPS Exata para o Motoboy
-                    </button>
-                    <p id="checkout-gps-status" class="text-center text-gray-500 italic">GPS não capturado (usando padrão)</p>
+                    <p class="font-bold text-gray-900 uppercase">Seus Dados</p>
+                    <input type="text" id="chk-nome" placeholder="Seu Nome Completo" class="w-full px-3 py-2 border rounded-lg bg-white">
+                    <input type="tel" id="chk-tel" placeholder="WhatsApp" class="w-full px-3 py-2 border rounded-lg bg-white">
+                    <textarea id="chk-end" rows="2" placeholder="Endereço (Rua, Número, Bairro)" class="w-full px-3 py-2 border rounded-lg bg-white"></textarea>
+                    <button type="button" onclick="capturarGPS()" class="w-full bg-amber-500 text-white font-bold py-2 rounded-lg"><i class="fa-solid fa-location-crosshairs"></i> Capturar GPS Exato</button>
+                    <p id="chk-gps-status" class="text-center text-gray-500 italic">GPS padrão pronto</p>
                 </div>
 
-                <!-- Pagamento -->
                 <div class="space-y-2">
                     <p class="font-bold text-gray-900 uppercase">Forma de Pagamento</p>
-                    <select id="checkout-pagamento" onchange="mudarFormaPagamentoModal()" class="w-full px-3 py-2 border rounded-lg bg-white font-medium">
+                    <select id="chk-pag" onchange="mudarPagamentoModal()" class="w-full px-3 py-2 border rounded-lg bg-white font-medium">
                         <option value="pix">Pix (Chave Automática)</option>
-                        <option value="cartao">Cartão na Entrega (Maquininha)</option>
-                        <option value="dinheiro">Dinheiro (Espécie)</option>
+                        <option value="cartao">Cartão na Entrega</option>
+                        <option value="dinheiro">Dinheiro</option>
                     </select>
-                    <div id="bloco-troco-modal" class="hidden">
-                        <input type="text" id="checkout-troco" placeholder="Troco para quanto? (Ex: R$ 50)" class="w-full px-3 py-2 border rounded-lg bg-white">
-                    </div>
-                    <div id="bloco-pix-modal" class="bg-orange-50 border border-orange-200 p-2.5 rounded-lg text-orange-900">
-                        <p class="font-bold mb-1"><i class="fa-solid fa-qrcode"></i> Chave Pix CNPJ:</p>
-                        <p class="font-mono bg-white p-1.5 rounded border text-center select-all">00.000.000/0001-00 (Burger & Cia)</p>
+                    <div id="bloco-troco" class="hidden">
+                        <input type="text" id="chk-troco" placeholder="Troco para quanto?" class="w-full px-3 py-2 border rounded-lg bg-white">
                     </div>
                 </div>
 
                 <div class="bg-gray-100 p-3 rounded-xl space-y-1 text-xs">
-                    <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="modal-subtotal">R$ 0,00</span></div>
-                    <div class="flex justify-between text-gray-600"><span>Taxa de Entrega</span><span>R$ 5,00</span></div>
-                    <div class="flex justify-between font-black text-gray-900 text-sm pt-2 border-t"><span>Total</span><span id="modal-total" class="text-orange-600">R$ 0,00</span></div>
+                    <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="mod-sub">R$ 0,00</span></div>
+                    <div class="flex justify-between text-gray-600"><span>Taxa Entrega</span><span>R$ 5,00</span></div>
+                    <div class="flex justify-between font-black text-gray-900 text-sm pt-2 border-t"><span>Total</span><span id="mod-tot" class="text-orange-600">R$ 0,00</span></div>
                 </div>
             </div>
-
             <div class="p-3 bg-white border-t">
-                <button onclick="enviarPedidoFinal()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl shadow transition text-sm">
-                    Enviar Pedido para a Lanchonete 🚀
-                </button>
+                <button onclick="enviarPedido()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl text-sm shadow">Enviar Pedido 🚀</button>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
     <!-- MODAL: MEUS PEDIDOS -->
-    <!-- ========================================== -->
     <div id="modal-meus-pedidos" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
                 <h3 class="font-bold text-sm"><i class="fa-solid fa-receipt"></i> Meus Pedidos</h3>
-                <button onclick="fecharMeusPedidos()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="fecharMeusPedidos()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-4 overflow-y-auto flex-1 space-y-3" id="lista-meus-pedidos-modal"></div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL: MAPA DO MOTOBOY (GPS) -->
-    <!-- ========================================== -->
-    <div id="modal-mapa-motoboy" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+    <!-- MODAL: MAPA GPS MOTOBOY -->
+    <div id="modal-mapa" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-2xl flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-sm"><i class="fa-solid fa-map-location-dot text-amber-400"></i> Rota de Entrega Exata</h3>
-                <button onclick="fecharMapaMotoboy()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-map-location-dot text-amber-400"></i> Rota GPS Exata</h3>
+                <button onclick="fecharMapa()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-4 space-y-3 text-xs">
-                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl space-y-1">
-                    <p class="font-bold text-amber-900" id="mapa-c-nome">Cliente: -</p>
-                    <p class="text-gray-700" id="mapa-c-end">Endereço: -</p>
-                    <p class="font-bold text-orange-600" id="mapa-c-pag">Pagamento: -</p>
+                <div class="bg-amber-50 border p-3 rounded-xl space-y-1">
+                    <p class="font-bold text-amber-900" id="mapa-cli-nome">Cliente: -</p>
+                    <p class="text-gray-700" id="mapa-cli-end">Endereço: -</p>
+                    <p class="font-bold text-orange-600" id="mapa-cli-pag">Pagamento: -</p>
                 </div>
-                <div class="bg-gray-100 h-48 rounded-xl flex items-center justify-center border text-center p-4 relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]"></div>
-                    <div class="z-10 space-y-1 bg-white/90 p-3 rounded-lg shadow">
-                        <i class="fa-solid fa-location-dot text-2xl text-orange-600 animate-bounce"></i>
-                        <p class="font-bold text-gray-800">Coordenadas GPS Capturadas</p>
-                        <p class="text-[10px] text-gray-500 font-mono" id="mapa-c-coords">Lat: -, Lng: -</p>
-                    </div>
-                </div>
-                <a id="btn-google-maps-link" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition text-center block text-sm shadow">
-                    <i class="fa-solid fa-diamond-turn-right"></i> Abrir Rota no Google Maps
+                <a id="btn-link-maps" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-center block shadow">
+                    <i class="fa-solid fa-diamond-turn-right"></i> Abrir Navegação no Google Maps
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- ACESSOS DISCRETOS NO RODAPÉ (DONO E MOTOBOY) -->
-    <!-- ========================================== -->
-    <footer class="mt-auto py-6 text-center border-t border-gray-200 bg-white">
-        <p class="text-[11px] text-gray-400 mb-2">&copy; 2026 Burger & Cia Express - Todos os direitos reservados.</p>
-        <div class="flex justify-center gap-4 text-xs">
-            <button onclick="mudarVisaoApp('motoboy')" class="text-gray-400 hover:text-gray-600 transition flex items-center gap-1"><i class="fa-solid fa-motorcycle"></i> Área Motoboy</button>
+    <!-- RODAPÉ DISCRETO (ACESSOS DO DONO E MOTOBOY) -->
+    <footer class="mt-auto py-6 text-center border-t bg-white">
+        <p class="text-[11px] text-gray-400 mb-2">&copy; 2026 Burger & Cia Express</p>
+        <div class="flex justify-center gap-4 text-xs font-semibold">
+            <button onclick="mudarVisaoApp('motoboy')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-motorcycle"></i> Área Motoboy</button>
             <span class="text-gray-300">•</span>
-            <button onclick="mudarVisaoApp('dono')" class="text-gray-400 hover:text-gray-600 transition flex items-center gap-1"><i class="fa-solid fa-lock"></i> Painel da Lanchonete</button>
+            <button onclick="mudarVisaoApp('dono')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-lock"></i> Painel da Lanchonete</button>
         </div>
     </footer>
 
@@ -301,11 +279,10 @@
     <script>
         let db = {
             cardapio: JSON.parse(localStorage.getItem('burger_cardapio')) || [
-                { id: 1, nome: 'X-Burger Artesanal', preco: 28.00, cat: 'Burger', desc: 'Pão brioche, carne 160g, cheddar derretido e molho especial.' },
-                { id: 2, nome: 'X-Bacon Supremo', preco: 34.00, cat: 'Burger', desc: 'Pão brioche, carne 160g, muito bacon crocante e maionese verde.' },
-                { id: 3, nome: 'Burger Duplo Monster', preco: 42.00, cat: 'Burger', desc: 'Dois blends de 160g, dobro de queijo, bacon e cebola caramelizada.' },
-                { id: 4, nome: 'Batata Frita com Cheddar', preco: 22.00, cat: 'Porção', desc: 'Porção generosa de batatas sequinhas com cheddar cremoso e bacon.' },
-                { id: 5, nome: 'Refrigerante Lata 350ml', preco: 6.00, cat: 'Bebida', desc: 'Coca-Cola, Guaraná Antarctica ou Sprite.' }
+                { id: 1, nome: 'X-Burger Artesanal', preco: 28.00, cat: 'Burger', foto: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', desc: 'Pão brioche, carne 160g, cheddar e molho especial.' },
+                { id: 2, nome: 'X-Bacon Supremo', preco: 34.00, cat: 'Burger', foto: 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400', desc: 'Pão brioche, carne 160g, muito bacon crocante.' },
+                { id: 3, nome: 'Batata com Cheddar e Bacon', preco: 22.00, cat: 'Porção', foto: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=400', desc: 'Porção generosa de batatas fritas sequinhas.' },
+                { id: 4, nome: 'Coca-Cola Lata 350ml', preco: 6.00, cat: 'Bebida', foto: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400', desc: 'Geladinha.' }
             ],
             motoboys: JSON.parse(localStorage.getItem('burger_motoboys')) || [
                 { nome: 'Carlos Entregador', tel: '(84) 98888-1111' },
@@ -315,26 +292,23 @@
         };
 
         let carrinho = [];
-        let categoriaAtual = 'todos';
-        let gpsAtual = { lat: -5.1878, lng: -37.3441 }; // Padrão Mossoró
+        let categoriaAtiva = 'todos';
+        let gpsSalvo = { lat: -5.1878, lng: -37.3441 };
 
-        // Inicialização
         window.onload = function() {
             renderizarVitrine();
-            popularSelectMotoboy();
+            popularMotoboysSelect();
             atualizarBadgePedidos();
-            const clienteSalvo = JSON.parse(localStorage.getItem('burger_cliente_temp'));
-            if(clienteSalvo) {
-                document.getElementById('checkout-nome').value = clienteSalvo.nome || '';
-                document.getElementById('checkout-tel').value = clienteSalvo.tel || '';
-                document.getElementById('checkout-end').value = clienteSalvo.endereco || '';
-                if(clienteSalvo.endTexto) {
-                    document.getElementById('header-endereco-txt').innerHTML = `<i class="fa-solid fa-location-dot text-orange-500"></i> ${clienteSalvo.endTexto}`;
-                }
+            const salvo = JSON.parse(localStorage.getItem('burger_cli_salvo'));
+            if(salvo) {
+                document.getElementById('chk-nome').value = salvo.nome || '';
+                document.getElementById('chk-tel').value = salvo.tel || '';
+                document.getElementById('chk-end').value = salvo.endereco || '';
+                if(salvo.endereco) document.getElementById('header-end-txt').innerHTML = `<i class="fa-solid fa-location-dot text-orange-500"></i> ${salvo.endereco}`;
             }
         };
 
-        function salvarDB() {
+        function salvarNoStorage() {
             localStorage.setItem('burger_cardapio', JSON.stringify(db.cardapio));
             localStorage.setItem('burger_motoboys', JSON.stringify(db.motoboys));
             localStorage.setItem('burger_pedidos', JSON.stringify(db.pedidos));
@@ -344,43 +318,46 @@
             document.getElementById('app-view-cliente').classList.add('hidden');
             document.getElementById('app-view-dono').classList.add('hidden');
             document.getElementById('app-view-motoboy').classList.add('hidden');
-            document.getElementById('barra-carrinho-flutuante').classList.add('hidden');
+            document.getElementById('barra-carrinho').classList.add('hidden');
 
             if(visao === 'cliente') {
                 document.getElementById('app-view-cliente').classList.remove('hidden');
-                if(carrinho.length > 0) document.getElementById('barra-carrinho-flutuante').classList.remove('hidden');
+                if(carrinho.length > 0) document.getElementById('barra-carrinho').classList.remove('hidden');
             } else if(visao === 'dono') {
                 document.getElementById('app-view-dono').classList.remove('hidden');
-                renderizarGestaoPedidos();
-                renderizarGestaoMotoboys();
-                renderizarGestaoCardapio();
+                renderizarPedidosDono();
+                renderizarCardapioDono();
+                renderizarMotoboysDono();
             } else if(visao === 'motoboy') {
                 document.getElementById('app-view-motoboy').classList.remove('hidden');
                 renderizarEntregasMotoboy();
             }
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo({top:0, behavior:'smooth'});
         }
 
-        // --- CLIENTE / VITRINE ---
-        function filtrarCategoria(cat) {
-            categoriaAtual = cat;
+        // --- CLIENTE ---
+        function filtrarCat(cat) {
+            categoriaAtiva = cat;
             renderizarVitrine();
         }
 
         function renderizarVitrine() {
             const container = document.getElementById('vitrine-cardapio');
-            const filtrados = categoriaAtual === 'todos' ? db.cardapio : db.cardapio.filter(i => i.cat === categoriaAtual);
+            const lista = categoriaAtiva === 'todos' ? db.cardapio : db.cardapio.filter(i => i.cat === categoriaAtiva);
             
-            container.innerHTML = filtrados.map(item => `
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center gap-3 hover:shadow-md transition">
-                    <div class="space-y-1 flex-1">
+            container.innerHTML = lista.map(item => `
+                <div class="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+                    <img src="${item.foto}" alt="${item.nome}" class="w-full h-36 object-cover bg-gray-200">
+                    <div class="p-3 space-y-1 flex-1">
                         <h4 class="font-bold text-gray-900 text-sm">${item.nome}</h4>
                         <p class="text-xs text-gray-500 line-clamp-2">${item.desc}</p>
                         <p class="font-black text-orange-600 text-sm pt-1">R$ ${item.preco.toFixed(2)}</p>
                     </div>
-                    <button onclick="adicionarCarrinho(${item.id})" class="w-10 h-10 bg-orange-50 hover:bg-orange-600 text-orange-600 hover:text-white rounded-xl flex items-center justify-center font-bold transition shadow-sm">
-                        <i class="fa-solid fa-plus"></i>
-                    </button>
+                    <div class="p-3 pt-0">
+                        <button onclick="adicionarCarrinho(${item.id})" class="w-full bg-orange-50 hover:bg-orange-600 text-orange-600 hover:text-white font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-plus"></i> Adicionar à Sacola
+                        </button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -390,248 +367,205 @@
             const existe = carrinho.find(c => c.id === id);
             if(existe) existe.qtd++;
             else carrinho.push({ ...prod, qtd: 1 });
-            
             atualizarBarraCarrinho();
         }
 
         function atualizarBarraCarrinho() {
-            const qtdTotal = carrinho.reduce((acc, item) => acc + item.qtd, 0);
-            const valTotal = carrinho.reduce((acc, item) => acc + (item.preco * item.qtd), 0);
-            
-            if(qtdTotal > 0) {
-                document.getElementById('resumo-qtd-itens').innerText = `${qtdTotal} ${qtdTotal === 1 ? 'item' : 'itens'}`;
-                document.getElementById('resumo-valor-total').innerText = `R$ ${valTotal.toFixed(2)}`;
-                document.getElementById('barra-carrinho-flutuante').classList.remove('hidden');
+            const qtd = carrinho.reduce((a, b) => a + b.qtd, 0);
+            const val = carrinho.reduce((a, b) => a + (b.preco * b.qtd), 0);
+            if(qtd > 0) {
+                document.getElementById('resumo-qtd').innerText = `${qtd} ${qtd === 1 ? 'item' : 'itens'}`;
+                document.getElementById('resumo-valor').innerText = `R$ ${val.toFixed(2)}`;
+                document.getElementById('barra-carrinho').classList.remove('hidden');
             } else {
-                document.getElementById('barra-carrinho-flutuante').classList.add('hidden');
+                document.getElementById('barra-carrinho').classList.add('hidden');
             }
         }
 
-        // --- CHECKOUT ---
         function abrirCheckout() {
             const container = document.getElementById('itens-sacola-modal');
-            let subtotal = 0;
-            container.innerHTML = carrinho.map((item, idx) => {
-                subtotal += item.preco * item.qtd;
+            let sub = 0;
+            container.innerHTML = carrinho.map((i, idx) => {
+                sub += i.preco * i.qtd;
                 return `
-                    <div class="py-2.5 flex justify-between items-center text-xs">
-                        <div>
-                            <p class="font-bold text-gray-800">${item.qtd}x ${item.nome}</p>
-                            <p class="text-gray-500">R$ ${item.preco.toFixed(2)} un</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-gray-900">R$ ${(item.preco * item.qtd).toFixed(2)}</span>
-                            <button onclick="removerItemCarrinho(${idx})" class="text-red-500 p-1"><i class="fa-solid fa-trash"></i></button>
-                        </div>
+                    <div class="py-2 flex justify-between items-center text-xs">
+                        <div><p class="font-bold">${i.qtd}x ${i.nome}</p><p class="text-gray-500">R$ ${i.preco.toFixed(2)}</p></div>
+                        <div class="flex items-center gap-2"><span class="font-bold">R$ ${(i.preco * i.qtd).toFixed(2)}</span><button onclick="removerItem(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>
                     </div>
                 `;
             }).join('');
-
-            document.getElementById('modal-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
-            document.getElementById('modal-total').innerText = `R$ ${(subtotal + 5.00).toFixed(2)}`;
+            document.getElementById('mod-sub').innerText = `R$ ${sub.toFixed(2)}`;
+            document.getElementById('mod-tot').innerText = `R$ ${(sub + 5.00).toFixed(2)}`;
             document.getElementById('modal-checkout').classList.remove('hidden');
         }
 
-        function fecharCheckout() {
-            document.getElementById('modal-checkout').classList.add('hidden');
-        }
+        function fecharCheckout() { document.getElementById('modal-checkout').classList.add('hidden'); }
+        function removerItem(idx) { carrinho.splice(idx, 1); atualizarBarraCarrinho(); if(carrinho.length === 0) fecharCheckout(); else abrirCheckout(); }
 
-        function removerItemCarrinho(idx) {
-            carrinho.splice(idx, 1);
-            atualizarBarraCarrinho();
-            if(carrinho.length === 0) fecharCheckout();
-            else abrirCheckout();
-        }
-
-        function capturarGPSCheckout() {
-            const status = document.getElementById('checkout-gps-status');
+        function capturarGPS() {
+            const st = document.getElementById('chk-gps-status');
             if(navigator.geolocation) {
-                status.innerText = "Buscando localização exata via GPS...";
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        gpsAtual = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                        status.innerText = `GPS Capturado com sucesso! (${gpsAtual.lat.toFixed(4)}, ${gpsAtual.lng.toFixed(4)})`;
-                        status.className = "text-center text-green-600 font-bold";
-                    },
-                    (err) => {
-                        status.innerText = "GPS padrão ativado com sucesso.";
-                        status.className = "text-center text-amber-600 font-bold";
-                    },
-                    { timeout: 10000 }
-                );
+                navigator.geolocation.getCurrentPosition(pos => {
+                    gpsSalvo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                    st.innerText = "GPS Capturado com sucesso!";
+                    st.className = "text-center text-green-600 font-bold";
+                }, () => { st.innerText = "GPS padrão ativado."; });
             }
         }
 
-        function mudarFormaPagamentoModal() {
-            const tipo = document.getElementById('checkout-pagamento').value;
-            document.getElementById('bloco-troco-modal').classList.toggle('hidden', tipo !== 'dinheiro');
-            document.getElementById('bloco-pix-modal').classList.toggle('hidden', tipo !== 'pix');
+        function mudarPagamentoModal() {
+            const t = document.getElementById('chk-pag').value;
+            document.getElementById('bloco-troco').classList.toggle('hidden', t !== 'dinheiro');
         }
 
-        function enviarPedidoFinal() {
-            const nome = document.getElementById('checkout-nome').value;
-            const tel = document.getElementById('checkout-tel').value;
-            const end = document.getElementById('checkout-end').value;
+        function enviarPedido() {
+            const nome = document.getElementById('chk-nome').value;
+            const tel = document.getElementById('chk-tel').value;
+            const end = document.getElementById('chk-end').value;
+            if(!nome || !tel || !end) { alert('Preencha nome, telefone e endereço.'); return; }
 
-            if(!nome || !tel || !end) {
-                alert('Por favor, preencha seu nome, telefone e endereço.');
-                return;
-            }
-
-            const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * item.qtd), 0);
-            const total = subtotal + 5.00;
-            const tipoPagamento = document.getElementById('checkout-pagamento').value;
-            const troco = document.getElementById('checkout-troco').value;
-
-            const novoPedido = {
+            const sub = carrinho.reduce((a, b) => a + (b.preco * b.qtd), 0);
+            const novo = {
                 id: 'PED-' + Math.floor(1000 + Math.random() * 9000),
-                cliente: { nome, tel, endereco: end, gps: gpsAtual },
+                cliente: { nome, tel, endereco: end, gps: gpsSalvo },
                 itens: [...carrinho],
-                total: total,
-                pagamento: tipoPagamento === 'dinheiro' ? `Dinheiro (Troco para: ${troco || 'Não'})` : (tipoPagamento === 'pix' ? 'Pix (Pago)' : 'Cartão na Entrega'),
+                total: sub + 5.00,
+                pagamento: document.getElementById('chk-pag').value,
                 status: 'Recebido',
                 motoboyAtribuido: null,
                 data: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
-            db.pedidos.unshift(novoPedido);
-            salvarDB();
-
-            // Salva dados temporários do cliente
-            localStorage.setItem('burger_cliente_temp', JSON.stringify({ nome, tel, endereco: end }));
-            document.getElementById('header-endereco-txt').innerHTML = `<i class="fa-solid fa-location-dot text-orange-500"></i> ${end}`;
+            db.pedidos.unshift(novo);
+            salvarNoStorage();
+            localStorage.setItem('burger_cli_salvo', JSON.stringify({ nome, tel, endereco: end }));
+            document.getElementById('header-end-txt').innerHTML = `<i class="fa-solid fa-location-dot text-orange-500"></i> ${end}`;
 
             carrinho = [];
             atualizarBarraCarrinho();
             fecharCheckout();
-            alert('Pedido realizado com sucesso! Acompanhe o status em "Meus Pedidos".');
+            falarVoz("Novo pedido recebido na lanchonete!");
+            alert('Pedido enviado com sucesso!');
             abrirMeusPedidos();
         }
 
         function abrirMeusPedidos() {
-            const container = document.getElementById('lista-meus-pedidos-modal');
-            const telUser = document.getElementById('checkout-tel').value;
+            const telUser = document.getElementById('chk-tel').value;
             const meus = telUser ? db.pedidos.filter(p => p.cliente.tel === telUser) : db.pedidos;
-
-            if(meus.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">Nenhum pedido recente encontrado.</p>`;
-            } else {
-                container.innerHTML = meus.map(p => `
-                    <div class="bg-gray-50 border rounded-xl p-3 text-xs space-y-2">
-                        <div class="flex justify-between font-bold">
-                            <span>${p.id} (${p.data})</span>
-                            <span class="px-2 py-0.5 rounded text-[10px] uppercase ${
-                                p.status === 'Recebido' ? 'bg-amber-100 text-amber-800' :
-                                p.status === 'Em Preparo' ? 'bg-blue-100 text-blue-800' :
-                                p.status === 'Saiu para Entrega' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
-                            }">${p.status}</span>
-                        </div>
-                        <p class="text-gray-600">${p.itens.map(i => `${i.qtd}x ${i.nome}`).join(', ')}</p>
-                        <div class="flex justify-between font-bold pt-1 border-t text-orange-600">
-                            <span>Total: R$ ${p.total.toFixed(2)}</span>
-                            <span class="text-gray-500 font-normal">Entregador: ${p.motoboyAtribuido || 'Aguardando'}</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
+            document.getElementById('lista-meus-pedidos-modal').innerHTML = meus.length === 0 ? `<p class="text-center text-xs text-gray-400 py-4">Nenhum pedido recente.</p>` : meus.map(p => `
+                <div class="bg-gray-50 border rounded-xl p-3 text-xs space-y-1">
+                    <div class="flex justify-between font-bold"><span>${p.id} (${p.data})</span><span class="text-orange-600 uppercase">${p.status}</span></div>
+                    <p class="text-gray-600">${p.itens.map(i => `${i.qtd}x ${i.nome}`).join(', ')}</p>
+                    <p class="font-bold pt-1 border-t">Total: R$ ${p.total.toFixed(2)} | Entregador: ${p.motoboyAtribuido || 'Aguardando'}</p>
+                </div>
+            `).join('');
             document.getElementById('modal-meus-pedidos').classList.remove('hidden');
         }
-
-        function fecharMeusPedidos() {
-            document.getElementById('modal-meus-pedidos').classList.add('hidden');
-        }
-
+        function fecharMeusPedidos() { document.getElementById('modal-meus-pedidos').classList.add('hidden'); }
         function atualizarBadgePedidos() {
-            const badge = document.getElementById('badge-pedidos');
-            if(db.pedidos.length > 0) {
-                badge.innerText = db.pedidos.length;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
+            const b = document.getElementById('badge-pedidos');
+            if(db.pedidos.length > 0) { b.innerText = db.pedidos.length; b.classList.remove('hidden'); }
+            else { b.classList.add('hidden'); }
         }
 
-        // --- PAINEL DONO (GESTÃO) ---
-        function mudarAbaGestao(aba) {
-            ['pedidos', 'motoboys', 'cardapio'].forEach(a => {
-                document.getElementById(`gestao-conteudo-${a}`).classList.add('hidden');
-                document.getElementById(`aba-btn-${a}`).className = "px-3 py-1.5 bg-white text-gray-700 border rounded-lg text-xs font-bold";
+        // --- PAINEL DONO ---
+        function mudarAbaDono(aba) {
+            ['pedidos', 'cardapio', 'motoboys'].forEach(a => {
+                document.getElementById(`dono-conteudo-${a}`).classList.add('hidden');
+                document.getElementById(`tab-dono-${a}`).className = "px-3 py-1.5 bg-white text-gray-700 border rounded-lg text-xs font-bold";
             });
-            document.getElementById(`gestao-conteudo-${aba}`).classList.remove('hidden');
-            document.getElementById(`aba-btn-${aba}`).className = "px-3 py-1.5 bg-orange-600 text-white rounded-lg text-xs font-bold shadow-sm";
+            document.getElementById(`dono-conteudo-${aba}`).classList.remove('hidden');
+            document.getElementById(`tab-dono-${aba}`).className = "px-3 py-1.5 bg-orange-600 text-white rounded-lg text-xs font-bold shadow-sm";
         }
 
-        function renderizarGestaoPedidos() {
+        function renderizarPedidosDono() {
             const container = document.getElementById('lista-pedidos-cozinha');
-            if(db.pedidos.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-400 italic col-span-2">Nenhum pedido na fila.</p>`;
-                return;
-            }
-
-            container.innerHTML = db.pedidos.map(p => `
-                <div class="bg-white p-4 rounded-2xl border shadow-sm text-xs space-y-2">
-                    <div class="flex justify-between font-bold">
-                        <span>${p.id} (${p.data})</span>
-                        <span class="px-2 py-0.5 rounded text-[10px] uppercase ${
-                            p.status === 'Recebido' ? 'bg-amber-100 text-amber-800' :
-                            p.status === 'Em Preparo' ? 'bg-blue-100 text-blue-800' :
-                            p.status === 'Saiu para Entrega' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
-                        }">${p.status}</span>
+            container.innerHTML = db.pedidos.length === 0 ? `<p class="text-xs text-gray-400 italic">Nenhum pedido na fila.</p>` : db.pedidos.map(p => `
+                <div class="bg-white p-3 rounded-xl border text-xs space-y-2">
+                    <div class="flex justify-between font-bold"><span>${p.id} (${p.data})</span><span class="text-orange-600 uppercase">${p.status}</span></div>
+                    <div><p class="font-bold">${p.cliente.nome} (${p.cliente.tel})</p><p class="text-gray-500">${p.cliente.endereco}</p></div>
+                    <div class="bg-gray-50 p-2 rounded">${p.itens.map(i => `<p>• ${i.qtd}x ${i.nome}</p>`).join('')}</div>
+                    <div class="flex gap-1">
+                        <button onclick="mudarStatusPedido('${p.id}', 'Em Preparo')" class="flex-1 bg-blue-50 text-blue-700 py-1 rounded font-bold">Preparo</button>
+                        <button onclick="mudarStatusPedido('${p.id}', 'Saiu para Entrega')" class="flex-1 bg-purple-50 text-purple-700 py-1 rounded font-bold">Despachar</button>
                     </div>
-                    <div>
-                        <p class="font-bold text-gray-800">${p.cliente.nome} (${p.cliente.tel})</p>
-                        <p class="text-gray-500">${p.cliente.endereco}</p>
-                    </div>
-                    <div class="bg-gray-50 p-2 rounded text-gray-700">
-                        ${p.itens.map(i => `<p>• ${i.qtd}x ${i.nome}</p>`).join('')}
-                        <p class="font-bold text-orange-600 mt-1 pt-1 border-t">R$ ${p.total.toFixed(2)} | ${p.pagamento}</p>
-                    </div>
-                    <div class="space-y-1 pt-1">
-                        <div class="flex gap-1">
-                            <button onclick="mudarStatus('${p.id}', 'Em Preparo')" class="flex-1 bg-blue-50 text-blue-700 py-1 rounded font-semibold">Em Preparo</button>
-                            <button onclick="mudarStatus('${p.id}', 'Saiu para Entrega')" class="flex-1 bg-purple-50 text-purple-700 py-1 rounded font-semibold">Despachar</button>
-                        </div>
-                        <div class="flex gap-1 items-center">
-                            <select id="atrib-${p.id}" class="flex-1 border rounded px-2 py-1 bg-white">
-                                <option value="">Atribuir Motoboy...</option>
-                                ${db.motoboys.map(m => `<option value="${m.nome}" ${p.motoboyAtribuido === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('')}
-                            </select>
-                            <button onclick="salvarMotoboyPedido('${p.id}')" class="bg-gray-900 text-white px-3 py-1 rounded font-bold">OK</button>
-                        </div>
+                    <div class="flex gap-1 items-center pt-1">
+                        <select id="sel-atrib-${p.id}" class="flex-1 border rounded px-2 py-1 bg-white">
+                            <option value="">Atribuir Motoboy...</option>
+                            ${db.motoboys.map(m => `<option value="${m.nome}" ${p.motoboyAtribuido === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('')}
+                        </select>
+                        <button onclick="atribuirMotoboy('${p.id}')" class="bg-gray-900 text-white px-3 py-1 rounded font-bold">OK</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function mudarStatus(id, status) {
+        function mudarStatusPedido(id, st) {
             const p = db.pedidos.find(x => x.id === id);
-            if(p) { p.status = status; salvarDB(); renderizarGestaoPedidos(); }
+            if(p) { p.status = st; salvarNoStorage(); renderizarPedidosDono(); }
         }
 
-        function salvarMotoboyPedido(id) {
-            const m = document.getElementById(`atrib-${id}`).value;
-            if(!m) { alert('Selecione um motoboy'); return; }
+        function atribuirMotoboy(id) {
+            const m = document.getElementById(`sel-atrib-${id}`).value;
+            if(!m) return alert('Selecione um motoboy');
             const p = db.pedidos.find(x => x.id === id);
-            if(p) { p.motoboyAtribuido = m; p.status = 'Saiu para Entrega'; salvarDB(); renderizarGestaoPedidos(); }
+            if(p) { p.motoboyAtribuido = m; p.status = 'Saiu para Entrega'; salvarNoStorage(); renderizarPedidosDono(); }
         }
 
+        // CADASTRO DE COMIDA DO DONO
+        function cadastrarProdutoDono(e) {
+            e.preventDefault();
+            db.cardapio.push({
+                id: Date.now(),
+                nome: document.getElementById('cp-nome').value,
+                preco: parseFloat(document.getElementById('cp-preco').value),
+                cat: document.getElementById('cp-cat').value,
+                foto: document.getElementById('cp-foto').value,
+                desc: document.getElementById('cp-desc').value
+            });
+            salvarNoStorage();
+            renderizarVitrine();
+            renderizarCardapioDono();
+            e.target.reset();
+            alert('Comida cadastrada no cardápio com sucesso!');
+        }
+
+        function renderizarCardapioDono() {
+            document.getElementById('lista-produtos-dono').innerHTML = db.cardapio.map((item, idx) => `
+                <div class="flex justify-between items-center p-2.5 bg-gray-50 border rounded-xl text-xs">
+                    <div class="flex items-center gap-2">
+                        <img src="${item.foto}" class="w-10 h-10 object-cover rounded-lg">
+                        <div><p class="font-bold">${item.nome} - R$ ${item.preco.toFixed(2)}</p><p class="text-gray-500">${item.cat}</p></div>
+                    </div>
+                    <button onclick="removerItemCardapio(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function removerItemCardapio(idx) {
+            db.cardapio.splice(idx, 1);
+            salvarNoStorage();
+            renderizarVitrine();
+            renderizarCardapioDono();
+        }
+
+        // CADASTRO DE MOTOBOY DO DONO
         function cadastrarMotoboyDono(e) {
             e.preventDefault();
             db.motoboys.push({
-                nome: document.getElementById('cad-m-nome').value,
-                tel: document.getElementById('cad-m-tel').value
+                nome: document.getElementById('cm-nome').value,
+                tel: document.getElementById('cm-tel').value
             });
-            salvarDB();
-            renderizarGestaoMotoboys();
-            popularSelectMotoboy();
-            document.getElementById('cad-m-nome').value = '';
-            document.getElementById('cad-m-tel').value = '';
-            alert('Motoboy cadastrado!');
+            salvarNoStorage();
+            renderizarMotoboysDono();
+            popularMotoboysSelect();
+            e.target.reset();
+            alert('Motoboy cadastrado com sucesso!');
         }
 
-        function renderizarGestaoMotoboys() {
-            document.getElementById('lista-motoboys-cadastrados').innerHTML = db.motoboys.map((m, idx) => `
-                <div class="flex justify-between items-center p-3 bg-white border rounded-xl text-xs">
+        function renderizarMotoboysDono() {
+            document.getElementById('lista-motoboys-dono').innerHTML = db.motoboys.map((m, idx) => `
+                <div class="flex justify-between items-center p-2.5 bg-gray-50 border rounded-xl text-xs">
                     <div><p class="font-bold">${m.nome}</p><p class="text-gray-500">${m.tel}</p></div>
                     <button onclick="removerMotoboy(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
                 </div>
@@ -640,71 +574,29 @@
 
         function removerMotoboy(idx) {
             db.motoboys.splice(idx, 1);
-            salvarDB();
-            renderizarGestaoMotoboys();
-            popularSelectMotoboy();
+            salvarNoStorage();
+            renderizarMotoboysDono();
+            popularMotoboysSelect();
         }
 
-        function cadastrarProdutoDono(e) {
-            e.preventDefault();
-            db.cardapio.push({
-                id: Date.now(),
-                nome: document.getElementById('cad-p-nome').value,
-                preco: parseFloat(document.getElementById('cad-p-preco').value),
-                cat: document.getElementById('cad-p-cat').value,
-                desc: 'Delicioso item recém-adicionado ao cardápio.'
-            });
-            salvarDB();
-            renderizarVitrine();
-            renderizarGestaoCardapio();
-            document.getElementById('cad-p-nome').value = '';
-            document.getElementById('cad-p-preco').value = '';
-            alert('Produto adicionado ao cardápio!');
-        }
-
-        function renderizarGestaoCardapio() {
-            document.getElementById('lista-produtos-cadastrados').innerHTML = db.cardapio.map((item, idx) => `
-                <div class="flex justify-between items-center p-3 bg-white border rounded-xl text-xs">
-                    <div><p class="font-bold">${item.nome} - R$ ${item.preco.toFixed(2)}</p><p class="text-gray-500">Cat: ${item.cat}</p></div>
-                    <button onclick="removerProduto(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        function removerProduto(idx) {
-            db.cardapio.splice(idx, 1);
-            salvarDB();
-            renderizarVitrine();
-            renderizarGestaoCardapio();
-        }
-
-        // --- PAINEL MOTOBOY ---
-        function popularSelectMotoboy() {
-            const sel = document.getElementById('select-motoboy-ativo');
+        // --- MOTOBOY ---
+        function popularMotoboysSelect() {
+            const sel = document.getElementById('select-motoboy-logado');
             sel.innerHTML = db.motoboys.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
         }
 
         function renderizarEntregasMotoboy() {
-            const motoboyAtivo = document.getElementById('select-motoboy-ativo').value;
+            const atual = document.getElementById('select-motoboy-logado').value;
             const container = document.getElementById('lista-entregas-motoboy');
-            const entregas = db.pedidos.filter(p => p.motoboyAtribuido === motoboyAtivo && p.status !== 'Entregue');
+            const entregas = db.pedidos.filter(p => p.motoboyAtribuido === atual && p.status !== 'Entregue');
 
-            if(entregas.length === 0) {
-                container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-gray-400 text-xs border shadow-sm"><i class="fa-solid fa-mug-hot text-2xl mb-2"></i><p>Nenhuma entrega para você no momento.</p></div>`;
-                return;
-            }
-
-            container.innerHTML = entregas.map(p => `
-                <div class="bg-white p-4 rounded-2xl border shadow-sm text-xs space-y-2">
-                    <div class="flex justify-between font-bold">
-                        <span>${p.id}</span>
-                        <span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded">${p.status}</span>
-                    </div>
+            container.innerHTML = entregas.length === 0 ? `<div class="bg-white p-6 rounded-2xl text-center text-xs border"><p>Nenhuma entrega atribuída a você.</p></div>` : entregas.map(p => `
+                <div class="bg-white p-4 rounded-xl border text-xs space-y-2">
+                    <div class="flex justify-between font-bold"><span>${p.id}</span><span class="text-purple-700">${p.status}</span></div>
                     <p><strong>Cliente:</strong> ${p.cliente.nome} (${p.cliente.tel})</p>
                     <p><strong>Endereço:</strong> ${p.cliente.endereco}</p>
-                    <p class="font-bold text-orange-600">Cobrança: ${p.pagamento} (Total: R$ ${p.total.toFixed(2)})</p>
                     <div class="flex gap-2 pt-2">
-                        <button onclick="abrirMapaGPS('${p.id}')" class="flex-1 bg-blue-600 text-white font-bold py-2 rounded-xl"><i class="fa-solid fa-map-location-dot"></i> Ver Rota GPS</button>
+                        <button onclick="abrirMapaGPS('${p.id}')" class="flex-1 bg-blue-600 text-white font-bold py-2 rounded-xl"><i class="fa-solid fa-map"></i> Rota GPS</button>
                         <button onclick="concluirEntrega('${p.id}')" class="flex-1 bg-green-600 text-white font-bold py-2 rounded-xl"><i class="fa-solid fa-check"></i> Concluir</button>
                     </div>
                 </div>
@@ -713,22 +605,28 @@
 
         function abrirMapaGPS(id) {
             const p = db.pedidos.find(x => x.id === id);
-            document.getElementById('mapa-c-nome').innerText = `Cliente: ${p.cliente.nome} (${p.cliente.tel})`;
-            document.getElementById('mapa-c-end').innerText = `Endereço: ${p.cliente.endereco}`;
-            document.getElementById('mapa-c-pag').innerText = `Condição: ${p.pagamento}`;
-            document.getElementById('mapa-c-coords').innerText = `Lat: ${p.cliente.gps.lat.toFixed(4)}, Lng: ${p.cliente.gps.lng.toFixed(4)}`;
-            
-            document.getElementById('btn-google-maps-link').href = `https://www.google.com/maps/search/?api=1&query=${p.cliente.gps.lat},${p.cliente.gps.lng}`;
-            document.getElementById('modal-mapa-motoboy').classList.remove('hidden');
+            document.getElementById('mapa-cli-nome').innerText = `Cliente: ${p.cliente.nome} (${p.cliente.tel})`;
+            document.getElementById('mapa-cli-end').innerText = `Endereço: ${p.cliente.endereco}`;
+            document.getElementById('btn-link-maps').href = `https://www.google.com/maps/search/?api=1&query=${p.cliente.gps.lat},${p.cliente.gps.lng}`;
+            document.getElementById('modal-mapa').classList.remove('hidden');
         }
-
-        function fecharMapaMotoboy() {
-            document.getElementById('modal-mapa-motoboy').classList.add('hidden');
-        }
-
+        function fecharMapa() { document.getElementById('modal-mapa').classList.add('hidden'); }
         function concluirEntrega(id) {
             const p = db.pedidos.find(x => x.id === id);
-            if(p) { p.status = 'Entregue'; salvarDB(); renderizarEntregasMotoboy(); alert('Entrega finalizada!'); }
+            if(p) { p.status = 'Entregue'; salvarNoStorage(); renderizarEntregasMotoboy(); alert('Entrega concluída!'); }
+        }
+
+        // SÍNTESE DE VOZ (MENSAGEM DE ÁUDIO AUTOMÁTICA)
+        function falarVoz(texto) {
+            if('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(texto);
+                utterance.lang = 'pt-BR';
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        function testarVozAlerta() {
+            falarVoz("Atenção! Novo pedido recebido na lanchonete Burger e Cia. Prepare o lanche!");
         }
     </script>
 </body>
