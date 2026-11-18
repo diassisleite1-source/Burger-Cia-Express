@@ -1,633 +1,218 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger & Cia Express - Delivery</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        ifood: { 500: '#ef4444', 600: '#ea580c', 700: '#c2410c' }
-                    }
-                }
-            }
-        }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff6b24">
+  <title>BrDias Lanches | Delivery</title>
+  <style>
+    :root{--orange:#ff6b24;--yellow:#ffd447;--red:#ef3f45;--green:#159b62;--ink:#25212a;--muted:#77717c;--paper:#fffaf4;--line:#eee5dc}
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--paper);color:var(--ink)}
+    button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:700}
+    .top{background:linear-gradient(110deg,#ff6b24,#ff9b28);color:#fff;padding:18px max(18px,calc((100% - 1180px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand{font-size:25px;font-weight:900;letter-spacing:-1px}.brand span{color:#3b2430}.top small{display:block;font-size:12px;opacity:.9;margin-top:3px}
+    .top-actions{display:flex;gap:8px;align-items:center}.top button{background:#fff;color:#d94c18}.top .ghost{background:#7c2f19;color:#fff}
+    main{max-width:1180px;margin:24px auto;padding:0 18px}.hero{background:linear-gradient(110deg,#3c2330,#6b2e3b);color:white;border-radius:22px;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px;overflow:hidden}
+    .hero h1{font-size:clamp(25px,4vw,42px);margin:0 0 10px}.hero p{max-width:580px;line-height:1.5;color:#f7dfe0;margin:0}.hero .emoji{font-size:74px}
+    .notice{padding:12px 15px;border-radius:12px;background:#fff1d3;color:#74460a;margin:16px 0;display:none}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.tab{background:#fff;border:1px solid var(--line);color:#554b50}.tab.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:25px 0 14px}.section-head h2{margin:0;font-size:23px}.muted{color:var(--muted);font-size:13px}
+    .categories{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.cat{background:#fff0df;color:#9b481b;border:1px solid #ffe0c2;padding:9px 14px;border-radius:30px}.cat.active{background:#3c2330;color:#fff;border-color:#3c2330}
+    .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}.product{background:#fff;border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 5px 18px #42220a0a}.product img{width:100%;height:155px;object-fit:cover;background:#f5e9df;display:block}.product-body{padding:14px}.product h3{margin:0 0 7px;font-size:17px}.product p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.4;min-height:35px}.price-row{display:flex;justify-content:space-between;align-items:center;gap:8px}.price{font-weight:900;color:#df4c20;font-size:18px}.add{background:var(--green);color:#fff;padding:9px 13px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:13px;font-weight:700;color:#5d5156}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #e6dcd4;border-radius:10px;background:#fff;color:var(--ink)}.field textarea{min-height:75px;resize:vertical}.wide{grid-column:1/-1}
+    .primary{background:var(--orange);color:#fff}.secondary{background:#f5eee8;color:#51454a}.danger{background:#ffe8e6;color:#a72b25}.success{background:#e3f7eb;color:#167345}
+    .hidden{display:none!important}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.cart-line,.order{border-bottom:1px solid var(--line);padding:12px 0;display:flex;justify-content:space-between;gap:12px;align-items:center}.cart-line:last-child,.order:last-child{border:0}.cart-total{font-size:20px;font-weight:900;text-align:right;margin:14px 0}
+    .status{display:inline-block;border-radius:30px;background:#fff0d8;color:#8a4b12;padding:5px 9px;font-size:12px;font-weight:700}.status.delivered{background:#e1f6e9;color:#147241}
+    .empty{padding:30px;text-align:center;color:var(--muted);background:#fff;border:1px dashed #e4d6ca;border-radius:15px}
+    .footer{text-align:center;padding:35px 15px;color:#897f83;font-size:12px}.loginbox{max-width:540px;margin:25px auto}.loginbox h2{margin-top:0}
+    .admin-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.order-actions{display:flex;gap:6px;flex-wrap:wrap}.order-actions button{padding:8px 10px;font-size:12px}
+    @media(max-width:650px){.hero{padding:22px}.hero .emoji{font-size:48px}.grid,.admin-layout{grid-template-columns:1fr}.top{padding:15px 18px}.top-actions{width:100%}.top-actions button{flex:1}.section-head{align-items:start;flex-direction:column}}
+  </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col pb-24">
+<body>
+<header class="top">
+  <div><div class="brand">🍔 BrDias <span>Lanches</span></div><small>Seu sabor favorito chega até você!</small></div>
+  <div class="top-actions">
+    <button class="ghost" id="loginOpen">Entrar</button>
+    <button id="cartOpen">🛒 Carrinho <span id="cartCount">0</span></button>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <div><h1>Fome de coisa boa?</h1><p>Escolha seus lanches favoritos, peça pelo BrDias Lanches e acompanhe seu pedido até a entrega.</p></div>
+    <div class="emoji">🍔 🍟 🥤</div>
+  </section>
+  <div id="notice" class="notice"></div>
+  <nav class="tabs">
+    <button class="tab active" data-view="store">Cardápio</button>
+    <button class="tab" data-view="account">Minha conta</button>
+    <button class="tab" data-view="orders">Meus pedidos</button>
+    <button class="tab hidden" id="ownerTab" data-view="owner">Painel do dono</button>
+    <button class="tab hidden" id="courierTab" data-view="courier">Área do motoboy</button>
+  </nav>
 
-    <!-- ========================================== -->
-    <!-- TOPO / HEADER DO CLIENTE -->
-    <!-- ========================================== -->
-    <header class="bg-white shadow-sm sticky top-0 z-30 border-b border-gray-100">
-        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="mudarVisaoApp('cliente')">
-                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-lg font-bold shadow-sm">
-                    <i class="fa-solid fa-burger"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-sm text-gray-900">Burger & Cia Express</h1>
-                    <p class="text-xs text-gray-500 truncate max-w-[200px]" id="header-end-txt">
-                        <i class="fa-solid fa-location-dot text-orange-500"></i> Toque para definir endereço
-                    </p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <button onclick="abrirMeusPedidos()" class="relative p-2.5 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition" title="Meus Pedidos">
-                    <i class="fa-solid fa-receipt text-sm"></i>
-                    <span id="badge-pedidos" class="absolute -top-1 -right-1 bg-orange-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden font-bold">0</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- ========================================== -->
-    <!-- VISÃO 1: CLIENTE (VITRINE iFOOD) -->
-    <!-- ========================================== -->
-    <main id="app-view-cliente" class="max-w-3xl mx-auto px-4 py-4 flex-1 w-full space-y-4">
-        <!-- Banner Destaque -->
-        <div class="bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex items-center justify-between">
-            <div class="relative z-10 space-y-1">
-                <span class="bg-white/20 text-[10px] uppercase font-bold px-2.5 py-1 rounded-full">Entrega Rápida 🚀</span>
-                <h2 class="text-xl font-black">Fome de Burger Artesanal?</h2>
-                <p class="text-xs text-orange-100">Ingredientes frescos e carnes suculentas na brasa.</p>
-            </div>
-            <div class="text-4xl opacity-40 md:opacity-90"><i class="fa-solid fa-utensils"></i></div>
-        </div>
-
-        <!-- Categorias -->
-        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <button onclick="filtrarCat('todos')" class="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-full shadow-sm whitespace-nowrap">🔥 Todos</button>
-            <button onclick="filtrarCat('Burger')" class="px-4 py-2 bg-white text-gray-700 border text-xs font-bold rounded-full whitespace-nowrap">🍔 Burgers</button>
-            <button onclick="filtrarCat('Porção')" class="px-4 py-2 bg-white text-gray-700 border text-xs font-bold rounded-full whitespace-nowrap">🍟 Porções</button>
-            <button onclick="filtrarCat('Bebida')" class="px-4 py-2 bg-white text-gray-700 border text-xs font-bold rounded-full whitespace-nowrap">🥤 Bebidas</button>
-        </div>
-
-        <!-- Lista de Produtos -->
-        <div>
-            <h3 class="font-bold text-gray-900 text-base mb-3">Cardápio Disponível</h3>
-            <div id="vitrine-cardapio" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-        </div>
-    </main>
-
-    <!-- ========================================== -->
-    <!-- VISÃO 2: PAINEL DO DONO (LANCHONETE) -->
-    <!-- ========================================== -->
-    <main id="app-view-dono" class="max-w-4xl mx-auto px-4 py-4 flex-1 w-full space-y-4 hidden">
-        <div class="bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-between shadow">
-            <div>
-                <h2 class="font-bold text-sm">Painel da Lanchonete (Gestão do Dono)</h2>
-                <p class="text-xs text-gray-400">Controle total de pedidos, cardápio e equipe</p>
-            </div>
-            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg text-white font-semibold"><i class="fa-solid fa-arrow-left"></i> Voltar ao App</button>
-        </div>
-
-        <!-- Abas do Dono -->
-        <div class="flex gap-2 border-b pb-2 text-xs font-bold">
-            <button onclick="mudarAbaDono('pedidos')" id="tab-dono-pedidos" class="px-3 py-1.5 bg-orange-600 text-white rounded-lg shadow-sm">Fila de Pedidos</button>
-            <button onclick="mudarAbaDono('cardapio')" id="tab-dono-cardapio" class="px-3 py-1.5 bg-white text-gray-700 border rounded-lg">Cadastrar Comidas</button>
-            <button onclick="mudarAbaDono('motoboys')" id="tab-dono-motoboys" class="px-3 py-1.5 bg-white text-gray-700 border rounded-lg">Cadastrar Motoboy</button>
-        </div>
-
-        <!-- ABA 1: PEDIDOS -->
-        <div id="dono-conteudo-pedidos" class="space-y-3">
-            <div class="flex justify-between items-center">
-                <h4 class="font-bold text-gray-800 text-sm">Pedidos na Cozinha</h4>
-                <div class="flex gap-2">
-                    <button onclick="testarVozAlerta()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg font-bold shadow flex items-center gap-1"><i class="fa-solid fa-volume-high"></i> Testar Alerta Voz</button>
-                    <button onclick="renderizarPedidosDono()" class="text-xs bg-white border px-3 py-1.5 rounded-lg font-semibold"><i class="fa-solid fa-rotate"></i></button>
-                </div>
-            </div>
-            <div id="lista-pedidos-cozinha" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-        </div>
-
-        <!-- ABA 2: CADASTRAR COMIDAS -->
-        <div id="dono-conteudo-cardapio" class="space-y-4 hidden">
-            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
-                <h4 class="font-bold text-gray-800 text-xs uppercase"><i class="fa-solid fa-burger text-orange-600"></i> Cadastrar Nova Comida / Bebida</h4>
-                <form onsubmit="cadastrarProdutoDono(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <input type="text" id="cp-nome" placeholder="Nome do Lanche (Ex: X-Tudo)" required class="px-3 py-2 border rounded-lg">
-                    <input type="number" step="0.01" id="cp-preco" placeholder="Preço (R$)" required class="px-3 py-2 border rounded-lg">
-                    <select id="cp-cat" class="px-3 py-2 border rounded-lg">
-                        <option value="Burger">Burger</option>
-                        <option value="Porção">Porção</option>
-                        <option value="Bebida">Bebida</option>
-                    </select>
-                    <input type="url" id="cp-foto" placeholder="Link da Imagem (URL da foto)" required class="px-3 py-2 border rounded-lg">
-                    <textarea id="cp-desc" rows="2" placeholder="Descrição dos ingredientes" required class="md:col-span-2 px-3 py-2 border rounded-lg"></textarea>
-                    <button type="submit" class="md:col-span-2 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-lg">Salvar Comida no Cardápio</button>
-                </form>
-            </div>
-            <div class="bg-white p-4 rounded-xl border shadow-sm">
-                <h4 class="font-bold text-gray-800 text-xs uppercase mb-3">Comidas Cadastradas</h4>
-                <div id="lista-produtos-dono" class="space-y-2"></div>
-            </div>
-        </div>
-
-        <!-- ABA 3: CADASTRAR MOTOBOY -->
-        <div id="dono-conteudo-motoboys" class="space-y-4 hidden">
-            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
-                <h4 class="font-bold text-gray-800 text-xs uppercase"><i class="fa-solid fa-motorcycle text-orange-600"></i> Cadastrar Novo Motoboy</h4>
-                <form onsubmit="cadastrarMotoboyDono(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                    <input type="text" id="cm-nome" placeholder="Nome do Motoboy" required class="px-3 py-2 border rounded-lg">
-                    <input type="tel" id="cm-tel" placeholder="WhatsApp" required class="px-3 py-2 border rounded-lg">
-                    <button type="submit" class="bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-lg">Cadastrar Motoboy</button>
-                </form>
-            </div>
-            <div class="bg-white p-4 rounded-xl border shadow-sm">
-                <h4 class="font-bold text-gray-800 text-xs uppercase mb-3">Motoboys da Equipe</h4>
-                <div id="lista-motoboys-dono" class="space-y-2"></div>
-            </div>
-        </div>
-    </main>
-
-    <!-- ========================================== -->
-    <!-- VISÃO 3: PAINEL DO MOTOBOY -->
-    <!-- ========================================== -->
-    <main id="app-view-motoboy" class="max-w-3xl mx-auto px-4 py-4 flex-1 w-full space-y-4 hidden">
-        <div class="bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-between shadow">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-gray-900 font-bold">
-                    <i class="fa-solid fa-motorcycle text-sm"></i>
-                </div>
-                <div>
-                    <select id="select-motoboy-logado" onchange="renderizarEntregasMotoboy()" class="bg-gray-800 text-amber-400 font-bold text-xs px-2 py-1 rounded border border-gray-700"></select>
-                    <p class="text-[10px] text-gray-400">Portal do Entregador</p>
-                </div>
-            </div>
-            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg text-white font-semibold"><i class="fa-solid fa-arrow-left"></i> Sair</button>
-        </div>
-        <div class="space-y-3" id="lista-entregas-motoboy"></div>
-    </main>
-
-    <!-- ========================================== -->
-    <!-- BARRA INFERIOR FLUTUANTE (CARRINHO) -->
-    <!-- ========================================== -->
-    <div id="barra-carrinho" class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 shadow-2xl z-40 hidden">
-        <div class="max-w-3xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 font-bold">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 font-semibold" id="resumo-qtd">0 itens</p>
-                    <p class="text-sm font-black text-gray-900" id="resumo-valor">R$ 0,00</p>
-                </div>
-            </div>
-            <button onclick="abrirCheckout()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-3 rounded-xl shadow transition text-sm">
-                Ver Sacola <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </div>
+  <section id="view-store">
+    <div class="section-head"><div><h2>Nosso cardápio 😋</h2><span class="muted">Feito para matar sua fome.</span></div><span class="muted" id="storeStatus">Cardápio online</span></div>
+    <div class="categories" id="categories">
+      <button class="cat active" data-category="Todos">Todos</button>
+      <button class="cat" data-category="Lanches">🍔 Lanches</button>
+      <button class="cat" data-category="Bebidas">🥤 Bebidas</button>
+      <button class="cat" data-category="Porções">🍟 Porções</button>
     </div>
+    <div id="products" class="products"><div class="empty">Configure o Supabase para carregar os produtos.</div></div>
+  </section>
 
-    <!-- ========================================== -->
-    <!-- MODAL: CHECKOUT (FINALIZAR PEDIDO) -->
-    <!-- ========================================== -->
-    <div id="modal-checkout" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end md:items-center justify-center p-0 md:p-4">
-        <div class="bg-white w-full max-w-lg rounded-t-3xl md:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-sm"><i class="fa-solid fa-bag-shopping"></i> Sacola e Entrega</h3>
-                <button onclick="fecharCheckout()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="p-4 overflow-y-auto flex-1 space-y-4 text-xs">
-                <div id="itens-sacola-modal" class="divide-y divide-gray-100"></div>
-
-                <div class="bg-gray-50 p-3 rounded-xl space-y-2 border">
-                    <p class="font-bold text-gray-900 uppercase">Seus Dados</p>
-                    <input type="text" id="chk-nome" placeholder="Seu Nome Completo" class="w-full px-3 py-2 border rounded-lg bg-white">
-                    <input type="tel" id="chk-tel" placeholder="WhatsApp" class="w-full px-3 py-2 border rounded-lg bg-white">
-                    <textarea id="chk-end" rows="2" placeholder="Endereço (Rua, Número, Bairro)" class="w-full px-3 py-2 border rounded-lg bg-white"></textarea>
-                    <button type="button" onclick="capturarGPS()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg"><i class="fa-solid fa-location-crosshairs"></i> Capturar GPS Exato</button>
-                    <p id="chk-gps-status" class="text-center text-gray-500 italic">GPS padrão pronto</p>
-                </div>
-
-                <div class="space-y-2">
-                    <p class="font-bold text-gray-900 uppercase">Forma de Pagamento</p>
-                    <select id="chk-pag" onchange="mudarPagamentoModal()" class="w-full px-3 py-2 border rounded-lg bg-white font-medium">
-                        <option value="pix">Pix (Chave Automática)</option>
-                        <option value="cartao">Cartão na Entrega</option>
-                        <option value="dinheiro">Dinheiro</option>
-                    </select>
-                    <div id="bloco-troco" class="hidden">
-                        <input type="text" id="chk-troco" placeholder="Troco para quanto?" class="w-full px-3 py-2 border rounded-lg bg-white">
-                    </div>
-                </div>
-
-                <div class="bg-gray-100 p-3 rounded-xl space-y-1 text-xs">
-                    <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="mod-sub">R$ 0,00</span></div>
-                    <div class="flex justify-between text-gray-600"><span>Taxa Entrega</span><span>R$ 5,00</span></div>
-                    <div class="flex justify-between font-black text-gray-900 text-sm pt-2 border-t"><span>Total</span><span id="mod-tot" class="text-orange-600">R$ 0,00</span></div>
-                </div>
-            </div>
-            <div class="p-3 bg-white border-t">
-                <button onclick="enviarPedido()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl text-sm shadow">Enviar Pedido 🚀</button>
-            </div>
-        </div>
+  <section id="view-account" class="hidden">
+    <div class="section-head"><div><h2>Minha conta</h2><span class="muted">Mantenha seus dados de entrega atualizados.</span></div></div>
+    <div class="panel">
+      <div id="accountState" class="muted">Entre ou crie sua conta para salvar seus dados.</div>
+      <form id="profileForm" class="grid hidden">
+        <div class="field"><label>Nome completo</label><input id="pName" required></div>
+        <div class="field"><label>Instagram</label><input id="pInstagram" placeholder="@seuinstagram"></div>
+        <div class="field"><label>WhatsApp</label><input id="pWhatsapp" required placeholder="(84) 99999-9999"></div>
+        <div class="field"><label>CEP</label><input id="pCep"></div>
+        <div class="field wide"><label>Endereço completo</label><input id="pAddress" required placeholder="Rua, número, bairro, complemento"></div>
+        <div class="field"><label>Cidade</label><input id="pCity" required value="Mossoró"></div>
+        <div class="field"><label>Ponto de referência</label><input id="pReference"></div>
+        <div class="field wide"><label>Link/localização do Google Maps (opcional)</label><input id="pLocation" placeholder="Cole aqui o link de localização"></div>
+        <div class="wide"><button class="primary" type="submit">Salvar meus dados</button></div>
+      </form>
     </div>
+  </section>
 
-    <!-- MODAL: MEUS PEDIDOS -->
-    <div id="modal-meus-pedidos" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-sm"><i class="fa-solid fa-receipt"></i> Meus Pedidos</h3>
-                <button onclick="fecharMeusPedidos()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-4 overflow-y-auto flex-1 space-y-3" id="lista-meus-pedidos-modal"></div>
-        </div>
+  <section id="view-orders" class="hidden">
+    <div class="section-head"><div><h2>Meus pedidos 📦</h2><span class="muted">Acompanhe o andamento dos seus pedidos.</span></div><button class="secondary" id="refreshOrders">Atualizar</button></div>
+    <div id="customerOrders" class="panel"><div class="empty">Entre na sua conta para visualizar seus pedidos.</div></div>
+  </section>
+
+  <section id="view-owner" class="hidden">
+    <div class="section-head"><div><h2>Painel do proprietário 👑</h2><span class="muted">Gerencie cardápio, equipe e pedidos.</span></div><button class="secondary" id="refreshOwner">Atualizar painel</button></div>
+    <div class="admin-layout">
+      <div class="panel">
+        <h3>➕ Cadastrar produto</h3>
+        <form id="productForm" class="grid">
+          <div class="field wide"><label>Nome do produto</label><input id="prodName" required></div>
+          <div class="field"><label>Categoria</label><select id="prodCategory"><option>Lanches</option><option>Bebidas</option><option>Porções</option></select></div>
+          <div class="field"><label>Preço (R$)</label><input id="prodPrice" type="number" min="0.01" step="0.01" required></div>
+          <div class="field wide"><label>Descrição</label><textarea id="prodDescription"></textarea></div>
+          <div class="field wide"><label>Foto do produto</label><input id="prodImage" type="file" accept="image/png,image/jpeg,image/gif"></div>
+          <div class="wide"><button class="primary" type="submit">Salvar produto</button></div>
+        </form>
+        <p class="muted">A imagem será enviada para o armazenamento do Supabase.</p>
+      </div>
+      <div class="panel">
+        <h3>🛵 Cadastrar motoboy</h3>
+        <form id="courierForm" class="grid">
+          <div class="field wide"><label>E-mail da conta do motoboy</label><input id="courierEmail" type="email" required></div>
+          <div class="field wide"><label>Nome do motoboy</label><input id="courierName" required></div>
+          <div class="field wide"><label>WhatsApp</label><input id="courierWhatsapp"></div>
+          <div class="wide"><button class="primary" type="submit">Vincular motoboy</button></div>
+        </form>
+        <p class="muted">O motoboy precisa criar a própria conta primeiro. Depois informe aqui o mesmo e-mail.</p>
+        <h3>📋 Produtos cadastrados</h3><div id="ownerProducts" class="muted">Carregando...</div>
+      </div>
     </div>
+    <div class="panel"><h3>🧾 Pedidos recebidos</h3><div id="ownerOrders">Carregando...</div></div>
+  </section>
 
-    <!-- MODAL: MAPA GPS MOTOBOY -->
-    <div id="modal-mapa" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 bg-gray-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-sm"><i class="fa-solid fa-map-location-dot text-amber-400"></i> Rota GPS Exata</h3>
-                <button onclick="fecharMapa()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-4 space-y-3 text-xs">
-                <div class="bg-amber-50 border p-3 rounded-xl space-y-1">
-                    <p class="font-bold text-amber-900" id="mapa-cli-nome">Cliente: -</p>
-                    <p class="text-gray-700" id="mapa-cli-end">Endereço: -</p>
-                    <p class="font-bold text-orange-600" id="mapa-cli-pag">Pagamento: -</p>
-                </div>
-                <a id="btn-link-maps" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-center block shadow">
-                    <i class="fa-solid fa-diamond-turn-right"></i> Abrir Navegação no Google Maps
-                </a>
-            </div>
-        </div>
+  <section id="view-courier" class="hidden">
+    <div class="section-head"><div><h2>Área do motoboy 🛵</h2><span class="muted">Consulte suas entregas e atualize o status.</span></div><button class="secondary" id="refreshCourier">Atualizar</button></div>
+    <div id="courierOrders" class="panel">Carregando entregas...</div>
+  </section>
+
+  <section id="view-login" class="hidden loginbox">
+    <div class="panel">
+      <h2>Bem-vindo ao BrDias! 👋</h2>
+      <p class="muted">Entre na sua conta ou faça seu cadastro para pedir.</p>
+      <form id="authForm" class="grid">
+        <div class="field wide"><label>E-mail</label><input id="authEmail" type="email" required></div>
+        <div class="field wide"><label>Senha</label><input id="authPassword" type="password" minlength="6" required></div>
+        <div class="row wide"><button class="primary" type="submit">Entrar</button><button class="secondary" type="button" id="signup">Criar conta</button></div>
+      </form>
+      <button class="secondary" id="closeLogin">Voltar</button>
     </div>
+  </section>
 
-    <!-- RODAPÉ DISCRETO (ACESSOS DO DONO E MOTOBOY) -->
-    <footer class="mt-auto py-6 text-center border-t bg-white">
-        <p class="text-[11px] text-gray-400 mb-2">&copy; 2026 Burger & Cia Express</p>
-        <div class="flex justify-center gap-4 text-xs font-semibold">
-            <button onclick="mudarVisaoApp('motoboy')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-motorcycle"></i> Área Motoboy</button>
-            <span class="text-gray-300">•</span>
-            <button onclick="mudarVisaoApp('dono')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-lock"></i> Painel da Lanchonete</button>
-        </div>
-    </footer>
+  <section id="view-cart" class="hidden">
+    <div class="section-head"><div><h2>Seu carrinho 🛒</h2><span class="muted">Confira os itens antes de finalizar.</span></div></div>
+    <div class="panel"><div id="cartItems"></div><div class="cart-total" id="cartTotal">Total: R$ 0,00</div>
+      <div class="field"><label>Observações do pedido</label><textarea id="orderNotes" placeholder="Ex.: sem cebola, entregar no portão..."></textarea></div>
+      <div class="row" style="margin-top:14px"><button class="primary" id="checkout">Finalizar pedido</button><button class="secondary" id="backMenu">Continuar comprando</button></div>
+    </div>
+  </section>
+</main>
+<footer class="footer">BrDias Lanches • Delivery com carinho ❤️</footer>
 
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT LOGIC -->
-    <!-- ========================================== -->
-    <script>
-        let db = {
-            cardapio: JSON.parse(localStorage.getItem('burger_cardapio')) || [
-                { id: 1, nome: 'X-Burger Artesanal', preco: 28.00, cat: 'Burger', foto: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', desc: 'Pão brioche, carne 160g, cheddar e molho especial.' },
-                { id: 2, nome: 'X-Bacon Supremo', preco: 34.00, cat: 'Burger', foto: 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400', desc: 'Pão brioche, carne 160g, muito bacon crocante.' },
-                { id: 3, nome: 'Batata com Cheddar e Bacon', preco: 22.00, cat: 'Porção', foto: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=400', desc: 'Porção generosa de batatas fritas sequinhas.' },
-                { id: 4, nome: 'Coca-Cola Lata 350ml', preco: 6.00, cat: 'Bebida', foto: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400', desc: 'Geladinha.' }
-            ],
-            motoboys: JSON.parse(localStorage.getItem('burger_motoboys')) || [
-                { nome: 'Carlos Entregador', tel: '(84) 98888-1111' },
-                { nome: 'João da Moto', tel: '(84) 99999-2222' }
-            ],
-            pedidos: JSON.parse(localStorage.getItem('burger_pedidos')) || []
-        };
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* CONFIGURAÇÃO: substitua os dois valores abaixo pelos dados do seu projeto Supabase. */
+const SUPABASE_URL = "COLE_AQUI_A_URL_DO_SUPABASE";
+const SUPABASE_ANON_KEY = "COLE_AQUI_A_CHAVE_ANON_PUBLIC";
+const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_ANON_KEY.startsWith("COLE_AQUI");
+const db = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        let carrinho = [];
-        let categoriaAtiva = 'todos';
-        let gpsSalvo = { lat: -5.1878, lng: -37.3441 };
-
-        window.onload = function() {
-            renderizarVitrine();
-            popularMotoboysSelect();
-            atualizarBadgePedidos();
-            const salvo = JSON.parse(localStorage.getItem('burger_cli_salvo'));
-            if(salvo) {
-                document.getElementById('chk-nome').value = salvo.nome || '';
-                document.getElementById('chk-tel').value = salvo.tel || '';
-                document.getElementById('chk-end').value = salvo.endereco || '';
-                if(salvo.endereco) document.getElementById('header-end-txt').innerHTML = `<i class="fa-solid fa-location-dot text-orange-500"></i> ${salvo.endereco}`;
-            }
-        };
-
-        function salvarNoStorage() {
-            localStorage.setItem('burger_cardapio', JSON.stringify(db.cardapio));
-            localStorage.setItem('burger_motoboys', JSON.stringify(db.motoboys));
-            localStorage.setItem('burger_pedidos', JSON.stringify(db.pedidos));
-        }
-
-        function mudarVisaoApp(visao) {
-            document.getElementById('app-view-cliente').classList.add('hidden');
-            document.getElementById('app-view-dono').classList.add('hidden');
-            document.getElementById('app-view-motoboy').classList.add('hidden');
-            document.getElementById('barra-carrinho').classList.add('hidden');
-
-            if(visao === 'cliente') {
-                document.getElementById('app-view-cliente').classList.remove('hidden');
-                if(carrinho.length > 0) document.getElementById('barra-carrinho').classList.remove('hidden');
-            } else if(visao === 'dono') {
-                document.getElementById('app-view-dono').classList.remove('hidden');
-                renderizarPedidosDono();
-                renderizarCardapioDono();
-                renderizarMotoboysDono();
-            } else if(visao === 'motoboy') {
-                document.getElementById('app-view-motoboy').classList.remove('hidden');
-                renderizarEntregasMotoboy();
-            }
-            window.scrollTo({top:0, behavior:'smooth'});
-        }
-
-        // --- CLIENTE ---
-        function filtrarCat(cat) {
-            categoriaAtiva = cat;
-            renderizarVitrine();
-        }
-
-        function renderizarVitrine() {
-            const container = document.getElementById('vitrine-cardapio');
-            const lista = categoriaAtiva === 'todos' ? db.cardapio : db.cardapio.filter(i => i.cat === categoriaAtiva);
-            
-            container.innerHTML = lista.map(item => `
-                <div class="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition">
-                    <img src="${item.foto}" alt="${item.nome}" class="w-full h-36 object-cover bg-gray-200">
-                    <div class="p-3 space-y-1 flex-1">
-                        <h4 class="font-bold text-gray-900 text-sm">${item.nome}</h4>
-                        <p class="text-xs text-gray-500 line-clamp-2">${item.desc}</p>
-                        <p class="font-black text-orange-600 text-sm pt-1">R$ ${item.preco.toFixed(2)}</p>
-                    </div>
-                    <div class="p-3 pt-0">
-                        <button onclick="adicionarCarrinho(${item.id})" class="w-full bg-orange-50 hover:bg-orange-600 text-orange-600 hover:text-white font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-plus"></i> Adicionar à Sacola
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function adicionarCarrinho(id) {
-            const prod = db.cardapio.find(p => p.id === id);
-            const existe = carrinho.find(c => c.id === id);
-            if(existe) existe.qtd++;
-            else carrinho.push({ ...prod, qtd: 1 });
-            atualizarBarraCarrinho();
-        }
-
-        function atualizarBarraCarrinho() {
-            const qtd = carrinho.reduce((a, b) => a + b.qtd, 0);
-            const val = carrinho.reduce((a, b) => a + (b.preco * b.qtd), 0);
-            if(qtd > 0) {
-                document.getElementById('resumo-qtd').innerText = `${qtd} ${qtd === 1 ? 'item' : 'itens'}`;
-                document.getElementById('resumo-valor').innerText = `R$ ${val.toFixed(2)}`;
-                document.getElementById('barra-carrinho').classList.remove('hidden');
-            } else {
-                document.getElementById('barra-carrinho').classList.add('hidden');
-            }
-        }
-
-        function abrirCheckout() {
-            const container = document.getElementById('itens-sacola-modal');
-            let sub = 0;
-            container.innerHTML = carrinho.map((i, idx) => {
-                sub += i.preco * i.qtd;
-                return `
-                    <div class="py-2 flex justify-between items-center text-xs">
-                        <div><p class="font-bold">${i.qtd}x ${i.nome}</p><p class="text-gray-500">R$ ${i.preco.toFixed(2)}</p></div>
-                        <div class="flex items-center gap-2"><span class="font-bold">R$ ${(i.preco * i.qtd).toFixed(2)}</span><button onclick="removerItem(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>
-                    </div>
-                `;
-            }).join('');
-            document.getElementById('mod-sub').innerText = `R$ ${sub.toFixed(2)}`;
-            document.getElementById('mod-tot').innerText = `R$ ${(sub + 5.00).toFixed(2)}`;
-            document.getElementById('modal-checkout').classList.remove('hidden');
-        }
-
-        function fecharCheckout() { document.getElementById('modal-checkout').classList.add('hidden'); }
-        function removerItem(idx) { carrinho.splice(idx, 1); atualizarBarraCarrinho(); if(carrinho.length === 0) fecharCheckout(); else abrirCheckout(); }
-
-        function capturarGPS() {
-            const st = document.getElementById('chk-gps-status');
-            if(navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    gpsSalvo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    st.innerText = "GPS Capturado com sucesso!";
-                    st.className = "text-center text-green-600 font-bold";
-                }, () => { st.innerText = "GPS padrão ativado."; });
-            }
-        }
-
-        function mudarPagamentoModal() {
-            const t = document.getElementById('chk-pag').value;
-            document.getElementById('bloco-troco').classList.toggle('hidden', t !== 'dinheiro');
-        }
-
-        function enviarPedido() {
-            const nome = document.getElementById('chk-nome').value;
-            const tel = document.getElementById('chk-tel').value;
-            const end = document.getElementById('chk-end').value;
-            if(!nome || !tel || !end) { alert('Preencha nome, telefone e endereço.'); return; }
-
-            const sub = carrinho.reduce((a, b) => a + (b.preco * b.qtd), 0);
-            const novo = {
-                id: 'PED-' + Math.floor(1000 + Math.random() * 9000),
-                cliente: { nome, tel, endereco: end, gps: gpsSalvo },
-                itens: [...carrinho],
-                total: sub + 5.00,
-                pagamento: document.getElementById('chk-pag').value,
-                status: 'Recebido',
-                motoboyAtribuido: null,
-                data: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            db.pedidos.unshift(novo);
-            salvarNoStorage();
-            localStorage.setItem('burger_cli_salvo', JSON.stringify({ nome, tel, endereco: end }));
-            document.getElementById('header-end-txt').innerHTML = `<i class="fa-solid fa-location-dot text-orange-500"></i> ${end}`;
-
-            carrinho = [];
-            atualizarBarraCarrinho();
-            fecharCheckout();
-            falarVoz("Novo pedido recebido na lanchonete!");
-            alert('Pedido enviado com sucesso!');
-            abrirMeusPedidos();
-        }
-
-        function abrirMeusPedidos() {
-            const telUser = document.getElementById('chk-tel').value;
-            const meus = telUser ? db.pedidos.filter(p => p.cliente.tel === telUser) : db.pedidos;
-            document.getElementById('lista-meus-pedidos-modal').innerHTML = meus.length === 0 ? `<p class="text-center text-xs text-gray-400 py-4">Nenhum pedido recente.</p>` : meus.map(p => `
-                <div class="bg-gray-50 border rounded-xl p-3 text-xs space-y-1">
-                    <div class="flex justify-between font-bold"><span>${p.id} (${p.data})</span><span class="text-orange-600 uppercase">${p.status}</span></div>
-                    <p class="text-gray-600">${p.itens.map(i => `${i.qtd}x ${i.nome}`).join(', ')}</p>
-                    <p class="font-bold pt-1 border-t">Total: R$ ${p.total.toFixed(2)} | Entregador: ${p.motoboyAtribuido || 'Aguardando'}</p>
-                </div>
-            `).join('');
-            document.getElementById('modal-meus-pedidos').classList.remove('hidden');
-        }
-        function fecharMeusPedidos() { document.getElementById('modal-meus-pedidos').classList.add('hidden'); }
-        function atualizarBadgePedidos() {
-            const b = document.getElementById('badge-pedidos');
-            if(db.pedidos.length > 0) { b.innerText = db.pedidos.length; b.classList.remove('hidden'); }
-            else { b.classList.add('hidden'); }
-        }
-
-        // --- PAINEL DONO ---
-        function mudarAbaDono(aba) {
-            ['pedidos', 'cardapio', 'motoboys'].forEach(a => {
-                document.getElementById(`dono-conteudo-${a}`).classList.add('hidden');
-                document.getElementById(`tab-dono-${a}`).className = "px-3 py-1.5 bg-white text-gray-700 border rounded-lg text-xs font-bold";
-            });
-            document.getElementById(`dono-conteudo-${aba}`).classList.remove('hidden');
-            document.getElementById(`tab-dono-${aba}`).className = "px-3 py-1.5 bg-orange-600 text-white rounded-lg text-xs font-bold shadow-sm";
-        }
-
-        function renderizarPedidosDono() {
-            const container = document.getElementById('lista-pedidos-cozinha');
-            container.innerHTML = db.pedidos.length === 0 ? `<p class="text-xs text-gray-400 italic">Nenhum pedido na fila.</p>` : db.pedidos.map(p => `
-                <div class="bg-white p-3 rounded-xl border text-xs space-y-2">
-                    <div class="flex justify-between font-bold"><span>${p.id} (${p.data})</span><span class="text-orange-600 uppercase">${p.status}</span></div>
-                    <div><p class="font-bold">${p.cliente.nome} (${p.cliente.tel})</p><p class="text-gray-500">${p.cliente.endereco}</p></div>
-                    <div class="bg-gray-50 p-2 rounded">${p.itens.map(i => `<p>• ${i.qtd}x ${i.nome}</p>`).join('')}</div>
-                    <div class="flex gap-1">
-                        <button onclick="mudarStatusPedido('${p.id}', 'Em Preparo')" class="flex-1 bg-blue-50 text-blue-700 py-1 rounded font-bold">Preparo</button>
-                        <button onclick="mudarStatusPedido('${p.id}', 'Saiu para Entrega')" class="flex-1 bg-purple-50 text-purple-700 py-1 rounded font-bold">Despachar</button>
-                    </div>
-                    <div class="flex gap-1 items-center pt-1">
-                        <select id="sel-atrib-${p.id}" class="flex-1 border rounded px-2 py-1 bg-white">
-                            <option value="">Atribuir Motoboy...</option>
-                            ${db.motoboys.map(m => `<option value="${m.nome}" ${p.motoboyAtribuido === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('')}
-                        </select>
-                        <button onclick="atribuirMotoboy('${p.id}')" class="bg-gray-900 text-white px-3 py-1 rounded font-bold">OK</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function mudarStatusPedido(id, st) {
-            const p = db.pedidos.find(x => x.id === id);
-            if(p) { p.status = st; salvarNoStorage(); renderizarPedidosDono(); }
-        }
-
-        function atribuirMotoboy(id) {
-            const m = document.getElementById(`sel-atrib-${id}`).value;
-            if(!m) return alert('Selecione um motoboy');
-            const p = db.pedidos.find(x => x.id === id);
-            if(p) { p.motoboyAtribuido = m; p.status = 'Saiu para Entrega'; salvarNoStorage(); renderizarPedidosDono(); }
-        }
-
-        // CADASTRO DE COMIDA DO DONO
-        function cadastrarProdutoDono(e) {
-            e.preventDefault();
-            db.cardapio.push({
-                id: Date.now(),
-                nome: document.getElementById('cp-nome').value,
-                preco: parseFloat(document.getElementById('cp-preco').value),
-                cat: document.getElementById('cp-cat').value,
-                foto: document.getElementById('cp-foto').value,
-                desc: document.getElementById('cp-desc').value
-            });
-            salvarNoStorage();
-            renderizarVitrine();
-            renderizarCardapioDono();
-            e.target.reset();
-            alert('Comida cadastrada no cardápio com sucesso!');
-        }
-
-        function renderizarCardapioDono() {
-            document.getElementById('lista-produtos-dono').innerHTML = db.cardapio.map((item, idx) => `
-                <div class="flex justify-between items-center p-2.5 bg-gray-50 border rounded-xl text-xs">
-                    <div class="flex items-center gap-2">
-                        <img src="${item.foto}" class="w-10 h-10 object-cover rounded-lg">
-                        <div><p class="font-bold">${item.nome} - R$ ${item.preco.toFixed(2)}</p><p class="text-gray-500">${item.cat}</p></div>
-                    </div>
-                    <button onclick="removerItemCardapio(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        function removerItemCardapio(idx) {
-            db.cardapio.splice(idx, 1);
-            salvarNoStorage();
-            renderizarVitrine();
-            renderizarCardapioDono();
-        }
-
-        // CADASTRO DE MOTOBOY DO DONO
-        function cadastrarMotoboyDono(e) {
-            e.preventDefault();
-            db.motoboys.push({
-                nome: document.getElementById('cm-nome').value,
-                tel: document.getElementById('cm-tel').value
-            });
-            salvarNoStorage();
-            renderizarMotoboysDono();
-            popularMotoboysSelect();
-            e.target.reset();
-            alert('Motoboy cadastrado com sucesso!');
-        }
-
-        function renderizarMotoboysDono() {
-            document.getElementById('lista-motoboys-dono').innerHTML = db.motoboys.map((m, idx) => `
-                <div class="flex justify-between items-center p-2.5 bg-gray-50 border rounded-xl text-xs">
-                    <div><p class="font-bold">${m.nome}</p><p class="text-gray-500">${m.tel}</p></div>
-                    <button onclick="removerMotoboy(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        function removerMotoboy(idx) {
-            db.motoboys.splice(idx, 1);
-            salvarNoStorage();
-            renderizarMotoboysDono();
-            popularMotoboysSelect();
-        }
-
-        // --- MOTOBOY ---
-        function popularMotoboysSelect() {
-            const sel = document.getElementById('select-motoboy-logado');
-            sel.innerHTML = db.motoboys.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
-        }
-
-        function renderizarEntregasMotoboy() {
-            const atual = document.getElementById('select-motoboy-logado').value;
-            const container = document.getElementById('lista-entregas-motoboy');
-            const entregas = db.pedidos.filter(p => p.motoboyAtribuido === atual && p.status !== 'Entregue');
-
-            container.innerHTML = entregas.length === 0 ? `<div class="bg-white p-6 rounded-2xl text-center text-xs border"><p>Nenhuma entrega atribuída a você.</p></div>` : entregas.map(p => `
-                <div class="bg-white p-4 rounded-xl border text-xs space-y-2">
-                    <div class="flex justify-between font-bold"><span>${p.id}</span><span class="text-purple-700">${p.status}</span></div>
-                    <p><strong>Cliente:</strong> ${p.cliente.nome} (${p.cliente.tel})</p>
-                    <p><strong>Endereço:</strong> ${p.cliente.endereco}</p>
-                    <div class="flex gap-2 pt-2">
-                        <button onclick="abrirMapaGPS('${p.id}')" class="flex-1 bg-blue-600 text-white font-bold py-2 rounded-xl"><i class="fa-solid fa-map"></i> Rota GPS</button>
-                        <button onclick="concluirEntrega('${p.id}')" class="flex-1 bg-green-600 text-white font-bold py-2 rounded-xl"><i class="fa-solid fa-check"></i> Concluir</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function abrirMapaGPS(id) {
-            const p = db.pedidos.find(x => x.id === id);
-            document.getElementById('mapa-cli-nome').innerText = `Cliente: ${p.cliente.nome} (${p.cliente.tel})`;
-            document.getElementById('mapa-cli-end').innerText = `Endereço: ${p.cliente.endereco}`;
-            document.getElementById('btn-link-maps').href = `https://www.google.com/maps/search/?api=1&query=${p.cliente.gps.lat},${p.cliente.gps.lng}`;
-            document.getElementById('modal-mapa').classList.remove('hidden');
-        }
-        function fecharMapa() { document.getElementById('modal-mapa').classList.add('hidden'); }
-        function concluirEntrega(id) {
-            const p = db.pedidos.find(x => x.id === id);
-            if(p) { p.status = 'Entregue'; salvarNoStorage(); renderizarEntregasMotoboy(); alert('Entrega concluída!'); }
-        }
-
-        // SÍNTESE DE VOZ (MENSAGEM DE ÁUDIO AUTOMÁTICA)
-        function falarVoz(texto) {
-            if('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(texto);
-                utterance.lang = 'pt-BR';
-                utterance.rate = 1.0;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-        function testarVozAlerta() {
-            falarVoz("Atenção! Novo pedido recebido na lanchonete Burger e Cia. Prepare o lanche!");
-        }
-    </script>
+let currentUser = null, currentProfile = null, cart = [], activeCategory = "Todos", productsCache = [];
+const money = n => Number(n || 0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const el = id => document.getElementById(id);
+function notify(msg, bad=false){const n=el("notice");n.textContent=msg;n.style.display="block";n.style.background=bad?"#ffe8e6":"#fff1d3";n.style.color=bad?"#9d2822":"#74460a";window.scrollTo({top:0,behavior:"smooth"});}
+function requireDb(){if(!db){notify("Falta configurar a URL e a chave pública do Supabase no final do arquivo index.html.",true);return false;}return true;}
+function showView(name){["store","account","orders","owner","courier","login","cart"].forEach(v=>el("view-"+v).classList.toggle("hidden",v!==name));document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===name));}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>showView(t.dataset.view)));
+el("loginOpen").onclick=()=>showView("login");el("closeLogin").onclick=()=>showView("store");el("cartOpen").onclick=()=>{renderCart();showView("cart");};el("backMenu").onclick=()=>showView("store");
+function setRoleUI(){const role=currentProfile?.role;el("ownerTab").classList.toggle("hidden",role!=="owner");el("courierTab").classList.toggle("hidden",role!=="courier");el("loginOpen").textContent=currentUser?"Sair":"Entrar";}
+async function loadProfile(){
+ if(!currentUser)return;
+ const {data,error}=await db.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
+ if(error){notify(error.message,true);return;}
+ currentProfile=data;
+ if(data){el("pName").value=data.full_name||"";el("pInstagram").value=data.instagram||"";el("pWhatsapp").value=data.whatsapp||"";el("pCep").value=data.cep||"";el("pAddress").value=data.address||"";el("pCity").value=data.city||"Mossoró";el("pReference").value=data.reference||"";el("pLocation").value=data.location_url||"";}
+ el("accountState").textContent="Conectado como "+currentUser.email+" • Perfil: "+(data?.role||"cliente");
+ el("profileForm").classList.remove("hidden");setRoleUI();
+}
+async function loadProducts(){
+ if(!requireDb())return;
+ const {data,error}=await db.from("products").select("*").eq("active",true).order("created_at",{ascending:false});
+ if(error){el("products").innerHTML='<div class="empty">Não foi possível carregar o cardápio. Confira o SQL de instalação.</div>';return;}
+ productsCache=data||[];renderProducts();
+}
+function renderProducts(){
+ const items=productsCache.filter(p=>activeCategory==="Todos"||p.category===activeCategory);
+ el("products").innerHTML=items.length?items.map(p=>`<article class="product"><img src="${escapeHtml(p.image_url||"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=700")}" alt="${escapeHtml(p.name)}"><div class="product-body"><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.description||"Delicioso e preparado na hora.")}</p><div class="price-row"><span class="price">${money(p.price)}</span><button class="add" data-add="${p.id}">Adicionar +</button></div></div></article>`).join(""):'<div class="empty">Ainda não há produtos nesta categoria. Volte em breve!</div>';
+ document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addCart(b.dataset.add));
+}
+document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{activeCategory=b.dataset.category;document.querySelectorAll(".cat").forEach(x=>x.classList.toggle("active",x===b));renderProducts();});
+function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function addCart(id){const p=productsCache.find(x=>x.id===id);if(!p)return;const found=cart.find(x=>x.id===id);if(found)found.quantity++;else cart.push({id:p.id,name:p.name,price:Number(p.price),quantity:1});renderCount();notify(p.name+" adicionado ao carrinho!");}
+function renderCount(){el("cartCount").textContent=cart.reduce((a,b)=>a+b.quantity,0);}
+function renderCart(){el("cartItems").innerHTML=cart.length?cart.map((p,i)=>`<div class="cart-line"><div><strong>${escapeHtml(p.name)}</strong><div class="muted">${money(p.price)} cada</div></div><div class="row"><button class="secondary" data-minus="${i}">−</button><strong>${p.quantity}</strong><button class="secondary" data-plus="${i}">+</button><strong>${money(p.price*p.quantity)}</strong><button class="danger" data-remove="${i}">×</button></div></div>`).join(""):'<div class="empty">Seu carrinho está vazio.</div>';el("cartTotal").textContent="Total: "+money(cart.reduce((a,b)=>a+b.price*b.quantity,0));document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{cart[b.dataset.minus].quantity--;if(cart[b.dataset.minus].quantity<=0)cart.splice(b.dataset.minus,1);renderCart();renderCount();});document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{cart[b.dataset.plus].quantity++;renderCart();renderCount();});document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{cart.splice(b.dataset.remove,1);renderCart();renderCount();});}
+el("authForm").onsubmit=async e=>{e.preventDefault();if(!requireDb())return;const {data,error}=await db.auth.signInWithPassword({email:el("authEmail").value,password:el("authPassword").value});if(error){notify(error.message,true);return;}currentUser=data.user;await loadProfile();notify("Login realizado com sucesso!");showView("store");};
+el("signup").onclick=async()=>{if(!requireDb())return;const {data,error}=await db.auth.signUp({email:el("authEmail").value,password:el("authPassword").value});if(error){notify(error.message,true);return;}notify("Cadastro iniciado! Verifique seu e-mail para confirmar a conta. Depois faça login.");};
+el("loginOpen").addEventListener("click",async()=>{if(currentUser){await db.auth.signOut();currentUser=null;currentProfile=null;setRoleUI();el("accountState").textContent="Você saiu da sua conta.";el("profileForm").classList.add("hidden");notify("Você saiu da sua conta.");}});
+el("profileForm").onsubmit=async e=>{e.preventDefault();if(!currentUser)return notify("Entre primeiro.",true);const profile={id:currentUser.id,full_name:el("pName").value,instagram:el("pInstagram").value,whatsapp:el("pWhatsapp").value,cep:el("pCep").value,address:el("pAddress").value,city:el("pCity").value,reference:el("pReference").value,location_url:el("pLocation").value};const {error}=await db.from("profiles").upsert(profile);if(error)notify(error.message,true);else{notify("Seus dados foram salvos!");await loadProfile();}};
+el("checkout").onclick=async()=>{
+ if(!requireDb())return;if(!currentUser){notify("Entre ou crie sua conta antes de finalizar o pedido.",true);showView("login");return;}if(!cart.length){notify("Adicione produtos ao carrinho.",true);return;}if(!currentProfile?.full_name||!currentProfile?.whatsapp||!currentProfile?.address){notify("Preencha e salve seu cadastro e endereço antes de pedir.",true);showView("account");return;}
+ const total=cart.reduce((a,b)=>a+b.price*b.quantity,0);
+ const {data:order,error}=await db.from("orders").insert({customer_id:currentUser.id,total,status:"pending",notes:el("orderNotes").value,delivery_address:currentProfile.address+", "+currentProfile.city,customer_name:currentProfile.full_name,customer_whatsapp:currentProfile.whatsapp}).select().single();
+ if(error){notify(error.message,true);return;}
+ const rows=cart.map(p=>({order_id:order.id,product_id:p.id,product_name:p.name,unit_price:p.price,quantity:p.quantity}));
+ const result=await db.from("order_items").insert(rows);
+ if(result.error){notify("Pedido criado, mas houve erro nos itens: "+result.error.message,true);return;}
+ cart=[];renderCount();renderCart();el("orderNotes").value="";notify("Pedido enviado! A lanchonete já pode recebê-lo.");showView("orders");loadCustomerOrders();
+};
+async function loadCustomerOrders(){if(!currentUser)return;const {data,error}=await db.from("orders").select("*,order_items(*)").eq("customer_id",currentUser.id).order("created_at",{ascending:false});if(error){el("customerOrders").textContent=error.message;return;}el("customerOrders").innerHTML=data.length?data.map(orderHtml).join(""):'<div class="empty">Você ainda não fez pedidos.</div>';}
+function statusName(s){return ({pending:"Aguardando confirmação",accepted:"Aceito pela loja",preparing:"Em preparação",ready:"Pronto para retirada",out_for_delivery:"Saiu para entrega",delivered:"Entregue",cancelled:"Cancelado"})[s]||s;}
+function orderHtml(o){return `<div class="order"><div><strong>Pedido #${o.id.slice(0,8)}</strong><div class="muted">${new Date(o.created_at).toLocaleString("pt-BR")} • ${escapeHtml(o.customer_name||"Cliente")}</div><div class="muted">${(o.order_items||[]).map(i=>`${i.quantity}x ${escapeHtml(i.product_name)}`).join(", ")}</div><span class="status ${o.status==="delivered"?"delivered":""}">${statusName(o.status)}</span></div><strong>${money(o.total)}</strong></div>`;}
+el("refreshOrders").onclick=loadCustomerOrders;
+async function ownerCheck(){if(currentProfile?.role!=="owner")return notify("Acesso restrito ao proprietário.",true);await loadOwnerOrders();await loadOwnerProducts();}
+el("refreshOwner").onclick=ownerCheck;
+el("productForm").onsubmit=async e=>{e.preventDefault();if(currentProfile?.role!=="owner")return notify("Somente o proprietário pode cadastrar produtos.",true);let image_url=null;const file=el("prodImage").files[0];if(file){if(file.size>2*1024*1024)return notify("A imagem deve ter até 2 MB.",true);const path=Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");const up=await db.storage.from("product-images").upload(path,file,{upsert:true});if(up.error)return notify(up.error.message,true);image_url=db.storage.from("product-images").getPublicUrl(path).data.publicUrl;}const {error}=await db.from("products").insert({name:el("prodName").value,category:el("prodCategory").value,price:Number(el("prodPrice").value),description:el("prodDescription").value,image_url,active:true});if(error)notify(error.message,true);else{notify("Produto cadastrado!");el("productForm").reset();loadProducts();loadOwnerProducts();}};
+async function loadOwnerProducts(){const {data,error}=await db.from("products").select("*").order("created_at",{ascending:false});el("ownerProducts").innerHTML=error?error.message:(data||[]).map(p=>`<div class="order"><span>${escapeHtml(p.name)} • ${money(p.price)} ${p.active?"":"(inativo)"}</span><button class="danger" data-delprod="${p.id}">Excluir</button></div>`).join("")||"Nenhum produto cadastrado.";document.querySelectorAll("[data-delprod]").forEach(b=>b.onclick=async()=>{if(!confirm("Excluir este produto do cardápio?"))return;const r=await db.from("products").update({active:false}).eq("id",b.dataset.delprod);if(r.error)notify(r.error.message,true);else{notify("Produto removido do cardápio.");loadProducts();loadOwnerProducts();}});}
+async function loadOwnerOrders(){const {data,error}=await db.from("orders").select("*,order_items(*)").order("created_at",{ascending:false});el("ownerOrders").innerHTML=error?error.message:data.length?data.map(o=>`<div class="order"><div><strong>#${o.id.slice(0,8)} • ${escapeHtml(o.customer_name)}</strong><div class="muted">${escapeHtml(o.customer_whatsapp)} • ${escapeHtml(o.delivery_address)}</div><div class="muted">${(o.order_items||[]).map(i=>`${i.quantity}x ${escapeHtml(i.product_name)}`).join(", ")}</div><span class="status">${statusName(o.status)}</span></div><div><strong>${money(o.total)}</strong><div class="order-actions"><select data-status="${o.id}"><option value="pending">Pendente</option><option value="accepted">Aceito</option><option value="preparing">Preparando</option><option value="ready">Pronto</option><option value="out_for_delivery">Saiu para entrega</option><option value="delivered">Entregue</option><option value="cancelled">Cancelado</option></select><button class="success" data-save-status="${o.id}">Salvar</button></div></div></div>`).join(""):'<div class="empty">Nenhum pedido recebido ainda.</div>';data?.forEach(o=>{const s=document.querySelector(`[data-status="${o.id}"]`);if(s)s.value=o.status;});document.querySelectorAll("[data-save-status]").forEach(b=>b.onclick=async()=>{const id=b.dataset.saveStatus;const status=document.querySelector(`[data-status="${id}"]`).value;const r=await db.from("orders").update({status}).eq("id",id);if(r.error)notify(r.error.message,true);else{notify("Status do pedido atualizado.");loadOwnerOrders();}});}
+el("courierForm").onsubmit=async e=>{e.preventDefault();if(currentProfile?.role!=="owner")return notify("Acesso restrito.",true);const {data:person,error:findError}=await db.from("profiles").select("id").eq("email",el("courierEmail").value.toLowerCase()).maybeSingle();if(findError||!person)return notify("Não encontrei esse usuário. Peça ao motoboy para criar a conta e tentar novamente.",true);const {error}=await db.from("profiles").update({role:"courier",full_name:el("courierName").value,whatsapp:el("courierWhatsapp").value}).eq("id",person.id);if(error)notify(error.message,true);else{notify("Motoboy vinculado com sucesso.");el("courierForm").reset();}};
+async function loadCourierOrders(){if(currentProfile?.role!=="courier")return notify("Acesso restrito aos motoboys.",true);const {data,error}=await db.from("orders").select("*,order_items(*)").in("status",["ready","out_for_delivery"]).order("created_at",{ascending:true});el("courierOrders").innerHTML=error?error.message:data.length?data.map(o=>`<div class="order"><div><strong>Pedido #${o.id.slice(0,8)}</strong><div>${escapeHtml(o.customer_name)} • ${escapeHtml(o.customer_whatsapp)}</div><div class="muted">${escapeHtml(o.delivery_address)}</div><div class="muted">${(o.order_items||[]).map(i=>`${i.quantity}x ${escapeHtml(i.product_name)}`).join(", ")}</div></div><div class="order-actions"><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.delivery_address)}">Abrir rota</a><button class="success" data-deliver="${o.id}">Marcar entregue</button></div></div>`).join(""):'<div class="empty">Nenhuma entrega aguardando.</div>';document.querySelectorAll("[data-deliver]").forEach(b=>b.onclick=async()=>{const r=await db.from("orders").update({status:"delivered"}).eq("id",b.dataset.deliver);if(r.error)notify(r.error.message,true);else{notify("Entrega marcada como concluída.");loadCourierOrders();}});}
+el("refreshCourier").onclick=loadCourierOrders;
+async function init(){if(!configured){notify("O visual do aplicativo já está pronto. Para ativar login, pedidos e painel, configure o Supabase no final do arquivo index.html.");return;}const {data}=await db.auth.getUser();currentUser=data.user||null;if(currentUser)await loadProfile();else setRoleUI();await loadProducts();db.auth.onAuthStateChange(async(_event,session)=>{currentUser=session?.user||null;if(currentUser)await loadProfile();else{currentProfile=null;setRoleUI();}});}
+init();
+</script>
 </body>
 </html>
