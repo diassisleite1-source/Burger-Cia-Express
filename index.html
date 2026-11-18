@@ -40,7 +40,7 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <button onclick="abrirMeusPedidos()" class="relative p-2.5 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition">
+                <button onclick="abrirMeusPedidos()" class="relative p-2.5 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition" title="Meus Pedidos">
                     <i class="fa-solid fa-receipt text-sm"></i>
                     <span id="badge-pedidos" class="absolute -top-1 -right-1 bg-orange-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden font-bold">0</span>
                 </button>
@@ -86,7 +86,7 @@
                 <h2 class="font-bold text-sm">Painel da Lanchonete (Gestão do Dono)</h2>
                 <p class="text-xs text-gray-400">Controle total de pedidos, cardápio e equipe</p>
             </div>
-            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg text-white font-semibold"><i class="fa-solid fa-arrow-left"></i> Sair</button>
+            <button onclick="mudarVisaoApp('cliente')" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg text-white font-semibold"><i class="fa-solid fa-arrow-left"></i> Voltar ao App</button>
         </div>
 
         <!-- Abas do Dono -->
@@ -101,8 +101,8 @@
             <div class="flex justify-between items-center">
                 <h4 class="font-bold text-gray-800 text-sm">Pedidos na Cozinha</h4>
                 <div class="flex gap-2">
-                    <button onclick="testarVozAlerta()" class="text-xs bg-amber-500 text-white px-3 py-1 rounded-lg font-bold shadow"><i class="fa-solid fa-volume-high"></i> Testar Alerta Voz</button>
-                    <button onclick="renderizarPedidosDono()" class="text-xs bg-white border px-3 py-1 rounded-lg font-semibold"><i class="fa-solid fa-rotate"></i></button>
+                    <button onclick="testarVozAlerta()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg font-bold shadow flex items-center gap-1"><i class="fa-solid fa-volume-high"></i> Testar Alerta Voz</button>
+                    <button onclick="renderizarPedidosDono()" class="text-xs bg-white border px-3 py-1.5 rounded-lg font-semibold"><i class="fa-solid fa-rotate"></i></button>
                 </div>
             </div>
             <div id="lista-pedidos-cozinha" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
@@ -138,7 +138,7 @@
                 <form onsubmit="cadastrarMotoboyDono(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                     <input type="text" id="cm-nome" placeholder="Nome do Motoboy" required class="px-3 py-2 border rounded-lg">
                     <input type="tel" id="cm-tel" placeholder="WhatsApp" required class="px-3 py-2 border rounded-lg">
-                    <button type="submit" class="bg-gray-900 text-white font-bold py-2 rounded-lg">Cadastrar Motoboy</button>
+                    <button type="submit" class="bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-lg">Cadastrar Motoboy</button>
                 </form>
             </div>
             <div class="bg-white p-4 rounded-xl border shadow-sm">
@@ -204,7 +204,7 @@
                     <input type="text" id="chk-nome" placeholder="Seu Nome Completo" class="w-full px-3 py-2 border rounded-lg bg-white">
                     <input type="tel" id="chk-tel" placeholder="WhatsApp" class="w-full px-3 py-2 border rounded-lg bg-white">
                     <textarea id="chk-end" rows="2" placeholder="Endereço (Rua, Número, Bairro)" class="w-full px-3 py-2 border rounded-lg bg-white"></textarea>
-                    <button type="button" onclick="capturarGPS()" class="w-full bg-amber-500 text-white font-bold py-2 rounded-lg"><i class="fa-solid fa-location-crosshairs"></i> Capturar GPS Exato</button>
+                    <button type="button" onclick="capturarGPS()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg"><i class="fa-solid fa-location-crosshairs"></i> Capturar GPS Exato</button>
                     <p id="chk-gps-status" class="text-center text-gray-500 italic">GPS padrão pronto</p>
                 </div>
 
